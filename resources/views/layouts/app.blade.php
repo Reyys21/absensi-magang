@@ -14,6 +14,8 @@
     </style>
 </head>
 
+
+
 <body class="bg-gray-100 text-gray-900">
 
     @yield('content')

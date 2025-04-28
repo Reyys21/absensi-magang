@@ -43,9 +43,7 @@
                 <div class="flex flex-col sm:flex-row justify-center items-center gap-10 sm:gap-20">
                     <!-- Check-In Time + Button -->
                     <div class="text-center flex flex-col items-center space-y-2">
-                        <p class="text-3xl font-bold">
-                            {{ \Carbon\Carbon::parse($attendances->where('date', now()->toDateString())->first()?->check_in)->format('H.i') ?? '--.--' }}
-                        </p>
+                        <p id="checkin-time" class="text-3xl font-bold">--.--</p>
                         <form action="{{ route('checkin.form') }}" method="GET">
                             <button @if ($attendances->where('date', now()->toDateString())->first()?->check_in)
                                 disabled @endif
@@ -58,9 +56,7 @@
 
                     <!-- Check-Out Time + Button -->
                     <div class="text-center flex flex-col items-center space-y-2">
-                        <p class="text-3xl font-bold">
-                            {{ \Carbon\Carbon::parse($attendances->where('date', now()->toDateString())->first()?->check_out)->format('H.i') ?? '--.--' }}
-                        </p>
+                        <p id="checkout-time" class="text-3xl font-bold">--.--</p>
                         <form action="{{ route('checkout.form') }}" method="GET">
                             <button @if ($attendances->where('date', now()->toDateString())->first()?->check_out)
                                 disabled @endif
@@ -72,7 +68,6 @@
                     </div>
                 </div>
             </div>
-
 
             <!-- My Attendance Card -->
             <div class="bg-[#0B849F] text-white rounded-2xl p-6 shadow-md flex flex-col items-center justify-center">
@@ -95,7 +90,6 @@
                             <th class="px-6 py-3 rounded-tr-2xl whitespace-nowrap text-center">Activity</th>
                         </tr>
                     </thead>
-
                     <tbody class="bg-[#0B849F] text-white">
                         @forelse ($attendances as $index => $item)
                         <tr class="{{ $loop->last ? 'rounded-b-2xl' : '' }}">
@@ -128,4 +122,23 @@
 
     </main>
 </div>
+
+<!-- Script untuk ambil waktu lokal -->
+<script>
+function updateLocalTime() {
+    const now = new Date();
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+
+    const formattedTime = `${hours}.${minutes}`;
+
+    document.getElementById('checkin-time').textContent = formattedTime;
+    document.getElementById('checkout-time').textContent = formattedTime;
+}
+
+// Update langsung saat page load
+updateLocalTime();
+// Optionally update setiap 1 menit
+setInterval(updateLocalTime, 60000);
+</script>
 @endsection

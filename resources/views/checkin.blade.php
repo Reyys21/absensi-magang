@@ -23,7 +23,7 @@
             <div class="flex justify-between items-center mb-8">
                 <!-- Jam -->
                 <div class="flex items-center gap-2">
-                    <img src="{{ asset('assets/icon/Clock.png') }}" alt="Clock" class="w-6">
+                    <i class="fa-regular fa-clock text-2xl"></i>
                     <p id="current-time" class="text-2xl font-bold tracking-wide">--:--</p>
                 </div>
 
@@ -32,7 +32,7 @@
 
                 <!-- Tanggal -->
                 <div class="flex items-center gap-2">
-                    <img src="{{ asset('assets/icon/Calendar.png') }}" alt="Calendar" class="w-6">
+                    <i class="fa-regular fa-calendar text-2xl"></i>
                     <p id="current-date" class="text-base font-semibold leading-tight">Loading...</p>
                 </div>
             </div>
@@ -46,7 +46,7 @@
 
             <!-- Daily Activity -->
             <div class="flex items-center justify-center gap-2 mb-6">
-                <img src="{{ asset('assets/icon/ThumbsUp.png') }}" alt="Thumbs Up" class="w-6">
+                <i class="fa-regular fa-thumbs-up text-2xl"></i>
                 <span class="text-sm font-semibold">Daily Activity</span>
             </div>
 
@@ -61,6 +61,9 @@
     </div>
 
 </div>
+
+<!-- Font Awesome -->
+<script src="https://kit.fontawesome.com/2d9ecd9e37.js" crossorigin="anonymous"></script>
 
 <!-- Script Jam & Tanggal Lokal -->
 <script>
@@ -77,7 +80,7 @@ function updateLocalTimeAndDate() {
         year: 'numeric'
     });
 
-    document.getElementById('current-time').textContent = `${hours}:${minutes}`;
+    document.getElementById('current-time').textContent = `${hours}.${minutes}`;
     document.getElementById('current-date').textContent = `${day}, ${date}`;
 }
 

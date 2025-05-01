@@ -19,6 +19,9 @@
         <form action="{{ route('checkin.store') }}" method="POST">
             @csrf
 
+            <!-- Hidden input untuk jam lokal -->
+            <input type="hidden" name="jam_lokal" id="jam_lokal">
+
             <!-- Jam & Tanggal -->
             <div class="flex justify-between items-center mb-8">
                 <!-- Jam -->
@@ -32,7 +35,7 @@
 
                 <!-- Tanggal -->
                 <div class="flex items-center gap-2">
-                    <i class="fa-regular fa-calendar text-2xl"></i>
+                    <i class="fa-light fa-calendar text-2xl"></i>
                     <p id="current-date" class="text-base font-semibold leading-tight">Loading...</p>
                 </div>
             </div>
@@ -46,7 +49,7 @@
 
             <!-- Daily Activity -->
             <div class="flex items-center justify-center gap-2 mb-6">
-                <i class="fa-regular fa-thumbs-up text-2xl"></i>
+                <i class="fa-light fa-thumbs-up text-xl"></i>
                 <span class="text-sm font-semibold">Daily Activity</span>
             </div>
 
@@ -62,10 +65,7 @@
 
 </div>
 
-<!-- Font Awesome -->
-<script src="https://kit.fontawesome.com/2d9ecd9e37.js" crossorigin="anonymous"></script>
-
-<!-- Script Jam & Tanggal Lokal -->
+<!-- Script Jam Lokal -->
 <script>
 function updateLocalTimeAndDate() {
     const now = new Date();
@@ -80,11 +80,15 @@ function updateLocalTimeAndDate() {
         year: 'numeric'
     });
 
-    document.getElementById('current-time').textContent = `${hours}.${minutes}`;
+    document.getElementById('current-time').textContent = `${hours}:${minutes}`;
     document.getElementById('current-date').textContent = `${day}, ${date}`;
+
+    // Hidden input untuk jam lokal
+    const jam = now.toTimeString().slice(0, 8);
+    document.getElementById('jam_lokal').value = jam;
 }
 
 updateLocalTimeAndDate();
-setInterval(updateLocalTimeAndDate, 60000);
+setInterval(updateLocalTimeAndDate, 1000);
 </script>
 @endsection

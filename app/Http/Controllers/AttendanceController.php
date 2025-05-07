@@ -3,9 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use App\Models\Attendance;
-use Illuminate\Support\Facades\Auth;
-use Carbon\Carbon;
 
 class AttendanceController extends Controller
 {
@@ -15,22 +14,32 @@ class AttendanceController extends Controller
     }
 
     public function storeCheckin(Request $request)
-    {
-        $today = Carbon::today()->toDateString();
-        $jam_lokal = $request->jam_lokal ?? Carbon::now()->toTimeString(); // Pakai jam dari browser
+{
+    $user = auth()->user();
+    $localDate = $request->input('local_date'); // Format: YYYY-MM-DD
+    $localTime = $request->input('local_time'); // Format: HH:mm:ss
 
-        Attendance::updateOrCreate(
-            [
-                'user_id' => Auth::id(),
-                'date' => $today,
-            ],
-            [
-                'check_in' => $jam_lokal,
-            ]
-        );
-
-        return redirect()->route('dashboard')->with('success', 'Check-in berhasil!');
+    if (!$localDate || !$localTime) {
+        return back()->with('error', 'Data waktu tidak tersedia.');
     }
+
+    // Cek apakah sudah check-in hari ini
+    $existing = Attendance::where('user_id', $user->id)->where('date', $localDate)->first();
+
+    if ($existing) {
+        return redirect()->route('checkin.form')->with('info', 'Sudah check-in hari ini.');
+    }
+
+    Attendance::create([
+        'user_id' => $user->id,
+        'date' => $localDate,
+        'check_in' => $localTime,
+    ]);
+
+    return redirect()->route('dashboard')->with('success', 'Check-in berhasil!');
+}
+
+    
 
     public function checkoutForm()
     {
@@ -39,23 +48,30 @@ class AttendanceController extends Controller
 
     public function storeCheckout(Request $request)
     {
-        $request->validate([
-            'activity_title' => 'required|string|max:255',
-            'activity_description' => 'required|string'
+        $user = auth()->user();
+        $today = Carbon::today();
+    
+        $attendance = Attendance::where('user_id', $user->id)->where('date', $today)->first();
+    
+        if (!$attendance) {
+            return redirect()->route('checkin.form')->with('error', 'Belum check-in hari ini.');
+        }
+    
+        // Ambil jam dari input hidden browser user (pastikan valid)
+        $checkoutTime = $request->input('current_time'); // format: HH:mm:ss
+    
+        // Validasi format (opsional tapi direkomendasikan)
+        if (!preg_match('/^\d{2}:\d{2}:\d{2}$/', $checkoutTime)) {
+            return back()->with('error', 'Format waktu tidak valid.');
+        }
+    
+        $attendance->update([
+            'check_out' => $checkoutTime,
+            'activity_title' => $request->input('activity_title'),
+            'activity_description' => $request->input('activity_description'),
         ]);
-
-        $today = Carbon::today()->toDateString();
-        $now = Carbon::now()->toTimeString();
-
-        Attendance::where([
-            'user_id' => Auth::id(),
-            'date' => $today
-        ])->update([
-            'check_out' => $now,
-            'activity_title' => $request->activity_title,
-            'activity_description' => $request->activity_description
-        ]);
-
+    
         return redirect()->route('dashboard')->with('success', 'Check-out berhasil!');
     }
+    
 }

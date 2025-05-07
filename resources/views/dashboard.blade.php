@@ -41,12 +41,11 @@
             <div
                 class="bg-[#0B849F] text-white rounded-2xl p-6 shadow-md border flex flex-col justify-between md:col-span-2">
                 <h2 class="text-base font-semibold text-center mb-4">Today’s Attendance</h2>
-
                 <div class="flex justify-center gap-16 items-center">
                     <!-- Check-In -->
                     <div class="text-center">
                         <p class="text-3xl font-bold">
-                            {{ optional($attendances->where('date', now()->toDateString())->first())->check_in ? \Carbon\Carbon::parse($attendances->where('date', now()->toDateString())->first()->check_in)->format('H.i') : '--.--' }}
+                            {{ optional($attendances->where('date', now()->toDateString())->first())->check_in ?? '--.--' }}
                         </p>
                         <form action="{{ route('checkin.form') }}" method="GET">
                             <button @if($attendances->where('date', now()->toDateString())->first()?->check_in) disabled
@@ -61,7 +60,7 @@
                     <!-- Check-Out -->
                     <div class="text-center">
                         <p class="text-3xl font-bold">
-                            {{ optional($attendances->where('date', now()->toDateString())->first())->check_out ? \Carbon\Carbon::parse($attendances->where('date', now()->toDateString())->first()->check_out)->format('H.i') : '--.--' }}
+                            {{ optional($attendances->where('date', now()->toDateString())->first())->check_out ?? '--.--' }}
                         </p>
                         <form action="{{ route('checkout.form') }}" method="GET">
                             <button @if(!$attendances->where('date', now()->toDateString())->first()?->check_in ||
@@ -72,6 +71,9 @@
                             </button>
                         </form>
                     </div>
+                </div>
+                <div class="text-center mt-4 text-sm">
+                    Jam sekarang: <span id="clock">--.--.--</span>
                 </div>
             </div>
 
@@ -126,4 +128,17 @@
         </div>
     </main>
 </div>
+
+<!-- Local Time Script -->
+<script>
+function updateClock() {
+    const now = new Date();
+    const h = String(now.getHours()).padStart(2, '0');
+    const m = String(now.getMinutes()).padStart(2, '0');
+    const s = String(now.getSeconds()).padStart(2, '0');
+    document.getElementById("clock").textContent = `${h}.${m}.${s}`;
+}
+setInterval(updateClock, 1000);
+updateClock();
+</script>
 @endsection

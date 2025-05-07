@@ -37,7 +37,6 @@
 
         <!-- Attendance Summary Cards -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-            <!-- Today's Attendance Card -->
             <div
                 class="bg-[#0B849F] text-white rounded-2xl p-6 shadow-md border flex flex-col justify-between md:col-span-2">
                 <h2 class="text-base font-semibold text-center mb-4">Today’s Attendance</h2>
@@ -45,7 +44,9 @@
                     <!-- Check-In -->
                     <div class="text-center">
                         <p class="text-3xl font-bold">
-                            {{ optional($attendances->where('date', now()->toDateString())->first())->check_in ?? '--.--' }}
+                            {{ optional($attendances->where('date', now()->toDateString())->first())->check_in 
+                                ? \Carbon\Carbon::parse($attendances->where('date', now()->toDateString())->first()->check_in)->format('H.i') 
+                                : '--.--' }}
                         </p>
                         <form action="{{ route('checkin.form') }}" method="GET">
                             <button @if($attendances->where('date', now()->toDateString())->first()?->check_in) disabled
@@ -60,11 +61,14 @@
                     <!-- Check-Out -->
                     <div class="text-center">
                         <p class="text-3xl font-bold">
-                            {{ optional($attendances->where('date', now()->toDateString())->first())->check_out ?? '--.--' }}
+                            {{ optional($attendances->where('date', now()->toDateString())->first())->check_out 
+                                ? \Carbon\Carbon::parse($attendances->where('date', now()->toDateString())->first()->check_out)->format('H.i') 
+                                : '--.--' }}
                         </p>
                         <form action="{{ route('checkout.form') }}" method="GET">
-                            <button @if(!$attendances->where('date', now()->toDateString())->first()?->check_in ||
-                                $attendances->where('date', now()->toDateString())->first()?->check_out) disabled @endif
+                            <button @if( !$attendances->where('date', now()->toDateString())->first()?->check_in ||
+                                $attendances->where('date', now()->toDateString())->first()?->check_out
+                                ) disabled @endif
                                 class="bg-yellow-400 text-black px-6 py-2 mt-2 rounded-lg shadow hover:bg-yellow-500
                                 disabled:opacity-50 disabled:cursor-not-allowed">
                                 Check-Out
@@ -72,9 +76,11 @@
                         </form>
                     </div>
                 </div>
-                <div class="text-center mt-4 text-sm">
-                    Jam sekarang: <span id="clock">--.--.--</span>
-                </div>
+
+                <!-- debug waktu -->
+                <!-- <div class="text-center mt-4 text-sm">
+                    Jam sekarang: <span id="clock">--.--</span>
+                </div> -->
             </div>
 
             <!-- My Attendance Card -->
@@ -88,22 +94,26 @@
         <section>
             <h2 class="text-xl font-bold mb-4">Attendance Records</h2>
             <div class="overflow-x-auto rounded-xl">
-                <table class="w-full text-sm text-left border-collapse table-auto">
+                <table class="w-full text-sm text-left table-auto border border-gray-300">
                     <thead class="bg-[#0B849F] text-white">
                         <tr>
-                            <th class="px-4 py-2 whitespace-nowrap">Date</th>
-                            <th class="px-4 py-2 whitespace-nowrap">Check-In</th>
-                            <th class="px-4 py-2 whitespace-nowrap">Check-Out</th>
-                            <th class="px-4 py-2">Activity</th>
+                            <th class="px-4 py-2 whitespace-nowrap border border-gray-300">Date</th>
+                            <th class="px-4 py-2 whitespace-nowrap border border-gray-300">Check-In</th>
+                            <th class="px-4 py-2 whitespace-nowrap border border-gray-300">Check-Out</th>
+                            <th class="px-4 py-2 border border-gray-300">Activity</th>
                         </tr>
                     </thead>
                     <tbody class="bg-[#13B4D8] text-gray-800">
                         @forelse ($attendances as $item)
-                        <tr class="border-b align-top">
-                            <td class="px-4 py-2">{{ $item->date }}</td>
-                            <td class="px-4 py-2">{{ $item->check_in ?? '--:--' }}</td>
-                            <td class="px-4 py-2">{{ $item->check_out ?? '--:--' }}</td>
-                            <td class="px-4 py-2">
+                        <tr class="align-top border border-gray-300">
+                            <td class="px-4 py-2 border border-gray-300">{{ $item->date }}</td>
+                            <td class="px-4 py-2 border border-gray-300">
+                                {{ $item->check_in ? \Carbon\Carbon::parse($item->check_in)->format('H.i') : '--.--' }}
+                            </td>
+                            <td class="px-4 py-2 border border-gray-300">
+                                {{ $item->check_out ? \Carbon\Carbon::parse($item->check_out)->format('H.i') : '--.--' }}
+                            </td>
+                            <td class="px-4 py-2 border border-gray-300">
                                 @if ($item->activity_title)
                                 <p><strong>{{ $item->activity_title }}</strong></p>
                                 <p class="text-sm">{{ $item->activity_description }}</p>
@@ -114,11 +124,12 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="4" class="text-center py-4">Belum ada data absensi</td>
+                            <td colspan="4" class="text-center py-4 border border-gray-300">Belum ada data absensi</td>
                         </tr>
                         @endforelse
                     </tbody>
                 </table>
+
             </div>
         </section>
 
@@ -133,10 +144,9 @@
 <script>
 function updateClock() {
     const now = new Date();
-    const h = String(now.getHours()).padStart(2, '0');
-    const m = String(now.getMinutes()).padStart(2, '0');
-    const s = String(now.getSeconds()).padStart(2, '0');
-    document.getElementById("clock").textContent = `${h}.${m}.${s}`;
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    document.getElementById("clock").textContent = `${hours}.${minutes}`;
 }
 setInterval(updateClock, 1000);
 updateClock();

@@ -4,35 +4,50 @@
 <div class="flex flex-col md:flex-row min-h-screen font-[Inter]">
 
     <!-- Sidebar -->
-    <aside class="w-full md:w-64 bg-[#2C3E50] text-white flex flex-col justify-between">
+    <aside class="w-full md:w-64 bg-[#2C3E50] text-white flex flex-col justify-between  shadow-sm">
         <div>
+            <!-- Logo -->
             <div class="p-4 flex items-center space-x-2">
-                <span class="text-yellow-400 text-xl">
-                    <img src="{{ asset('assets/images/Logo_PLN.png') }}" alt="Logo PLN"
-                        class="w-12 h-12 object-contain" />
-                </span>
+                <img src="{{ asset('assets/images/Logo_PLN.png') }}" alt="Logo PLN" class="w-12 h-12 object-contain" />
                 <div>
                     <p class="text-sm font-bold leading-4">PLN</p>
-                    <p class="text-xs">UID KALSELTENG</p>
+                    <p class="text-xs text-gray-300">UID KALSELTENG</p>
                 </div>
             </div>
-            <nav class="mt-6 px-4 space-y-2">
+
+            <!-- Navigation -->
+            <nav class="mt-4 px-4 space-y-2">
                 <a href="{{ route('dashboard') }}">
-                    <button class="w-full bg-[#FFD100] text-black py-2 rounded font-semibold">Dashboard</button>
+                    <div
+                        class="@if (request()->routeIs('dashboard')) bg-[#FFD100] text-black @else hover:bg-[#3C5A6D] text-white @endif w-full flex items-center gap-2 px-4 py-2 rounded-xl font-medium transition">
+                        <i class="fa-solid fa-house"></i>
+                        Dashboard
+                    </div>
                 </a>
+
+                <a href="{{ route('helpdesk') }}">
+                    <div
+                        class="@if (request()->routeIs('helpdesk')) bg-[#FFD100] text-black @else hover:bg-[#3C5A6D] text-white @endif w-full flex items-center gap-2 px-4 py-2 rounded-xl font-medium transition">
+                        <i class="fa-solid fa-circle-question"></i>
+                        Helpdesk
+                    </div>
+                </a>
+
+                <!-- Logout -->
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
-                    <button type="submit" class="w-full text-left text-white mt-2">Log Out</button>
+                    <button type="submit"
+                        class="w-full flex items-center gap-2 text-sm text-white px-4 py-2 hover:bg-[#3C5A6D] rounded-xl transition">
+                        <i class="fa-solid fa-right-from-bracket"></i> Log Out
+                    </button>
                 </form>
             </nav>
         </div>
-        <div class="p-4 text-xs text-blue-300">
-            <a href="{{ route('helpdesk') }}" class="underline">Helpdesk</a>
-        </div>
+
     </aside>
 
     <!-- Main Content -->
-    <main class="flex-1 p-6 sm:p-10 bg-white rounded-t-3xl md:rounded-l-3xl shadow-lg">
+    <main class="flex-1 p-6 sm:p-10 bg-white shadow-lg">
         <h1 class="text-2xl font-bold mb-6">Welcome, Mahasiswa/Siswa Magang!</h1>
 
         <!-- Attendance Summary Cards -->
@@ -76,11 +91,6 @@
                         </form>
                     </div>
                 </div>
-
-                <!-- debug waktu -->
-                <!-- <div class="text-center mt-4 text-sm">
-                    Jam sekarang: <span id="clock">--.--</span>
-                </div> -->
             </div>
 
             <!-- My Attendance Card -->
@@ -93,27 +103,32 @@
         <!-- Attendance Table -->
         <section>
             <h2 class="text-xl font-bold mb-4">Attendance Records</h2>
-            <div class="overflow-x-auto rounded-xl">
+            <div class="overflow-auto max-h-[450px] rounded-xl">
                 <table class="w-full text-sm text-left table-auto border border-gray-300">
                     <thead class="bg-[#0B849F] text-white">
                         <tr>
-                            <th class="px-4 py-2 whitespace-nowrap border border-gray-300">Date</th>
-                            <th class="px-4 py-2 whitespace-nowrap border border-gray-300">Check-In</th>
-                            <th class="px-4 py-2 whitespace-nowrap border border-gray-300">Check-Out</th>
-                            <th class="px-4 py-2 border border-gray-300">Activity</th>
+                            <th class="px-4 py-2 border border-gray-300 text-center">No</th>
+                            <th class="px-4 py-2 border border-gray-300 text-center">Date</th>
+                            <th class="px-4 py-2 border border-gray-300 text-center">Check-In</th>
+                            <th class="px-4 py-2 border border-gray-300 text-center">Check-Out</th>
+                            <th class="px-4 py-2 border border-gray-300 text-center">Activity</th>
                         </tr>
                     </thead>
+
                     <tbody class="bg-[#13B4D8] text-gray-800">
                         @forelse ($attendances as $item)
                         <tr class="align-top border border-gray-300">
-                            <td class="px-4 py-2 border border-gray-300">{{ $item->date }}</td>
-                            <td class="px-4 py-2 border border-gray-300">
+                            <td class="px-4 py-2 border border-gray-300 text-center">
+                                {{ ($attendances->currentPage() - 1) * $attendances->perPage() + $loop->iteration }}
+                            </td>
+                            <td class="px-4 py-2 border border-gray-300 text-center">{{ $item->date }}</td>
+                            <td class="px-4 py-2 border border-gray-300 text-center">
                                 {{ $item->check_in ? \Carbon\Carbon::parse($item->check_in)->format('H.i') : '--.--' }}
                             </td>
-                            <td class="px-4 py-2 border border-gray-300">
+                            <td class="px-4 py-2 border border-gray-300 text-center">
                                 {{ $item->check_out ? \Carbon\Carbon::parse($item->check_out)->format('H.i') : '--.--' }}
                             </td>
-                            <td class="px-4 py-2 border border-gray-300">
+                            <td class="px-4 py-2 border border-gray-300 text-justify">
                                 @if ($item->activity_title)
                                 <p><strong>{{ $item->activity_title }}</strong></p>
                                 <p class="text-sm">{{ $item->activity_description }}</p>
@@ -124,13 +139,19 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="4" class="text-center py-4 border border-gray-300">Belum ada data absensi</td>
+                            <td colspan="5" class="text-center py-4 border border-gray-300">Belum ada data absensi</td>
                         </tr>
                         @endforelse
+
                     </tbody>
                 </table>
-
             </div>
+
+            <!-- Pagination Controls -->
+            <div class="mt-4 flex justify-center">
+                {{ $attendances->links() }}
+            </div>
+
         </section>
 
         <!-- Footer -->

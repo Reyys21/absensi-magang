@@ -7,7 +7,7 @@
     <aside class="w-full md:w-64 bg-[#2C3E50] text-white flex flex-col justify-between  shadow-sm">
         <div>
             <!-- Logo -->
-            <div class="p-4 flex items-center space-x-2">
+            <div class="p-4 flex items-center justify-center space-x-2">
                 <img src="{{ asset('assets/images/Logo_PLN.png') }}" alt="Logo PLN" class="w-12 h-12 object-contain" />
                 <div>
                     <p class="text-sm font-bold leading-4">PLN</p>
@@ -16,7 +16,7 @@
             </div>
 
             <!-- Navigation -->
-            <nav class="mt-4 px-4 space-y-2">
+            <nav class="mt-4 px-4  space-y-2">
                 <a href="{{ route('dashboard') }}">
                     <div
                         class="@if (request()->routeIs('dashboard')) bg-[#FFD100] text-black @else hover:bg-[#3C5A6D] text-white @endif w-full flex items-center gap-2 px-4 py-2 rounded-xl font-medium transition">

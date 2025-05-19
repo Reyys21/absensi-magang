@@ -51,15 +51,11 @@
                         <!-- Check-In -->
                         <div class="flex flex-col items-start">
                             <p class="text-3xl sm:text-4xl font-bold leading-none pl-1 sm:pl-2">
-                                {{ optional($attendances->where('date', now()->toDateString())->first())->check_in
-                                    ? \Carbon\Carbon::parse($attendances->where('date', now()->toDateString())->first()->check_in)->format('H.i')
-                                    : '--.--' }}
+                                {{ $firstCheckIn ? \Carbon\Carbon::parse($firstCheckIn)->format('H.i') : '--.--' }}
                             </p>
                             <form action="{{ route('checkin.form') }}" method="GET">
-                                <button @if($attendances->where('date', now()->toDateString())->first()?->check_in)
-                                    disabled @endif
-                                    class="bg-black text-white px-5 py-1.5 mt-1 rounded-lg text-sm font-semibold shadow
-                                    hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed">
+                                <button type="submit"
+                                    class="bg-black text-white px-5 py-1.5 mt-1 rounded-lg text-sm font-semibold shadow hover:bg-gray-800">
                                     Check-In
                                 </button>
                             </form>
@@ -68,16 +64,11 @@
                         <!-- Check-Out -->
                         <div class="flex flex-col items-start">
                             <p class="text-3xl sm:text-4xl font-bold leading-none pl-1 sm:pl-2">
-                                {{ optional($attendances->where('date', now()->toDateString())->first())->check_out
-                                    ? \Carbon\Carbon::parse($attendances->where('date', now()->toDateString())->first()->check_out)->format('H.i')
-                                    : '--.--' }}
+                                {{ $lastCheckOut ? \Carbon\Carbon::parse($lastCheckOut)->format('H.i') : '--.--' }}
                             </p>
                             <form action="{{ route('checkout.form') }}" method="GET">
-                                <button @if( !$attendances->where('date', now()->toDateString())->first()?->check_in ||
-                                    $attendances->where('date', now()->toDateString())->first()?->check_out) disabled
-                                    @endif
-                                    class="bg-black text-white px-5 py-1.5 mt-1 rounded-lg text-sm font-semibold shadow
-                                    hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed">
+                                <button type="submit"
+                                    class="bg-black text-white px-5 py-1.5 mt-1 rounded-lg text-sm font-semibold shadow hover:bg-gray-800">
                                     Check-Out
                                 </button>
                             </form>
@@ -87,7 +78,7 @@
                     <!-- Illustration -->
                     <div class="block absolute bottom-0 right-0 w-[45%] md:w-[30%] animate-bounce-slow">
                         <img src="{{ asset('assets/images/undraw_relaxed-reading_wfkr.svg') }}" alt="Reading"
-                            class="w-full ">
+                            class="w-full " style="transform: scaleX(-1);">
                     </div>
                 </div>
             </div>
@@ -156,8 +147,6 @@
     </main>
 </div>
 </section>
-
-
 
 <!-- Local Time Script -->
 <script>

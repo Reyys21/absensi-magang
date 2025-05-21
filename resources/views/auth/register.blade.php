@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login Mahasiswa</title>
+    <title>Register Mahasiswa</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
     <style>
@@ -96,53 +96,56 @@
                 height: 45px;
             }
         }
-@media only screen and (max-width: 768px) {
-    .bg-left {
-        background-color: #0B849F;
-        background-image: none;
-        text-align: center;
-        padding: 2rem 1rem;
-    }
 
-    .pln-brand {
-        justify-content: center;
-        align-items: center;
-        display: flex;
-        flex-direction: column;
-    }
+        @media only screen and (max-width: 768px) {
+            .bg-left {
+                background-color: #0B849F;
+                background-image: none;
+                text-align: center;
+                padding: 2rem 1rem;
+            }
 
-    .custom-travel-img {
-        max-width: 200px;
-        margin-top: 1rem;
-    }
+            .pln-brand {
+                justify-content: center;
+                align-items: center;
+                display: flex;
+                flex-direction: column;
+            }
 
-    .form-container h4 {
-        font-size: 22px;
-    }
+            .custom-travel-img {
+                max-width: 200px;
+                margin-top: 1rem;
+            }
 
-    .top-signup {
-        top: 15px;
-        right: 15px;
-        font-size: 13px;
-        color: white; /* <-- Tambahan: ini membuat teks span putih */
-    }
+            .form-container h4 {
+                font-size: 22px;
+            }
 
-    .top-signup span {
-        color: white; /* <-- Ini yang membuat tulisan 'Don't have an account yet?' menjadi putih */
-    }
+            .top-signup {
+                top: 15px;
+                right: 15px;
+                font-size: 13px;
+                color: white;
+                /* <-- Tambahan: ini membuat teks span putih */
+            }
 
-    .top-signup a {
-        padding: 4px 10px;
-        font-size: 13px;
-        color: white;
-        border-color: white;
-    }
+            .top-signup span {
+                color: white;
+                /* <-- Ini yang membuat tulisan 'Don't have an account yet?' menjadi putih */
+            }
 
-    .top-signup a:hover {
-        background-color: white;
-        color: #0B849F;
-    }
-}
+            .top-signup a {
+                padding: 4px 10px;
+                font-size: 13px;
+                color: white;
+                border-color: white;
+            }
+
+            .top-signup a:hover {
+                background-color: white;
+                color: #0B849F;
+            }
+        }
 
 
         @media only screen and (min-width: 992px) {
@@ -212,12 +215,11 @@
 
 <body>
     <div class="top-signup">
-        <span>Don't have an account yet?</span>
-        <a href="{{ route('register') }}">SIGN UP</a>
+        <span>Already have an account?</span>
+        <a href="{{ route('login') }}">SIGN IN</a>
     </div>
 
     <div class="d-flex flex-column flex-md-row h-100">
-
         <!-- Left Side -->
         <div class="bg-left d-flex flex-column justify-content-center align-items-start w-100 w-md-50 p-4">
             <div class="pln-brand mb-3 text-white">
@@ -225,7 +227,6 @@
                 <h6 class="fw-bold m-0">PLN</h6>
                 <p class="m-0">UID KALSELTENG</p>
             </div>
-
             <div class="d-flex justify-content-center align-items-center w-100 mt-3">
                 <img src="{{ asset('assets/images/undraw_traveling_c18z (1).svg') }}" alt="Travel"
                     class="custom-travel-img">
@@ -235,29 +236,53 @@
         <!-- Right Side -->
         <div class="d-flex flex-column justify-content-center align-items-center w-100 w-md-50 px-4 py-5">
             <div class="form-container">
-                <h4 class="text-center fw-bold mb-2">WELCOME</h4>
-                <p class="text-center text-muted mb-4">Welcome to the Website for Internship Absences. Please Login
-                    First</p>
+                <h4 class="text-center fw-bold mb-2">REGISTER</h4>
+                <p class="text-center text-muted mb-4">Please create your account to continue</p>
 
                 @if ($errors->any())
-                <div class="alert alert-danger">{{ $errors->first() }}</div>
+                    <div class="alert alert-danger">{{ $errors->first() }}</div>
                 @endif
 
-                <form method="POST" action="/login" class="login-form">
+                <form method="POST" action="{{ route('register') }}" class="login-form">
                     @csrf
+
                     <div class="mb-3">
-                        <input type="email" name="email" class="form-control" placeholder="Enter Your Gmail" required
-                            autofocus>
+                        <select name="role" class="form-control" required>
+                            <option value="">Register as</option>
+                            <option value="mahasiswa">Mahasiswa</option>
+                            <option value="siswa">Siswa</option>
+                        </select>
                     </div>
+
+                    <div class="mb-3 d-flex gap-2">
+                        <input type="text" name="name" class="form-control" placeholder="Nama" required>
+                        <input type="email" name="email" class="form-control" placeholder="Email" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <input type="text" name="asal_kampus" class="form-control" placeholder="Asal Kampus" required>
+
+                    </div>
+
+                    <div class="mb-3">
+                     <input type="text" name="phone" class="form-control" placeholder="Nomor Telepon">
+                    </div>
+
+                    <div class="mb-3">
+                        <input type="text" name="nim" class="form-control" placeholder="NIM (Optional)">
+                    </div>
+
+                    <div class="mb-3">
+                        <input type="password" name="password" class="form-control" placeholder="Password" required>
+                    </div>
+
                     <div class="mb-4">
-                        <input type="password" name="password" class="form-control" placeholder="Enter Your Password"
-                            required>
+                        <input type="password" name="password_confirmation" class="form-control"
+                            placeholder="Confirm Password" required>
                     </div>
+
                     <div class="d-grid">
-                        <button type="submit" class="btn btn-dark">LOGIN</button>
-                    </div>
-                    <div class="mt-3 text-center">
-                        <a href="/forgot-password" class="text-decoration-none">Forgot Password?</a>
+                        <button type="submit" class="btn btn-dark">REGISTER</button>
                     </div>
                 </form>
             </div>

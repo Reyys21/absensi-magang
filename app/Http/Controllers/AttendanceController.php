@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use App\Models\Attendance;
 use Illuminate\Support\Facades\Auth;
+use Maatwebsite\Excel\Facades\Excel;
+use PDF; // pastikan sudah import alias PDF kalau menggunakan package dompdf
 
 class AttendanceController extends Controller
 {
@@ -15,27 +17,25 @@ class AttendanceController extends Controller
     }
 
     public function storeCheckin(Request $request)
-{
-    $userId = Auth::id();
-    $today = $request->local_date;
+    {
+        $userId = Auth::id();
+        $today = $request->local_date;
 
-    // Cek apakah sudah ada check-in hari ini
-    $existingCheckin = Attendance::where('user_id', $userId)
-        ->whereDate('date', $today)
-        ->whereNotNull('check_in')
-        ->first();
+        $existingCheckin = Attendance::where('user_id', $userId)
+            ->whereDate('date', $today)
+            ->whereNotNull('check_in')
+            ->first();
 
-    // Jika belum ada, simpan check-in baru
-    if (!$existingCheckin) {
-        Attendance::create([
-            'user_id' => $userId,
-            'date' => $today,
-            'check_in' => $request->local_time,
-        ]);
+        if (!$existingCheckin) {
+            Attendance::create([
+                'user_id' => $userId,
+                'date' => $today,
+                'check_in' => $request->local_time,
+            ]);
+        }
+
+        return redirect()->route('dashboard')->with('success', 'Check-in berhasil!');
     }
-
-    return redirect()->route('dashboard')->with('success', 'Check-in berhasil!');
-}
 
     public function checkoutForm()
     {
@@ -43,35 +43,73 @@ class AttendanceController extends Controller
     }
 
     public function storeCheckout(Request $request)
-{
-    $userId = Auth::id();
-    $today = now()->toDateString(); // Atau pakai $request->tanggal kalau dikirim
+    {
+        $userId = Auth::id();
+        $today = now()->toDateString();
 
-    // Cari data attendance hari ini
-    $attendance = Attendance::where('user_id', $userId)
-        ->whereDate('date', $today)
-        ->orderByDesc('id') // untuk memastikan ambil data terakhir
-        ->first();
+        $attendance = Attendance::where('user_id', $userId)
+            ->whereDate('date', $today)
+            ->orderByDesc('id')
+            ->first();
 
-    if ($attendance) {
-        // Update check_out dan simpan aktivitas
-        $attendance->update([
-            'check_out' => $request->current_time,
-            'activity_title' => $request->activity_title,
-            'activity_description' => $request->activity_description,
-        ]);
-    } else {
-        // Jika tidak ada data check-in sebelumnya, buat data baru (opsional)
-        Attendance::create([
-            'user_id' => $userId,
-            'date' => $today,
-            'check_out' => $request->current_time,
-            'activity_title' => $request->activity_title,
-            'activity_description' => $request->activity_description,
-        ]);
+        if ($attendance) {
+            $attendance->update([
+                'check_out' => $request->current_time,
+                'activity_title' => $request->activity_title,
+                'activity_description' => $request->activity_description,
+            ]);
+        } else {
+            Attendance::create([
+                'user_id' => $userId,
+                'date' => $today,
+                'check_out' => $request->current_time,
+                'activity_title' => $request->activity_title,
+                'activity_description' => $request->activity_description,
+            ]);
+        }
+
+        return redirect()->route('dashboard')->with('success', 'Check-out berhasil!');
     }
 
-    return redirect()->route('dashboard')->with('success', 'Check-out berhasil!');
-}
+    public function myAttendance(Request $request)
+    {
+        $query = Attendance::where('user_id', auth()->id());
 
+        if ($request->filled('date')) {
+            $query->whereDate('date', $request->date);
+        }
+
+        $sort = $request->get('sort', 'desc');
+        $query->orderBy('date', $sort);
+
+        $attendances = $query->paginate(10);
+
+        return view('attendances.myattendance', compact('attendances'));
+
+    }
+
+    public function export(Request $request)
+    {
+        $format = $request->get('format', 'csv');
+        $userId = auth()->id();
+
+        $query = Attendance::where('user_id', $userId);
+
+        if ($request->filled('date')) {
+            $query->whereDate('date', $request->date);
+        }
+
+        $attendances = $query->orderBy('date', $request->get('sort', 'desc'))->get();
+
+        if ($format === 'csv' || $format === 'xlsx') {
+            $export = new \App\Exports\AttendancesExport($attendances);
+            $fileName = 'attendance_' . now()->format('Ymd_His') . '.' . $format;
+            return Excel::download($export, $fileName);
+        } elseif ($format === 'pdf') {
+            $pdf = PDF::loadView('attendance.export_pdf', compact('attendances'));
+            return $pdf->download('attendance_' . now()->format('Ymd_His') . '.pdf');
+        }
+
+        return redirect()->back()->with('error', 'Format export tidak didukung.');
+    }
 }

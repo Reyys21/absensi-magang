@@ -1,3 +1,4 @@
+{{-- dashboard.blade.php --}}
 @extends('layouts.app')
 
 @section('content')
@@ -29,7 +30,7 @@
                         <button onclick="toggleDropdown('attendanceDropdown')"
                             class="flex items-center justify-between w-full px-4 py-2 rounded-xl transition duration-150 hover:bg-[#3C5A6D]">
                             <div class="flex items-center gap-3">
-                                <i class="fa-solid fa-user-check"></i> <span>Attendance</span>
+                                <i class="fa-solid fa-user-check "></i> <span>Attendance</span>
                             </div>
                             <i class="fa-solid fa-chevron-down"></i>
                         </button>
@@ -37,8 +38,11 @@
                             class="hidden mt-2 space-y-1 rounded-xl bg-[#34495E] overflow-hidden transition-all">
                             <a href="#"
                                 class="block px-6 py-2 text-sm hover:bg-[#2C3E50] hover:text-[#FFD100]">History</a>
-                            <a href="#" class="block px-6 py-2 text-sm hover:bg-[#2C3E50] hover:text-[#FFD100]">My
-                                Attendance</a>
+                            <a href="{{ route('attendance.my') }}"
+                                class="block px-6 py-2 text-sm {{ request()->routeIs('attendance.my') ? 'bg-[#2C3E50] text-[#FFD100]' : 'hover:bg-[#2C3E50] hover:text-[#FFD100]' }}">
+                                My Attendance
+                            </a>
+
                             <a href="#"
                                 class="block px-6 py-2 text-sm hover:bg-[#2C3E50] hover:text-[#FFD100]">Attendance
                                 Records</a>
@@ -140,7 +144,7 @@
                         </thead>
                         <tbody class="bg-[#13B4D8] text-gray-800">
                             @forelse ($attendances as $item)
-                                <tr class="align-top border border-gray-300">
+                                <tr class="  border-gray-300">
                                     <td class="px-4 py-2 border border-gray-300 text-center">
                                         {{ ($attendances->currentPage() - 1) * $attendances->perPage() + $loop->iteration }}
                                     </td>
@@ -154,7 +158,8 @@
                                     <td class="px-4 py-2 border border-gray-300 text-justify">
                                         @if ($item->activity_title)
                                             <p><strong>{{ $item->activity_title }}</strong></p>
-                                            <p class="text-sm">{{ $item->activity_description }}</p>
+                                            <p class="text-sm">{!! nl2br(e($item->activity_description)) !!}</p>
+
                                         @else
                                             <span>—</span>
                                         @endif

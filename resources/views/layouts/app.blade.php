@@ -5,28 +5,25 @@
     <meta charset="UTF-8">
     <title>Absensi Magang</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Tailwind via CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Tambahkan ini untuk Font Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-    <!-- font awesome -->
-    <script src="https://kit.fontawesome.com/2d9ecd9e37.js" crossorigin="anonymous">
-    </script>
+    <script src="https://kit.fontawesome.com/2d9ecd9e37.js" crossorigin="anonymous"></script>
+   @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     <style>
-    body {
-        font-family: 'Segoe UI', sans-serif;
-    }
+        body {
+            font-family: 'Inter', sans-serif; /* Menggunakan Font Inter yang sudah Anda load */
+        }
     </style>
 </head>
 
-
-
 <body class="bg-gray-100 text-gray-900">
-
+    {{-- Konten utama dari view yang extend layout ini --}}
     @yield('content')
-    @yield('Script')
 
+    @yield('Script') {{-- Pastikan @yield('Script') ini ada di bagian bawah body --}}
+
+    
 </body>
 
 </html>

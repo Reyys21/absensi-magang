@@ -96,10 +96,10 @@
                         class="hidden absolute mt-2 bg-[#3E25FF] text-white px-4 py-2 rounded text-sm border-2 border-black rounded p-4 w-64 z-10 space-y-3">
 
                         <button type="submit" name="sort" value="desc"
-                            class="w-full text-left text-sm text-white hover:bg-gray-100 px-2 py-1 rounded">Terbaru</button>
+                            class="w-full text-left text-sm text-white hover:bg-[#3d3d3d] px-2 py-1 rounded">Terbaru</button>
 
                         <button type="submit" name="sort" value="asc"
-                            class="w-full text-left text-sm text-white hover:bg-gray-100 px-2 py-1 rounded">Terlama</button>
+                            class="w-full text-left text-sm text-white hover:bg-[#3d3d3d] px-2 py-1 rounded">Terlama</button>
 
                         <div class="flex flex-col">
                             <label class="text-sm text-white mb-1">Pilih Tanggal</label>
@@ -115,7 +115,6 @@
                         </a>
                     </form>
 
-
                 </div>
             </div>
 
@@ -123,7 +122,7 @@
 
             <div class="overflow-x-auto bg-white rounded-lg shadow border border-gray-200">
                 <table class="min-w-full text-sm text-left table-auto">
-                    <thead class="bg-[#0B849F] text-white uppercase text-xs tracking-wider">
+                    <thead class="bg-white text-black uppercase text-xs tracking-wider">
                         <tr>
                             <th class="py-3 px-4 whitespace-nowrap">No</th>
                             <th class="py-3 px-4 whitespace-nowrap">Date</th>
@@ -140,13 +139,33 @@
                                 <td class="py-2 px-4">
                                     {{ \Carbon\Carbon::parse($item->date)->translatedFormat('l, d F Y') }}
                                 </td>
-                                <td class="py-2 px-4">{{ \Carbon\Carbon::parse($item->check_in)->format('H:i') }}</td>
-                                <td class="py-2 px-4">{{ \Carbon\Carbon::parse($item->check_out)->format('H:i') }}</td>
+                                <td class="px-4 py-2 border border-gray-300 text-center">
+                                    {{ $item->check_in ? \Carbon\Carbon::parse($item->check_in)->format('H.i') : '--.--' }}
+                                <td class="px-4 py-2 border border-gray-300 text-center">
+                                    {{ $item->check_out ? \Carbon\Carbon::parse($item->check_out)->format('H.i') : '--.--' }}
                                 <td class="py-2 px-4 text-justify">
                                     @if ($item->activity_title)
                                         <p class="font-semibold text-gray-800">{{ $item->activity_title }}</p>
-                                        <p class="text-sm">{!! nl2br(e($item->activity_description)) !!}</p>
 
+                                        @php
+                                            // Tentukan panjang batas karakter
+                                            $limit = 150;
+                                            $shortDescription = Str::limit($item->activity_description, $limit);
+                                            $isLongDescription = strlen($item->activity_description) > $limit;
+                                        @endphp
+
+                                        <span class="activity-content activity-short-description-{{ $item->id }}">
+                                            {!! nl2br(e($shortDescription)) !!}
+                                        </span>
+
+                                        @if ($isLongDescription)
+                                            <a href="#" class="text-[#8180ff] hover:underline see-more-btn"
+                                                data-id="{{ $item->id }}" data-full-text="{!! e($item->activity_description) !!}">See
+                                                More</a>
+                                            <a href="#" class="text-blue-500 hover:underline see-less-btn hidden"
+                                                data-id="{{ $item->id }}"
+                                                data-short-text="{!! e($shortDescription) !!}">Summary</a>
+                                        @endif
                                     @else
                                         <span class="text-gray-400 italic">—</span>
                                     @endif
@@ -190,6 +209,42 @@
                     if (!filterBtn.contains(e.target) && !filterDropdown.contains(e.target)) {
                         filterDropdown.classList.add('hidden');
                     }
+                });
+
+                // JavaScript untuk fitur "Lihat Selengkapnya"
+                document.querySelectorAll('.see-more-btn').forEach(button => {
+                    button.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        const itemId = this.dataset.id;
+                        const fullText = this.dataset.fullText;
+                        const shortDescriptionSpan = document.querySelector(
+                            `.activity-short-description-${itemId}`);
+                        const seeLessBtn = document.querySelector(`.see-less-btn[data-id="${itemId}"]`);
+
+                        shortDescriptionSpan.innerHTML = fullText; // Gunakan innerHTML karena sudah ada nl2br
+                        this.classList.add('hidden');
+                        if (seeLessBtn) {
+                            seeLessBtn.classList.remove('hidden');
+                        }
+                    });
+                });
+
+                document.querySelectorAll('.see-less-btn').forEach(button => {
+                    button.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        const itemId = this.dataset.id;
+                        const shortText = this.dataset
+                            .shortText; // Ambil teks pendek dari data-short-text di tombol "Ciutkan"
+                        const shortDescriptionSpan = document.querySelector(
+                            `.activity-short-description-${itemId}`);
+                        const seeMoreBtn = document.querySelector(`.see-more-btn[data-id="${itemId}"]`);
+
+                        shortDescriptionSpan.innerHTML = shortText; // Gunakan innerHTML
+                        this.classList.add('hidden');
+                        if (seeMoreBtn) {
+                            seeMoreBtn.classList.remove('hidden');
+                        }
+                    });
                 });
             </script>
         @endsection

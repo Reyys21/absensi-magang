@@ -141,14 +141,15 @@
                                 </td>
                                 <td class="px-4 py-2 border border-gray-300 text-center">
                                     {{ $item->check_in ? \Carbon\Carbon::parse($item->check_in)->format('H.i') : '--.--' }}
+                                </td>
                                 <td class="px-4 py-2 border border-gray-300 text-center">
                                     {{ $item->check_out ? \Carbon\Carbon::parse($item->check_out)->format('H.i') : '--.--' }}
+                                </td>
                                 <td class="py-2 px-4 text-justify">
                                     @if ($item->activity_title)
                                         <p class="font-semibold text-gray-800">{{ $item->activity_title }}</p>
 
                                         @php
-                                            // Tentukan panjang batas karakter
                                             $limit = 150;
                                             $shortDescription = Str::limit($item->activity_description, $limit);
                                             $isLongDescription = strlen($item->activity_description) > $limit;
@@ -160,11 +161,11 @@
 
                                         @if ($isLongDescription)
                                             <a href="#" class="text-[#8180ff] hover:underline see-more-btn"
-                                                data-id="{{ $item->id }}" data-full-text="{!! e($item->activity_description) !!}">See
+                                                data-id="{{ $item->id }}" data-full-text="{!! nl2br(e($item->activity_description)) !!}">See
                                                 More</a>
                                             <a href="#" class="text-blue-500 hover:underline see-less-btn hidden"
                                                 data-id="{{ $item->id }}"
-                                                data-short-text="{!! e($shortDescription) !!}">Summary</a>
+                                                data-short-text="{!! nl2br(e($shortDescription)) !!}">Summary</a>
                                         @endif
                                     @else
                                         <span class="text-gray-400 italic">—</span>

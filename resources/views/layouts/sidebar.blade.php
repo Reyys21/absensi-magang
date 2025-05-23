@@ -7,7 +7,7 @@
 <aside id="sidebar"
     class="bg-[#2C3E50] text-white flex flex-col justify-between shadow-lg h-screen overflow-y-auto
            fixed inset-y-0 left-0
-           transform -translate-x-full 
+           transform -translate-x-full
            md:relative md:translate-x-0
            md:w-64
            transition-all duration-300 ease-in-out z-40">
@@ -20,7 +20,8 @@
                     <p class="text-xs text-gray-300">UID KALSELTENG</p>
                 </div>
             </div>
-            <button id="desktop-sidebar-toggle" class="hidden md:block p-2 text-white rounded-md hover:bg-[#3C5A6D] focus:outline-none transition duration-200">
+            <button id="desktop-sidebar-toggle"
+                class="hidden md:block p-2 text-white rounded-md hover:bg-[#3C5A6D] focus:outline-none transition duration-200">
                 <i class="fa-solid fa-bars transition-transform duration-300"></i>
             </button>
         </div>
@@ -49,7 +50,8 @@
                         class="block px-6 py-2 text-sm {{ request()->routeIs('attendance.my') ? 'bg-[#2C3E50] text-[#FFD100]' : 'hover:bg-[#2C3E50] hover:text-[#FFD100]' }} rounded">My
                         Attendance</a>
                     <a href="#"
-                        class="block px-6 py-2 text-sm hover:bg-[#2C3E50] hover:text-[#FFD100] rounded">Attendance Records</a>
+                        class="block px-6 py-2 text-sm hover:bg-[#2C3E50] hover:text-[#FFD100] rounded">Attendance
+                        Records</a>
                 </div>
             </div>
 
@@ -102,19 +104,20 @@
 
         if (isDesktop) {
             sidebar.classList.remove('fixed', '-translate-x-full');
-            sidebarOverlay.classList.add('hidden'); 
-            sidebar.classList.add('md:relative', 'md:translate-x-0'); 
+            sidebarOverlay.classList.add('hidden');
+            sidebar.classList.add('md:relative', 'md:translate-x-0');
 
             sidebar.classList.toggle('md:w-64', isOpen);
             sidebar.classList.toggle('md:w-20', !isOpen);
-            
+
             plnText.classList.toggle('hidden', !isOpen);
             navTexts.forEach(span => span.classList.toggle('hidden', !isOpen));
             arrowIcons.forEach(icon => icon.classList.toggle('hidden', !isOpen));
             // Toggle hamburger icon if sidebar is collapsed, otherwise keep it as hamburger
             desktopSidebarToggle.querySelector('i').classList.toggle('fa-bars', isOpen);
             desktopSidebarToggle.querySelector('i').classList.toggle('fa-chevron-left', !isOpen); // Mengganti ikon
-            desktopSidebarToggle.querySelector('i').classList.toggle('rotate-180', !isOpen); // Putar jika jadi panah dan kolaps
+            desktopSidebarToggle.querySelector('i').classList.toggle('rotate-180', !
+            isOpen); // Putar jika jadi panah dan kolaps
 
             // Tutup dropdown jika sidebar kolaps
             if (!isOpen) {
@@ -123,7 +126,7 @@
                 document.querySelector('#btn-attendance .fa-chevron-down').classList.remove('rotate-180');
                 document.querySelector('#btn-approval .fa-chevron-down').classList.remove('rotate-180');
             }
-            
+
             isDesktopSidebarOpen = isOpen;
 
         } else { // Mobile
@@ -131,7 +134,7 @@
             sidebar.classList.add('fixed');
             sidebar.classList.toggle('-translate-x-full', !isOpen);
             sidebarOverlay.classList.toggle('hidden', !isOpen);
-            
+
             // Di mobile, pastikan sidebar selalu full dan semua teks/ikon terlihat
             sidebar.classList.add('w-64');
             plnText.classList.remove('hidden');
@@ -175,7 +178,7 @@
 
             if (isDesktop && !isDesktopSidebarOpen) { // Jika di desktop dan sidebar kolaps
                 // Lebarkan sidebar terlebih dahulu
-                setSidebarState(true); 
+                setSidebarState(true);
                 // Beri sedikit delay agar transisi sidebar selesai sebelum dropdown dibuka
                 setTimeout(() => {
                     dropdown.classList.toggle('hidden');
@@ -270,6 +273,7 @@
         border-radius: 0.375rem;
         transition: background-color 0.15s ease-in-out, color 0.15s ease-in-out;
     }
+
     #sidebar.md\:w-20 #attendanceDropdown a:hover,
     #sidebar.md\:w-20 #approvalDropdown a:hover {
         background-color: #2C3E50;
@@ -285,6 +289,7 @@
     #sidebar.md\:w-20 #pln-text {
         display: none;
     }
+
     #sidebar.md\:w-20 #pln-logo-text {
         justify-content: center;
         width: 100%;
@@ -294,6 +299,7 @@
     #sidebar.md\:w-20 .nav-text {
         display: none;
     }
+
     #sidebar.md\:w-20 nav a,
     #sidebar.md\:w-20 nav button {
         justify-content: center;
@@ -307,6 +313,7 @@
         position: relative;
         overflow: hidden;
     }
+
     #sidebar.md\:w-20 nav a.active-link-indicator::before,
     #sidebar.md\:w-20 nav button.active-link-indicator::before {
         content: '';
@@ -319,5 +326,4 @@
         background-color: #FFD100;
         border-radius: 0 4px 4px 0;
     }
-
 </style>

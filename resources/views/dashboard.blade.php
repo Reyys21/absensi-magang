@@ -40,14 +40,14 @@
                         </div>
                         <div class="block absolute bottom-0 right-0 w-[45%] md:w-[30%] animate-bounce-slow">
                             <img src="{{ asset('assets/images/undraw_relaxed-reading_wfkr.svg') }}" alt="Reading"
-                                class="w-full" style="transform: scaleX(-1) ">
+                                class="w-full" style="transform: scaleX(1) ">
                         </div>
                     </div>
                 </div>
 
                 <div
-                    class="bg-[#0B849F] text-white rounded-[20px] p-4 sm:p-6 shadow-lg flex flex-col items-center justify-center">
-                    <a href="{{ route('attendance.my') }}">
+                    class="bg-[#0B849F] text-white rounded-[20px] p-4 sm:p-6 shadow-lg flex flex-col items-center justify-center text-center">
+                    <a class="flex flex-col items-center justify-center w-full h-full" href="{{ route('attendance.my') }}">
                         <h2 class="text-base font-semibold mb-2">My Attendance</h2>
                         <p class="text-3xl font-bold">{{ $attendanceCount }} days</p>
                     </a>

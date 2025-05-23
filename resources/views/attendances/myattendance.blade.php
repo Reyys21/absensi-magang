@@ -2,8 +2,6 @@
 
 @section('content')
     <div class="flex flex-col md:flex-row min-h-screen font-[Inter]">
-
-
         {{-- sidebar --}}
         @include('layouts.sidebar')
         

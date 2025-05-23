@@ -47,62 +47,14 @@
 
                 <div
                     class="bg-[#0B849F] text-white rounded-[20px] p-4 sm:p-6 shadow-lg flex flex-col items-center justify-center">
-                    <h2 class="text-base font-semibold mb-2">My Attendance</h2>
-                    <p class="text-3xl font-bold">{{ $attendanceCount }} days</p>
+                    <a href="{{ route('attendance.my') }}">
+                        <h2 class="text-base font-semibold mb-2">My Attendance</h2>
+                        <p class="text-3xl font-bold">{{ $attendanceCount }} days</p>
+                    </a>
                 </div>
             </div>
 
-            <section>
-                <h2 class="text-xl font-bold mb-4">Attendance Records</h2>
-                <div class="overflow-auto max-h-[450px] rounded-xl">
-                    <table class="w-full text-sm text-left table-auto border border-gray-300">
-                        <thead class="bg-[#0B849F] text-white">
-                            <tr>
-                                <th class="px-4 py-2 border border-gray-300 text-center">No</th>
-                                <th class="px-4 py-2 border border-gray-300 text-center">Date</th>
-                                <th class="px-4 py-2 border border-gray-300 text-center">Check-In</th>
-                                <th class="px-4 py-2 border border-gray-300 text-center">Check-Out</th>
-                                <th class="px-4 py-2 border border-gray-300 text-center">Activity</th>
-                            </tr>
-                        </thead>
-                        <tbody class="bg-[#13B4D8] text-gray-800">
-                            @forelse ($attendances as $item)
-                                <tr class="border-gray-300">
-                                    <td class="px-4 py-2 border border-gray-300 text-center">
-                                        {{ ($attendances->currentPage() - 1) * $attendances->perPage() + $loop->iteration }}
-                                    </td>
-                                    <td class="px-4 py-2 border border-gray-300 text-center">{{ $item->date }}</td>
-                                    <td class="px-4 py-2 border border-gray-300 text-center">
-                                        {{ $item->check_in ? \Carbon\Carbon::parse($item->check_in)->format('H.i') : '--.--' }}
-                                    </td>
-                                    <td class="px-4 py-2 border border-gray-300 text-center">
-                                        {{ $item->check_out ? \Carbon\Carbon::parse($item->check_out)->format('H.i') : '--.--' }}
-                                    </td>
-                                    <td class="px-4 py-2 border border-gray-300 text-justify">
-                                        @if ($item->activity_title)
-                                            <p><strong>{{ $item->activity_title }}</strong></p>
-                                            <p class="text-sm">{!! nl2br(e($item->activity_description)) !!}</p>
-                                        @else
-                                            <span>—</span>
-                                        @endif
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="5" class="text-center py-4 border border-gray-300">Belum ada data
-                                        absensi</td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-                <div class="mt-6 flex justify-center space-x-2">
-                    {{ $attendances->onEachSide(1)->links('pagination::tailwind') }}
-                </div>
-                <div class="text-center text-xs text-blue-500 mt-10">
-                    by <a href="#" class="underline">PKL TRKJ POLITALA</a>
-                </div>
-            </section>
+
         </main>
     </div>
 

@@ -6,6 +6,7 @@
 
         {{-- sidebar --}}
         @include('layouts.sidebar')
+        
         <main class="flex-1 p-4 md:p-6 bg-gray-100">
             <div class="flex justify-between items-center mb-6">
                 <h1 class="text-xl sm:text-2xl font-bold">My Attendance</h1>

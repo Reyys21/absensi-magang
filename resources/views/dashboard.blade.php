@@ -2,20 +2,23 @@
 @extends('layouts.app')
 
 @section('content')
+    {{-- Ini adalah div pembungkus utama yang akan memiliki tata letak flex --}}
     <div class="flex flex-col md:flex-row min-h-screen font-[Inter]">
 
-        {{-- sidebar --}}
+        {{-- sidebar (akan fixed) --}}
         @include('layouts.sidebar')
 
-        <main class="flex-1 p-4 sm:p-6 md:p-10 bg-white shadow-lg">
+        {{-- Main content area --}}
+        {{-- id="main-content" sangat penting untuk JavaScript --}}
+        {{-- transition-all duration-300 ease-in-out untuk transisi margin --}}
+        <main id="main-content" class="flex-1 p-4 sm:p-6 md:p-10 bg-white shadow-lg transition-all duration-300 ease-in-out">
             {{-- Flex container untuk judul dan profil --}}
             <div class="flex justify-between items-center mb-6">
                 <h1 class="text-xl sm:text-2xl font-bold">Dashboard Mahasiswa/Siswa</h1>
-                {{-- Ini dia! Sertakan komponen profil di sini --}}
                 @include('layouts.profile')
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 mb-6">
+       <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 mb-6">
                 <div
                     class="bg-[#0B849F] text-white rounded-[20px] px-4 sm:px-6 py-5 shadow-lg border flex flex-col justify-between md:col-span-2 relative overflow-hidden">
                     <h2 class="text-white text-base sm:text-lg font-semibold mb-4">Today’s Attendance</h2>
@@ -53,40 +56,42 @@
                     </a>
                 </div>
             </div>
-
-
         </main>
     </div>
+@endsection
 
+@section('Script')
+    {{-- JavaScript tambahan yang spesifik untuk halaman ini --}}
     <script>
         function updateClock() {
             const now = new Date();
             const hours = String(now.getHours()).padStart(2, '0');
             const minutes = String(now.getMinutes()).padStart(2, '0');
-            document.getElementById("clock").textContent = `${hours}.${minutes}`;
+            // Pastikan ada elemen dengan id="clock" di HTML Anda
+            const clockElement = document.getElementById("clock");
+            if (clockElement) {
+                clockElement.textContent = `${hours}.${minutes}`;
+            }
         }
         setInterval(updateClock, 1000);
         updateClock();
 
         function toggleDropdown(dropdownId) {
             const dropdown = document.getElementById(dropdownId);
-            dropdown.classList.toggle('hidden');
+            if (dropdown) { // Pastikan elemen ada
+                dropdown.classList.toggle('hidden');
+            }
         }
     </script>
-
+    {{-- Gaya CSS tambahan yang spesifik untuk halaman ini --}}
     <style>
-        #attendanceDropdown,
-        #approvalDropdown {
-            transition: all 0.3s ease;
-        }
+        /* Anda tidak perlu menyertakan CSS sidebar di sini lagi karena sudah di app.css */
 
         @keyframes bounce-slow {
-
             0%,
             100% {
                 transform: translateY(0) scaleX(-1);
             }
-
             50% {
                 transform: translateY(-10px) scaleX(-1);
             }

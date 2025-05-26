@@ -1,15 +1,22 @@
+{{-- resources/views/layouts/sidebar.blade.php --}}
+
+{{-- Tombol toggle untuk mobile (di luar sidebar, fixed di pojok kanan bawah) --}}
+{{-- Class 'fixed bottom-4 right-4 z-50' sangat penting --}}
 <button id="mobile-menu-toggle"
     class="md:hidden fixed bottom-4 right-4 p-3 z-50 bg-[#2C3E50] text-white rounded-full shadow-lg hover:bg-[#3C5A6D] focus:outline-none">
     <i class="fa-solid fa-bars text-xl"></i>
 </button>
+
+{{-- Overlay untuk mobile (tersembunyi secara default, muncul saat sidebar mobile terbuka) --}}
+{{-- Z-index harus lebih rendah dari sidebar tapi di atas konten utama --}}
 <div id="sidebar-overlay" class="hidden fixed inset-0 bg-black opacity-50 z-30 md:hidden"></div>
 
 <aside id="sidebar"
     class="bg-[#2C3E50] text-white flex flex-col justify-between shadow-lg h-screen overflow-y-auto
            fixed inset-y-0 left-0
-           transform -translate-x-full
-           md:relative md:translate-x-0
-           md:w-64
+           transform -translate-x-full {{-- Selalu mulai tersembunyi di mobile --}}
+           md:relative md:translate-x-0 {{-- Di desktop, jadi relatif dan tidak tersembunyi --}}
+           md:w-64 {{-- Lebar default di desktop, JS akan toggle ke w-20 --}}
            transition-all duration-300 ease-in-out z-40">
     <div>
         <div class="p-4 flex items-center justify-between space-x-3 border-b border-[#1F2A36]">
@@ -35,7 +42,7 @@
             <div class="relative">
                 <button id="btn-attendance" type="button"
                     class="flex items-center justify-between w-full px-4 py-2 rounded-xl transition duration-150 cursor-pointer
-                {{ request()->routeIs('attendance.*') ? 'bg-[#FFD100] text-black active-link-indicator' : 'hover:bg-[#3C5A6D]' }}">
+                    {{ request()->routeIs('attendance.*') ? 'bg-[#FFD100] text-black active-link-indicator' : 'hover:bg-[#3C5A6D]' }}">
                     <div class="flex items-center gap-3">
                         <i class="fa-solid fa-user-check"></i> <span class="nav-text">Attendance</span>
                     </div>
@@ -44,8 +51,8 @@
 
                 <div id="attendanceDropdown"
                     class="{{ request()->routeIs('attendance.*') ? 'mt-2 space-y-1 rounded-xl bg-[#34495E] block' : 'hidden mt-2 space-y-1 rounded-xl bg-[#34495E]' }}">
-                    <a href="#"
-                        class="block px-6 py-2 text-sm hover:bg-[#2C3E50] hover:text-[#FFD100] rounded">History</a>
+                    <a href="{{ route('attendance.history') }}"
+                        class="block px-6 py-2 text-sm {{ request()->routeIs('attendance.history') ? 'bg-[#2C3E50] text-[#FFD100]' : 'hover:bg-[#2C3E50] hover:text-[#FFD100]' }} rounded">History</a>
                     <a href="{{ route('attendance.my') }}"
                         class="block px-6 py-2 text-sm {{ request()->routeIs('attendance.my') ? 'bg-[#2C3E50] text-[#FFD100]' : 'hover:bg-[#2C3E50] hover:text-[#FFD100]' }} rounded">My
                         Attendance</a>
@@ -89,133 +96,227 @@
 </aside>
 
 <script>
-    const sidebar = document.getElementById('sidebar');
-    const sidebarOverlay = document.getElementById('sidebar-overlay');
-    const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
-    const desktopSidebarToggle = document.getElementById('desktop-sidebar-toggle');
-    const plnText = document.getElementById('pln-text');
-    const navTexts = document.querySelectorAll('.nav-text');
-    const arrowIcons = document.querySelectorAll('.arrow-icon');
+    // Pastikan DOM sudah sepenuhnya dimuat sebelum menjalankan skrip
+    document.addEventListener('DOMContentLoaded', () => {
+        const sidebar = document.getElementById('sidebar');
+        const sidebarOverlay = document.getElementById('sidebar-overlay');
+        const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+        const desktopSidebarToggle = document.getElementById('desktop-sidebar-toggle');
+        const plnText = document.getElementById('pln-text');
+        const navTexts = document.querySelectorAll('.nav-text');
+        const arrowIcons = document.querySelectorAll('.arrow-icon');
+        const mainContent = document.getElementById('main-content'); // Dapatkan elemen main-content
 
-    let isDesktopSidebarOpen = true; // Default terbuka di desktop
-
-    function setSidebarState(isOpen) {
-        const isDesktop = window.innerWidth >= 768;
-
-        if (isDesktop) {
-            sidebar.classList.remove('fixed', '-translate-x-full');
-            sidebarOverlay.classList.add('hidden');
-            sidebar.classList.add('md:relative', 'md:translate-x-0');
-
-            sidebar.classList.toggle('md:w-64', isOpen);
-            sidebar.classList.toggle('md:w-20', !isOpen);
-
-            plnText.classList.toggle('hidden', !isOpen);
-            navTexts.forEach(span => span.classList.toggle('hidden', !isOpen));
-            arrowIcons.forEach(icon => icon.classList.toggle('hidden', !isOpen));
-            // Toggle hamburger icon if sidebar is collapsed, otherwise keep it as hamburger
-            desktopSidebarToggle.querySelector('i').classList.toggle('fa-bars', isOpen);
-            desktopSidebarToggle.querySelector('i').classList.toggle('fa-chevron-left', !isOpen); // Mengganti ikon
-            desktopSidebarToggle.querySelector('i').classList.toggle('rotate-180', !
-            isOpen); // Putar jika jadi panah dan kolaps
-
-            // Tutup dropdown jika sidebar kolaps
-            if (!isOpen) {
-                document.getElementById('attendanceDropdown').classList.add('hidden');
-                document.getElementById('approvalDropdown').classList.add('hidden');
-                document.querySelector('#btn-attendance .fa-chevron-down').classList.remove('rotate-180');
-                document.querySelector('#btn-approval .fa-chevron-down').classList.remove('rotate-180');
-            }
-
-            isDesktopSidebarOpen = isOpen;
-
-        } else { // Mobile
-            sidebar.classList.remove('md:relative', 'md:w-64', 'md:w-20', 'md:translate-x-0');
-            sidebar.classList.add('fixed');
-            sidebar.classList.toggle('-translate-x-full', !isOpen);
-            sidebarOverlay.classList.toggle('hidden', !isOpen);
-
-            // Di mobile, pastikan sidebar selalu full dan semua teks/ikon terlihat
-            sidebar.classList.add('w-64');
-            plnText.classList.remove('hidden');
-            navTexts.forEach(span => span.classList.remove('hidden'));
-            arrowIcons.forEach(icon => icon.classList.remove('hidden'));
+        // Hanya inisialisasi jika elemen-elemen penting ditemukan
+        if (!sidebar || !mainContent || !mobileMenuToggle || !desktopSidebarToggle || !sidebarOverlay) {
+            console.warn("One or more essential sidebar elements not found. Sidebar functionality may be limited or absent.");
+            return; // Hentikan eksekusi jika elemen penting tidak ada
         }
-    }
 
-    function initializeSidebar() {
-        if (window.innerWidth >= 768) {
-            setSidebarState(isDesktopSidebarOpen);
-            sidebar.classList.remove('-translate-x-full');
-            sidebarOverlay.classList.add('hidden');
-        } else {
-            setSidebarState(false);
-        }
-    }
+        let isDesktopSidebarOpen = localStorage.getItem('isDesktopSidebarOpen') === 'false' ? false : true;
 
-    if (mobileMenuToggle) {
-        mobileMenuToggle.addEventListener('click', () => {
-            setSidebarState(sidebar.classList.contains('-translate-x-full'));
-        });
-    }
-
-    if (desktopSidebarToggle) {
-        desktopSidebarToggle.addEventListener('click', () => {
-            // Toggle state berdasarkan apakah sidebar sedang kolaps (w-20)
-            setSidebarState(sidebar.classList.contains('md:w-20'));
-        });
-    }
-
-    if (sidebarOverlay) {
-        sidebarOverlay.addEventListener('click', () => setSidebarState(false)); // Tutup sidebar mobile
-    }
-
-    // Fungsi untuk menangani klik tombol dropdown
-    function handleDropdownClick(buttonId, dropdownId) {
-        document.getElementById(buttonId).addEventListener('click', function() {
-            const dropdown = document.getElementById(dropdownId);
+        function setSidebarState(isOpen) {
             const isDesktop = window.innerWidth >= 768;
 
-            if (isDesktop && !isDesktopSidebarOpen) { // Jika di desktop dan sidebar kolaps
-                // Lebarkan sidebar terlebih dahulu
-                setSidebarState(true);
-                // Beri sedikit delay agar transisi sidebar selesai sebelum dropdown dibuka
-                setTimeout(() => {
-                    dropdown.classList.toggle('hidden');
-                    this.querySelector('i.fa-chevron-down').classList.toggle('rotate-180');
-                }, 300); // Sesuaikan dengan durasi transisi sidebar
+            if (isDesktop) {
+                // Logika untuk desktop
+                sidebar.classList.remove('-translate-x-full'); // Pastikan tidak tersembunyi
+                sidebar.classList.add('fixed'); // Pastikan fixed di desktop
+
+                sidebarOverlay.classList.add('hidden'); // Selalu sembunyikan overlay di desktop
+
+                sidebar.classList.toggle('md:w-64', isOpen);
+                sidebar.classList.toggle('md:w-20', !isOpen);
+
+                // Toggle visibilitas teks dan ikon
+                if (plnText) plnText.classList.toggle('hidden', !isOpen);
+                navTexts.forEach(span => span.classList.toggle('hidden', !isOpen));
+                arrowIcons.forEach(icon => icon.classList.toggle('hidden', !isOpen));
+
+                // Atur ikon desktop toggle
+                if (isOpen) {
+                    desktopSidebarToggle.querySelector('i').classList.remove('fa-chevron-left', 'rotate-180');
+                    desktopSidebarToggle.querySelector('i').classList.add('fa-bars');
+                } else {
+                    desktopSidebarToggle.querySelector('i').classList.remove('fa-bars');
+                    desktopSidebarToggle.querySelector('i').classList.add('fa-chevron-left', 'rotate-180');
+                }
+
+                // Tutup dropdown saat sidebar kolaps di desktop
+                if (!isOpen) {
+                    const attendanceDropdown = document.getElementById('attendanceDropdown');
+                    const approvalDropdown = document.getElementById('approvalDropdown');
+                    if (attendanceDropdown) attendanceDropdown.classList.add('hidden');
+                    if (approvalDropdown) approvalDropdown.classList.add('hidden');
+
+                    const attendanceArrow = document.querySelector('#btn-attendance .fa-chevron-down');
+                    const approvalArrow = document.querySelector('#btn-approval .fa-chevron-down');
+                    if (attendanceArrow) attendanceArrow.classList.remove('rotate-180');
+                    if (approvalArrow) approvalArrow.classList.remove('rotate-180');
+                }
+
+                isDesktopSidebarOpen = isOpen;
+                localStorage.setItem('isDesktopSidebarOpen', isDesktopSidebarOpen);
+
+            } else { // Mobile
+                sidebar.classList.remove('md:relative', 'md:w-64', 'md:w-20', 'md:translate-x-0'); // Hapus kelas desktop
+                sidebar.classList.add('fixed'); // Sidebar fixed di mobile
+
+                sidebar.classList.toggle('-translate-x-full', !isOpen); // Toggle untuk menyembunyikan/menampilkan drawer
+                sidebarOverlay.classList.toggle('hidden', !isOpen); // Toggle overlay
+
+                mainContent.style.marginLeft = '0'; // Tidak ada margin di mobile
+
+                // Pastikan sidebar selalu terlihat penuh di mobile (w-64)
+                sidebar.classList.add('w-64');
+                if (plnText) plnText.classList.remove('hidden');
+                navTexts.forEach(span => span.classList.remove('hidden'));
+                arrowIcons.forEach(icon => icon.classList.remove('hidden'));
+
+                // Atur ikon mobile toggle
+                if (isOpen) { // Sidebar terbuka, tampilkan ikon silang
+                    mobileMenuToggle.querySelector('i').classList.remove('fa-bars');
+                    mobileMenuToggle.querySelector('i').classList.add('fa-times');
+                } else { // Sidebar tertutup, tampilkan ikon hamburger
+                    mobileMenuToggle.querySelector('i').classList.remove('fa-times');
+                    mobileMenuToggle.querySelector('i').classList.add('fa-bars');
+                }
+                // Pastikan desktop toggle ikon kembali ke bars jika terlihat karena suatu alasan
+                if (desktopSidebarToggle) {
+                    desktopSidebarToggle.querySelector('i').classList.remove('fa-chevron-left', 'rotate-180');
+                    desktopSidebarToggle.querySelector('i').classList.add('fa-bars');
+                }
+            }
+        }
+
+        function initializeSidebar() {
+            if (window.innerWidth >= 768) {
+                // Desktop view
+                isDesktopSidebarOpen = localStorage.getItem('isDesktopSidebarOpen') === 'false' ? false : true;
+                setSidebarState(isDesktopSidebarOpen);
+                sidebar.classList.remove('-translate-x-full'); // Pastikan sidebar tidak tersembunyi
+                sidebarOverlay.classList.add('hidden'); // Pastikan overlay tersembunyi
             } else {
-                // Langsung toggle dropdown (baik di mobile atau sidebar sudah terbuka di desktop)
-                dropdown.classList.toggle('hidden');
-                this.querySelector('i.fa-chevron-down').classList.toggle('rotate-180');
+                // Mobile view
+                setSidebarState(false); // Selalu tutup sidebar di mobile saat inisialisasi
             }
+        }
+
+        // Event Listeners
+        mobileMenuToggle.addEventListener('click', () => {
+            // Cek status saat ini dari sidebar untuk menentukan state berikutnya
+            const currentStateIsHidden = sidebar.classList.contains('-translate-x-full');
+            setSidebarState(currentStateIsHidden);
         });
-    }
 
-    handleDropdownClick('btn-attendance', 'attendanceDropdown');
-    handleDropdownClick('btn-approval', 'approvalDropdown');
-
-    // Opsional: Tutup sidebar saat mengklik item navigasi di mobile
-    const navLinks = document.querySelectorAll('#sidebar nav a, #sidebar nav button');
-    navLinks.forEach(link => {
-        link.addEventListener('click', function(event) {
-            if (this.id === 'btn-attendance' || this.id === 'btn-approval') {
-                return; // Jangan tutup sidebar jika klik pada tombol dropdown itu sendiri
-            }
-
-            if (window.innerWidth < 768) {
-                setTimeout(() => {
-                    setSidebarState(false);
-                }, 100);
-            }
+        desktopSidebarToggle.addEventListener('click', () => {
+            isDesktopSidebarOpen = !isDesktopSidebarOpen; // Toggle state
+            localStorage.setItem('isDesktopSidebarOpen', isDesktopSidebarOpen);
+            setSidebarState(isDesktopSidebarOpen);
         });
-    });
 
-    document.addEventListener('DOMContentLoaded', initializeSidebar);
-    window.addEventListener('resize', initializeSidebar);
+        sidebarOverlay.addEventListener('click', () => {
+            setSidebarState(false); // Tutup sidebar mobile saat overlay diklik
+        });
+
+        // Fungsi untuk menangani klik tombol dropdown
+        function handleDropdownClick(buttonId, dropdownId) {
+            const button = document.getElementById(buttonId);
+            if (button) {
+                button.addEventListener('click', function(event) {
+                    event.stopPropagation(); // Mencegah event bubbling ke parent
+
+                    const dropdown = document.getElementById(dropdownId);
+                    const isDesktop = window.innerWidth >= 768;
+
+                    if (isDesktop && !isDesktopSidebarOpen) { // Jika di desktop dan sidebar kolaps
+                        setSidebarState(true); // Lebarkan sidebar terlebih dahulu
+                        setTimeout(() => {
+                            if (dropdown) dropdown.classList.toggle('hidden');
+                            const arrow = this.querySelector('i.fa-chevron-down');
+                            if (arrow) arrow.classList.toggle('rotate-180');
+                        }, 300); // Sesuaikan dengan durasi transisi sidebar
+                    } else {
+                        // Langsung toggle dropdown (baik di mobile atau sidebar sudah terbuka di desktop)
+                        if (dropdown) dropdown.classList.toggle('hidden');
+                        const arrow = this.querySelector('i.fa-chevron-down');
+                        if (arrow) arrow.classList.toggle('rotate-180');
+                    }
+                });
+            }
+        }
+
+        initializeSidebar(); // Panggil inisialisasi saat DOM siap
+        handleDropdownClick('btn-attendance', 'attendanceDropdown');
+        handleDropdownClick('btn-approval', 'approvalDropdown');
+
+        // Tutup sidebar saat mengklik item navigasi di mobile (kecuali dropdown itu sendiri)
+        const navLinks = document.querySelectorAll('#sidebar nav a, #sidebar nav button');
+        navLinks.forEach(link => {
+            link.addEventListener('click', function(event) {
+                // Jangan tutup sidebar jika klik pada tombol dropdown itu sendiri
+                if (this.id === 'btn-attendance' || this.id === 'btn-approval') {
+                    return;
+                }
+
+                // Juga, jangan tutup sidebar jika klik pada item di dalam dropdown
+                let parent = this.parentElement;
+                let isInsideDropdown = false;
+                while(parent) {
+                    if (parent.id === 'attendanceDropdown' || parent.id === 'approvalDropdown') {
+                        isInsideDropdown = true;
+                        break;
+                    }
+                    parent = parent.parentElement;
+                }
+                if (isInsideDropdown) {
+                    return;
+                }
+
+                // Jika di mobile (lebar < 768px), tutup sidebar
+                if (window.innerWidth < 768) {
+                    setTimeout(() => {
+                        setSidebarState(false);
+                    }, 100);
+                }
+            });
+        });
+
+        // Panggil initializeSidebar lagi saat ukuran jendela berubah
+        window.addEventListener('resize', () => {
+            // Memberikan sedikit delay agar transisi ukuran jendela selesai sebelum menyesuaikan sidebar
+            setTimeout(initializeSidebar, 150);
+        });
+
+        // --- Tambahan untuk fungsi umum seperti updateClock() jika masih ada ---
+        function updateClock() {
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const clockElement = document.getElementById("clock");
+            if (clockElement) {
+                clockElement.textContent = `${hours}.${minutes}`;
+            }
+        }
+        // Jika 'clock' ada di layout.profile atau tempat lain yang selalu ada, panggil ini:
+        // (Pastikan ID 'clock' ada di HTML Anda jika menggunakan fungsi ini)
+        // updateClock();
+        // setInterval(updateClock, 1000);
+    }); // Akhir dari DOMContentLoaded
 </script>
 
 <style>
+    /* Tailwind CSS base, components, and utilities should be handled by app.css */
+    /* Jika Anda menempatkan ini langsung di Blade, Anda mungkin tidak menggunakan Tailwind melalui Vite */
+    /* Jika Anda tetap ingin ini bekerja tanpa Vite sepenuhnya, Anda harus menyertakan Tailwind CDN atau build CSS secara manual */
+    /* HANYA JIKA ANDA TIDAK MENGGUNAKAN VITE DAN TAILWIND VIA app.css */
+    /* @tailwind base;
+    @tailwind components;
+    @tailwind utilities; */
+
+
+    /* -- MULAI CSS SIDEBAR -- */
+
     /* Rotate transition */
     .rotate-180 {
         transform: rotate(180deg);
@@ -250,7 +351,7 @@
         background-color: #34495E;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
         border-radius: 0.5rem;
-        z-index: 50;
+        z-index: 50; /* Z-index lebih tinggi dari sidebar */
         opacity: 0;
         visibility: hidden;
         transform: translateX(-10px);
@@ -326,4 +427,10 @@
         background-color: #FFD100;
         border-radius: 0 4px 4px 0;
     }
+
+    /* Pastikan main content memiliki z-index yang lebih rendah agar tidak menutupi sidebar mobile */
+    main {
+        z-index: 10;
+    }
+    /* -- AKHIR CSS SIDEBAR -- */
 </style>

@@ -32,6 +32,7 @@ Route::middleware('auth')->group(function () {
 
     // Attendance lainnya
     Route::get('/attendance/my', [AttendanceController::class, 'myAttendance'])->name('attendance.my');
+    Route::get('/attendance/history', [AttendanceController::class, 'history'])->name('attendance.history'); // <--- TAMBAHKAN BARIS INI
     Route::get('/attendance/export', [AttendanceController::class, 'export'])->name('attendance.export');
 
     Route::get('/attendance/create', [AttendanceController::class, 'create'])->name('attendance.create');
@@ -39,4 +40,4 @@ Route::middleware('auth')->group(function () {
 
     // Logout
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-}); 
+});

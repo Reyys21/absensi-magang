@@ -1,6 +1,4 @@
-<!-- Wrapper Dropdown Profil -->
 <div class="relative inline-block text-left">
-    <!-- Trigger -->
     <button id="profileToggle"
         class="flex items-center focus:outline-none hover:bg-gray-300 px-3 py-2 rounded-md transition duration-200"
         aria-haspopup="true" aria-expanded="false">
@@ -11,12 +9,11 @@
         </svg>
     </button>
 
-    <!-- Dropdown -->
     <div id="profileDropdown"
-        class="hidden origin-top-right absolute right-0 mt-2 w-80 bg-gray-900 rounded-lg shadow-xl z-50 p-6 text-gray-200
-           ring-1 ring-black ring-opacity-5 focus:outline-none transition transform scale-95 opacity-0"
+        class="hidden origin-top-right absolute right-0 mt-2 bg-gray-900 rounded-lg shadow-xl z-50 p-6 text-gray-200
+               ring-1 ring-black ring-opacity-5 focus:outline-none transition transform scale-95 opacity-0
+               w-full sm:w-72 md:w-80 lg:w-96"
         role="menu" aria-orientation="vertical" aria-labelledby="profileToggle">
-        <!-- Header -->
         <div class="flex items-center space-x-4">
             <div>
                 <h2 class="text-xl font-semibold text-white">{{ Auth::user()->name }}</h2>
@@ -30,9 +27,7 @@
             </div>
         </div>
 
-        <!-- Absensi Summary -->
         <div class="mt-6 space-y-5">
-            <!-- Complete Absen -->
             <div class="flex items-start space-x-3">
                 <div class="w-9 h-9 rounded-full bg-green-100 flex items-center justify-center text-green-600 text-lg">
                     <i class="fas fa-check-circle"></i>
@@ -49,7 +44,6 @@
                 </div>
             </div>
 
-            <!-- Belum Check-In -->
             <div class="flex items-start space-x-3">
                 <div
                     class="w-9 h-9 rounded-full bg-yellow-100 flex items-center justify-center text-yellow-600 text-lg">
@@ -67,7 +61,6 @@
                 </div>
             </div>
 
-            <!-- Belum Check-Out -->
             <div class="flex items-start space-x-3">
                 <div class="w-9 h-9 rounded-full bg-red-100 flex items-center justify-center text-red-600 text-lg">
                     <i class="fas fa-sign-out-alt"></i>
@@ -84,7 +77,6 @@
                 </div>
             </div>
 
-            <!-- Absent -->
             <div class="flex items-start space-x-3">
                 <div class="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 text-lg">
                     <i class="fas fa-times-circle"></i>
@@ -102,7 +94,6 @@
             </div>
         </div>
 
-        <!-- Footer -->
         <div class="mt-6 pt-4 border-t border-gray-700 flex justify-between text-sm text-blue-500">
             <a href="#" class="hover:underline focus:outline-none focus:ring-2 focus:ring-blue-400 rounded">Edit
                 Profile</a>
@@ -116,10 +107,8 @@
     </div>
 </div>
 
-<!-- Font Awesome -->
 <script src="https://kit.fontawesome.com/your-kit-id.js" crossorigin="anonymous"></script>
 
-<!-- Dropdown toggle script with smooth transition -->
 <script>
     const toggleBtn = document.getElementById('profileToggle');
     const dropdown = document.getElementById('profileDropdown');

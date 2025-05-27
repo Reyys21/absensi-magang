@@ -3,7 +3,6 @@
 @section('content')
     <div class="flex flex-col md:flex-row min-h-screen font-[Inter]">
 
-
         {{-- sidebar --}}
         @include('layouts.sidebar')
 
@@ -49,7 +48,7 @@
                     </button>
 
                     <form id="filterDropdown" action="{{ route('attendance.my') }}" method="GET"
-                        class="hidden absolute mt-2 bg-[#3E25FF] text-white px-4 py-2 rounded text-sm border-2 border-black rounded p-4 w-64 z-10 space-y-3  transition-all duration-300 opacity-0 scale-95">
+                        class="hidden absolute mt-2 bg-[#3E25FF] text-white px-4 py-2 rounded text-sm border-2 border-black rounded p-4 w-64 z-10 space-y-3 transition-all duration-300 opacity-0 scale-95">
 
                         <button type="submit" name="sort" value="desc"
                             class="w-full text-left text-sm text-white hover:bg-[#aeb1ff] hover:text-black px-2 py-1 rounded hover:rounded">Terbaru</button>
@@ -73,6 +72,7 @@
                 </div>
             </div>
 
+            {{-- Table container with overflow-x-auto for responsiveness --}}
             <div class="overflow-x-auto bg-white rounded-lg shadow border border-gray-200" id="tableContainer">
                 <table id="attendanceTable" class="min-w-full text-sm text-left table-auto">
                     <thead class="bg-white text-black uppercase text-xs tracking-wider">
@@ -81,14 +81,16 @@
                             <th class="py-3 px-4 whitespace-nowrap">Date</th>
                             <th class="py-3 px-4 whitespace-nowrap">Check-In</th>
                             <th class="py-3 px-4 whitespace-nowrap">Check-Out</th>
-                            <th class="py-3 px-4 whitespace-nowrap">Activity Title</th>
-                            <th class="py-3 px-4 whitespace-nowrap w-[40%]">Activity Description</th>
+                            {{-- Removed whitespace-nowrap to allow text wrapping for Activity Title --}}
+                            <th class="py-3 px-4">Activity Title</th>
+                            {{-- Removed whitespace-nowrap to allow text wrapping for Activity Description and adjusted width --}}
+                            <th class="py-3 px-4 w-full md:w-[38%]">Activity Description</th>
                             <th class="py-3 px-4 whitespace-nowrap">Status</th>
                         </tr>
                     </thead>
                     <tbody class="text-gray-700 divide-y divide-gray-200">
                         @forelse($attendances as $index => $item)
-                            <tr class=" align-top border hover:bg-gray-50 transition-all duration-200">
+                            <tr class="align-top border hover:bg-gray-50 transition-all duration-200">
                                 <td class="py-2 px-4">{{ $index + 1 }}</td>
                                 <td class="py-2 px-4">
                                     {{ \Carbon\Carbon::parse($item->date)->translatedFormat('l, d F Y') }}
@@ -115,7 +117,8 @@
                                         @endphp
 
                                         <span class="activity-content activity-short-description-{{ $item->id }}"
-                                            data-full-text="{!! nl2br(e($item->activity_description)) !!}">
+                                            data-full-text="{!! nl2br(e($item->activity_description)) !!}"
+                                            data-short-text="{!! nl2br(e($shortDescription)) !!}">
                                             {!! nl2br(e($shortDescription)) !!}
                                         </span>
 
@@ -172,10 +175,12 @@
             <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
             <script>
+                // Function to toggle dropdown visibility
                 function toggleDropdown(id) {
                     const dropdown = document.getElementById(id);
                     const allDropdowns = document.querySelectorAll('.dropdown');
 
+                    // Close other open dropdowns
                     allDropdowns.forEach(d => {
                         if (d.id !== id && !d.classList.contains('hidden')) {
                             d.classList.remove('opacity-100', 'scale-100', 'pointer-events-auto');
@@ -184,6 +189,7 @@
                         }
                     });
 
+                    // Toggle the clicked dropdown
                     if (dropdown.classList.contains('hidden')) {
                         dropdown.classList.remove('hidden', 'pointer-events-none');
                         setTimeout(() => {
@@ -199,6 +205,7 @@
                     }
                 }
 
+                // Close dropdowns when clicking outside
                 document.addEventListener('click', function(e) {
                     const isDropdownButton = e.target.closest('button[onclick^="toggleDropdown"]');
                     const isDropdownContent = e.target.closest('.dropdown');
@@ -215,7 +222,7 @@
                 });
 
 
-                // See More / See Less functionality
+                // See More / See Less functionality for activity description
                 document.querySelectorAll('.see-more-btn').forEach(button => {
                     button.addEventListener('click', function(e) {
                         e.preventDefault();
@@ -239,16 +246,11 @@
                         const itemId = this.dataset.id;
                         const shortDescriptionSpan = document.querySelector(
                             `.activity-short-description-${itemId}`);
-                        const shortText = `{!! nl2br(e(Str::limit($item->activity_description ?? '', 150))) !!}`; // This needs to be correctly injected from Laravel
+                        // Retrieve the original short text from the data attribute
+                        const originalShortText = shortDescriptionSpan.dataset.shortText;
                         const seeMoreBtn = document.querySelector(`.see-more-btn[data-id="${itemId}"]`);
 
-                        // To correctly get the original short text, you might need to store it in a data attribute
-                        // or re-calculate it. For simplicity, we'll use a placeholder or re-limit here.
-                        // A more robust solution might pass the original short text as a data attribute on the span.
-                        const originalShortText = shortDescriptionSpan.dataset.shortText || `{!! nl2br(e(Str::limit($item->activity_description ?? '', 150))) !!}`;
                         shortDescriptionSpan.innerHTML = originalShortText;
-
-
                         this.classList.add('hidden');
                         if (seeMoreBtn) {
                             seeMoreBtn.classList.remove('hidden');
@@ -260,93 +262,45 @@
 
                 function exportToExcel() {
                     const table = document.getElementById('attendanceTable');
-                    const ws = XLSX.utils.table_to_sheet(table, {
-                        raw: true
-                    }); // Use raw: true to get raw cell values first
+                    // Create a new workbook and sheet
+                    const wb = XLSX.utils.book_new();
+                    const ws_data = [];
 
-                    // Define the actual header names
+                    // Add header row manually, removing whitespace-nowrap effect
                     const headerNames = ["No", "Date", "Check-In", "Check-Out", "Activity Title",
                         "Activity Description", "Status"
                     ];
-                    XLSX.utils.sheet_add_aoa(ws, [headerNames], {
-                        origin: "A1"
+                    ws_data.push(headerNames);
+
+                    // Iterate over table rows to get the full text for Activity Description
+                    const rows = table.querySelectorAll('tbody tr');
+                    rows.forEach(row => {
+                        const rowData = [];
+                        // Get data for fixed columns
+                        rowData.push(row.cells[0].innerText.trim()); // No
+                        rowData.push(row.cells[1].innerText.trim()); // Date
+                        rowData.push(row.cells[2].innerText.trim()); // Check-In
+                        rowData.push(row.cells[3].innerText.trim()); // Check-Out
+
+                        // Get full text for Activity Title and Description
+                        const activityTitleElement = row.querySelector('.activity-cell-title span');
+                        const activityDescriptionElement = row.querySelector('.activity-cell-description .activity-content');
+                        const statusElement = row.querySelector('td:last-child span');
+
+                        const activityTitle = activityTitleElement ? activityTitleElement.innerText.trim() : '';
+                        let activityDescription = activityDescriptionElement ? activityDescriptionElement.dataset.fullText || activityDescriptionElement.innerText.trim() : '';
+                        activityDescription = activityDescription.replace(/(\r\n|\n|\r)/gm, " ").replace(/\s\s+/g, " "); // Clean newlines for Excel
+
+                        const status = statusElement ? statusElement.innerText.trim() : '';
+
+                        rowData.push(activityTitle);
+                        rowData.push(activityDescription);
+                        rowData.push(status);
+                        ws_data.push(rowData);
                     });
 
-
-                    // Process each row to correctly populate Activity Title and Activity Description
-                    // This ensures the full text is captured, even if "See More" was active.
-                    const rows = document.querySelectorAll('#attendanceTable tbody tr');
-                    rows.forEach((row, rowIndex) => {
-                        const activityTitleCell = row.querySelector('.activity-cell-title span');
-                        const activityDescriptionSpan = row.querySelector(
-                            '.activity-cell-description .activity-content');
-                        const statusSpan = row.querySelector('td:last-child span');
-
-                        const activityTitle = activityTitleCell ? activityTitleCell.innerText.trim() : '';
-                        let activityDescription = activityDescriptionSpan ? activityDescriptionSpan.dataset
-                            .fullText || activityDescriptionSpan.innerText.trim() : '';
-
-                        // Clean newlines for Excel
-                        activityDescription = activityDescription.replace(/(\r\n|\n|\r)/gm, " ")
-                            .replace(/\s\s+/g, " ");
-
-                        const status = statusSpan ? statusSpan.innerText.trim() : '';
-
-                        // Update the cell values in the worksheet
-                        // Row index starts from 1 for header + current row index
-                        // Column indexes: No (0), Date (1), Check-In (2), Check-Out (3), Activity Title (4), Activity Description (5), Status (6)
-                        XLSX.utils.sheet_add_aoa(ws, [
-                            [
-                                row.cells[0].innerText, // No
-                                row.cells[1].innerText, // Date
-                                row.cells[2].innerText, // Check-In
-                                row.cells[3].innerText, // Check-Out
-                                activityTitle, // Full Activity Title
-                                activityDescription, // Full Activity Description
-                                status // Status
-                            ]
-                        ], {
-                            origin: -1
-                        }); // -1 appends to the next row
-                    });
-
-                    // Remove the original table_to_sheet data and then add the structured data
-                    // This is a workaround because table_to_sheet doesn't directly handle the collapsed text properly.
-                    // We generate a new sheet with the corrected data.
-                    const newWs = XLSX.utils.aoa_to_sheet([headerNames]);
-                    rows.forEach((row, rowIndex) => {
-                        const activityTitleCell = row.querySelector('.activity-cell-title span');
-                        const activityDescriptionSpan = row.querySelector(
-                            '.activity-cell-description .activity-content');
-                        const statusSpan = row.querySelector('td:last-child span');
-
-                        const activityTitle = activityTitleCell ? activityTitleCell.innerText.trim() : '';
-                        let activityDescription = activityDescriptionSpan ? activityDescriptionSpan.dataset
-                            .fullText || activityDescriptionSpan.innerText.trim() : '';
-
-                        activityDescription = activityDescription.replace(/(\r\n|\n|\r)/gm, " ")
-                            .replace(/\s\s+/g, " ");
-
-                        const status = statusSpan ? statusSpan.innerText.trim() : '';
-
-                        XLSX.utils.sheet_add_aoa(newWs, [
-                            [
-                                row.cells[0].innerText,
-                                row.cells[1].innerText,
-                                row.cells[2].innerText,
-                                row.cells[3].innerText,
-                                activityTitle,
-                                activityDescription,
-                                status
-                            ]
-                        ], {
-                            origin: -1
-                        });
-                    });
-
-
-                    const wb = XLSX.utils.book_new();
-                    XLSX.utils.book_append_sheet(wb, newWs, "Attendance"); // Use newWs
+                    const ws = XLSX.utils.aoa_to_sheet(ws_data);
+                    XLSX.utils.book_append_sheet(wb, ws, "Attendance");
                     XLSX.writeFile(wb, "my_attendance.xlsx");
                 }
 
@@ -412,7 +366,7 @@
                     const {
                         jsPDF
                     } = window.jspdf;
-                    const doc = new jsPDF('l', 'pt', 'a4');
+                    const doc = new jsPDF('l', 'pt', 'a4'); // 'l' for landscape, 'pt' for points, 'a4' for A4 size
                     const table = document.getElementById('attendanceTable');
 
                     // 1. Store initial states and expand all "Activity" content
@@ -471,11 +425,10 @@
                         x: 10,
                         y: 10,
                         html2canvas: {
-                            scale: 0.6, // Adjusted scale
+                            scale: 0.6, // Adjusted scale to fit more content on the page
                             logging: true,
                             allowTaint: true,
                             useCORS: true,
-                            // Adjusted width/height for html2canvas might not be strictly needed if table.style.width is set to 'fit-content'
                         }
                     });
                 }
@@ -511,6 +464,7 @@
                     // Create a temporary element to hold the table for printing
                     const printWindow = window.open('', '', 'height=600,width=800');
                     printWindow.document.write('<html><head><title>Print</title>');
+                    // Link to the main app's CSS for consistent styling
                     printWindow.document.write('<link href="{{ asset('build/assets/app.css') }}" rel="stylesheet">');
                     printWindow.document.write('<style>');
                     printWindow.document.write('body { font-family: sans-serif; margin: 20px; }');
@@ -521,9 +475,11 @@
                         'th, td { border: 1px solid #ccc; padding: 5px; text-align: left; vertical-align: top;}'
                     );
                     printWindow.document.write('thead { background-color: #f2f2f2; }');
+                    // Hide "See More/Less" buttons in print
                     printWindow.document.write('.see-more-btn, .see-less-btn { display: none !important; }');
+                    // Ensure text wraps in description cells for printing
                     printWindow.document.write('td.activity-cell-description { white-space: normal; }');
-                    // Add print-specific styles to ensure table fits page, text wraps
+                    // Print-specific styles for table layout and word wrapping
                     printWindow.document.write('@media print { body { -webkit-print-color-adjust: exact; } table { table-layout: fixed; width: 100%; } td { word-wrap: break-word; } }');
                     printWindow.document.write('</style>');
                     printWindow.document.write('</head><body>');

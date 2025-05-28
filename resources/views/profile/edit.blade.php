@@ -53,33 +53,19 @@
             </div>
         </div>
 
-        {{-- Form Unggah Foto Baru dengan Cropping --}}
-        <h3 class="text-xl font-semibold mb-3 text-gray-700">Unggah Foto Kustom (Crop)</h3>
-        <div class="mb-4">
-            <label for="upload_profile_photo" class="block text-gray-700 text-sm font-bold mb-2">Pilih Gambar:</label>
-            <input type="file" name="upload_profile_photo" id="upload_profile_photo" accept="image/*"
-                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-            <p class="text-xs text-gray-500 mt-1">Maksimal 2MB, format JPG, PNG.</p>
-        </div>
-
-        {{-- Modal untuk Cropping --}}
-        <div id="cropModal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 hidden">
-            <div class="bg-white rounded-lg shadow-xl p-6 max-w-lg w-full">
-                <h2 class="text-2xl font-bold mb-4">Pangkas Gambar</h2>
-                <div class="img-container mb-4" style="max-height: 400px; overflow: hidden;"> {{-- Batasi tinggi container --}}
-                    <img id="imageToCrop" src="" alt="Image to crop" class="max-w-full h-auto">
-                </div>
-                <div class="flex justify-end space-x-2 mt-4">
-                    <button type="button" id="cropCancelBtn" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">Batal</button>
-                    <button type="button" id="cropApplyBtn" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Pangkas & Unggah</button>
-                </div>
-            </div>
-        </div>
-
-        {{-- Ini adalah hidden input untuk mengirim data gambar hasil crop --}}
-        <form action="{{ route('profile.update-photo') }}" method="POST" id="cropUploadForm">
+        {{-- Form Unggah Foto Baru (tanpa cropping) --}}
+        <h3 class="text-xl font-semibold mb-3 text-gray-700">Unggah Foto Baru</h3>
+        <form action="{{ route('profile.update-photo') }}" method="POST" enctype="multipart/form-data" class="mb-8">
             @csrf
-            <input type="hidden" name="cropped_image_data" id="croppedImageData">
+            <div class="mb-4">
+                <label for="profile_photo" class="block text-gray-700 text-sm font-bold mb-2">Pilih Gambar:</label>
+                <input type="file" name="profile_photo" id="profile_photo" accept="image/*"
+                    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                <p class="text-xs text-gray-500 mt-1">Maksimal 2MB, format JPG, PNG, GIF.</p>
+            </div>
+            <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                Unggah Foto
+            </button>
         </form>
 
 
@@ -112,133 +98,6 @@
 </div>
 @endsection
 
-@push('scripts') {{-- Jika Anda menggunakan @stack('scripts') di layout utama --}}
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const uploadProfilePhoto = document.getElementById('upload_profile_photo');
-        const cropModal = document.getElementById('cropModal');
-        const imageToCrop = document.getElementById('imageToCrop');
-        const cropCancelBtn = document.getElementById('cropCancelBtn');
-        const cropApplyBtn = document.getElementById('cropApplyBtn');
-        const croppedImageData = document.getElementById('croppedImageData');
-        const cropUploadForm = document.getElementById('cropUploadForm');
-
-        // Pastikan semua elemen yang dibutuhkan ditemukan
-        if (!uploadProfilePhoto || !cropModal || !imageToCrop || !cropCancelBtn || !cropApplyBtn || !croppedImageData || !cropUploadForm) {
-            console.error("ERROR: Satu atau lebih elemen yang dibutuhkan untuk fitur cropping tidak ditemukan. Periksa ID HTML Anda.");
-            return;
-        }
-
-        let cropper; // Variabel untuk menyimpan instance Cropper
-
-        uploadProfilePhoto.addEventListener('change', function(e) {
-            const files = e.target.files;
-            if (files && files.length > 0) {
-                const file = files[0];
-
-                if (!file.type.startsWith('image/')) {
-                    console.error("File yang dipilih bukan gambar.");
-                    alert("File yang dipilih bukan gambar. Mohon pilih file gambar.");
-                    uploadProfilePhoto.value = '';
-                    return;
-                }
-
-                const maxSize = 2 * 1024 * 1024; // 2MB
-                if (file.size > maxSize) {
-                    console.error("Ukuran file gambar melebihi 2MB.");
-                    alert("Ukuran gambar maksimal 2MB. Mohon pilih gambar yang lebih kecil.");
-                    uploadProfilePhoto.value = '';
-                    return;
-                }
-
-                const reader = new FileReader();
-
-                reader.onload = function(event) {
-                    console.log("FileReader selesai membaca gambar.");
-                    imageToCrop.src = event.target.result;
-
-                    // Pastikan cropper dihancurkan sebelum inisialisasi ulang
-                    if (cropper) {
-                        cropper.destroy();
-                        console.log("Cropper sebelumnya dihancurkan.");
-                    }
-
-                    // Inisialisasi Cropper setelah gambar benar-benar dimuat ke elemen <img>
-                    // Menggunakan event 'load' atau timeout untuk memastikan gambar sudah di-render
-                    imageToCrop.addEventListener('load', function handler() {
-                        console.log("imageToCrop.src berhasil dimuat.");
-                        cropper = new Cropper(imageToCrop, {
-                            aspectRatio: 1,
-                            viewMode: 1,
-                            background: false,
-                        });
-                        console.log("Cropper diinisialisasi.");
-                        cropModal.classList.remove('hidden'); // Tampilkan modal setelah Cropper siap
-                        imageToCrop.removeEventListener('load', handler); // Hapus listener setelah terpicu
-                    });
-
-                    // Fallback jika gambar sudah di-cache dan 'load' event tidak terpicu
-                    if (imageToCrop.complete && imageToCrop.naturalWidth > 0) {
-                        console.log("Gambar sudah di-cache, inisialisasi Cropper langsung.");
-                        if (cropper) {
-                            cropper.destroy();
-                        }
-                        cropper = new Cropper(imageToCrop, {
-                            aspectRatio: 1,
-                            viewMode: 1,
-                            background: false,
-                        });
-                        console.log("Cropper diinisialisasi (cache).");
-                        cropModal.classList.remove('hidden');
-                    }
-                };
-                reader.readAsDataURL(file);
-            }
-        });
-
-        cropCancelBtn.addEventListener('click', function() {
-            console.log("Tombol Batal diklik.");
-            cropModal.classList.add('hidden');
-            if (cropper) {
-                cropper.destroy();
-            }
-            uploadProfilePhoto.value = '';
-        });
-
-        cropApplyBtn.addEventListener('click', function() {
-            console.log("Tombol Pangkas & Unggah diklik.");
-            if (cropper) {
-                try {
-                    const croppedCanvas = cropper.getCroppedCanvas({
-                        width: 256,
-                        height: 256,
-                        fillColor: '#fff',
-                    });
-                    const imageData = croppedCanvas.toDataURL('image/png');
-
-                    croppedImageData.value = imageData;
-                    cropUploadForm.submit();
-                    console.log("Form disubmit.");
-                    cropModal.classList.add('hidden');
-                    if (cropper) {
-                        cropper.destroy();
-                    }
-                } catch (error) {
-                    console.error("Error saat mendapatkan data crop atau submit form:", error);
-                    alert("Gagal memproses gambar. Coba lagi atau gunakan gambar lain.");
-                }
-            } else {
-                console.warn("Cropper belum diinisialisasi saat tombol Apply diklik.");
-                alert("Mohon pilih gambar terlebih dahulu.");
-            }
-        });
-
-        cropModal.addEventListener('click', function(e) {
-            if (e.target === cropModal) {
-                console.log("Klik di luar modal terdeteksi.");
-                cropCancelBtn.click();
-            }
-        });
-    });
-</script>
+@push('scripts')
+{{-- Tidak ada script Cropper.js di sini lagi --}}
 @endpush

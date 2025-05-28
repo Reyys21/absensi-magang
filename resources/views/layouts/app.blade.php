@@ -8,8 +8,7 @@
     <script src="https://cdn.tailwindcss.com"></script> {{-- Menggunakan Tailwind dari CDN --}}
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     
-    {{-- Cropper.js CSS harus di <head> --}}
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css" rel="stylesheet">
+    {{-- Hapus semua link CSS/JS Cropper.js di sini --}}
 
     <style>
         body {
@@ -55,8 +54,7 @@
 
     {{-- Font Awesome JS (lebih baik di akhir body) --}}
     <script src="https://kit.fontawesome.com/2d9ecd9e37.js" crossorigin="anonymous"></script>
-    {{-- Cropper.js JavaScript (lebih baik di akhir body, setelah elemen-elemennya) --}}
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
+    {{-- Hapus semua script Cropper.js di sini --}}
 
     {{-- Pastikan @stack('scripts') ini ada di bagian bawah body, setelah semua JS lainnya --}}
     @stack('scripts') 

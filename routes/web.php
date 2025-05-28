@@ -5,6 +5,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\RegisteredUserController;
+use App\Http\Controllers\ProfileController;
 
 // Routes untuk guest (belum login)
 Route::middleware('guest')->group(function () {
@@ -29,7 +30,12 @@ Route::middleware('auth')->group(function () {
         Route::get('/checkout', 'checkoutForm')->name('checkout.form');
         Route::post('/checkout', 'storeCheckout')->name('checkout.store');
     });
-
+   Route::middleware('auth')->group(function () {
+    // Pastikan rute ini ada di sini
+    Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::post('/profile/update-photo', [ProfileController::class, 'updateProfilePhoto'])->name('profile.update-photo');
+    Route::post('/profile/delete-photo', [ProfileController::class, 'deleteProfilePhoto'])->name('profile.delete-photo');
+});
     // Attendance lainnya
     Route::get('/attendance/my', [AttendanceController::class, 'myAttendance'])->name('attendance.my');
     Route::get('/attendance/history', [AttendanceController::class, 'history'])->name('attendance.history'); // <--- TAMBAHKAN BARIS INI

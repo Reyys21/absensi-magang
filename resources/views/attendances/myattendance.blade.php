@@ -4,9 +4,9 @@
     <div class="flex flex-col md:flex-row min-h-screen font-[Inter]">
 
         {{-- sidebar --}}
-        @include('layouts.sidebar')
+   
 
-        <main class="flex-1 p-4 md:p-6 bg-gray-100">
+        <main id="main-content"  class="flex-1 p-4 md:p-6 bg-gray-100">
             <div class="flex justify-between items-center mb-6">
                 <h1 class="text-xl sm:text-2xl font-bold">My Attendance</h1>
                 {{-- Ini dia! Sertakan komponen profil di sini --}}
@@ -84,7 +84,7 @@
                             {{-- Removed whitespace-nowrap to allow text wrapping for Activity Title --}}
                             <th class="py-3 px-4">Activity Title</th>
                             {{-- Removed whitespace-nowrap to allow text wrapping for Activity Description and adjusted width --}}
-                            <th class="py-3 px-4 w-full md:w-[38%]">Activity Description</th>
+                            <th class="py-3 px-4 w-full md:w-[35%]">Activity Description</th>
                             <th class="py-3 px-4 whitespace-nowrap">Status</th>
                         </tr>
                     </thead>

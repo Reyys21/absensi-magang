@@ -109,7 +109,7 @@
 
         // Hanya inisialisasi jika elemen-elemen penting ditemukan
         if (!sidebar || !mainContent || !mobileMenuToggle || !desktopSidebarToggle || !sidebarOverlay) {
-            console.warn("One or more essential sidebar elements not found. Sidebar functionality may be limited or absent.");
+            console.warn("Satu atau lebih elemen sidebar penting tidak ditemukan. Fungsionalitas sidebar mungkin terbatas atau tidak ada.");
             return; // Hentikan eksekusi jika elemen penting tidak ada
         }
 
@@ -158,6 +158,11 @@
                 isDesktopSidebarOpen = isOpen;
                 localStorage.setItem('isDesktopSidebarOpen', isDesktopSidebarOpen);
 
+                // Atur margin kiri main content
+                if (mainContent) {
+                    mainContent.style.marginLeft = '0';
+                }
+
             } else { // Mobile
                 sidebar.classList.remove('md:relative', 'md:w-64', 'md:w-20', 'md:translate-x-0'); // Hapus kelas desktop
                 sidebar.classList.add('fixed'); // Sidebar fixed di mobile
@@ -165,7 +170,9 @@
                 sidebar.classList.toggle('-translate-x-full', !isOpen); // Toggle untuk menyembunyikan/menampilkan drawer
                 sidebarOverlay.classList.toggle('hidden', !isOpen); // Toggle overlay
 
-                mainContent.style.marginLeft = '0'; // Tidak ada margin di mobile
+                if (mainContent) {
+                    mainContent.style.marginLeft = '0'; // Tidak ada margin di mobile
+                }
 
                 // Pastikan sidebar selalu terlihat penuh di mobile (w-64)
                 sidebar.classList.add('w-64');
@@ -191,13 +198,13 @@
 
         function initializeSidebar() {
             if (window.innerWidth >= 768) {
-                // Desktop view
+                // Tampilan desktop
                 isDesktopSidebarOpen = localStorage.getItem('isDesktopSidebarOpen') === 'false' ? false : true;
                 setSidebarState(isDesktopSidebarOpen);
                 sidebar.classList.remove('-translate-x-full'); // Pastikan sidebar tidak tersembunyi
                 sidebarOverlay.classList.add('hidden'); // Pastikan overlay tersembunyi
             } else {
-                // Mobile view
+                // Tampilan mobile
                 setSidebarState(false); // Selalu tutup sidebar di mobile saat inisialisasi
             }
         }
@@ -306,15 +313,6 @@
 </script>
 
 <style>
-    /* Tailwind CSS base, components, and utilities should be handled by app.css */
-    /* Jika Anda menempatkan ini langsung di Blade, Anda mungkin tidak menggunakan Tailwind melalui Vite */
-    /* Jika Anda tetap ingin ini bekerja tanpa Vite sepenuhnya, Anda harus menyertakan Tailwind CDN atau build CSS secara manual */
-    /* HANYA JIKA ANDA TIDAK MENGGUNAKAN VITE DAN TAILWIND VIA app.css */
-    /* @tailwind base;
-    @tailwind components;
-    @tailwind utilities; */
-
-
     /* -- MULAI CSS SIDEBAR -- */
 
     /* Rotate transition */
@@ -351,7 +349,7 @@
         background-color: #34495E;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
         border-radius: 0.5rem;
-        z-index: 50; /* Z-index lebih tinggi dari sidebar */
+        z-index: 50;
         opacity: 0;
         visibility: hidden;
         transform: translateX(-10px);
@@ -364,21 +362,6 @@
         opacity: 1;
         visibility: visible;
         transform: translateX(0);
-    }
-
-    /* Padding dan warna hover untuk item dropdown saat sidebar kolaps */
-    #sidebar.md\:w-20 #attendanceDropdown a,
-    #sidebar.md\:w-20 #approvalDropdown a {
-        padding: 0.75rem 1.25rem;
-        font-size: 0.875rem;
-        border-radius: 0.375rem;
-        transition: background-color 0.15s ease-in-out, color 0.15s ease-in-out;
-    }
-
-    #sidebar.md\:w-20 #attendanceDropdown a:hover,
-    #sidebar.md\:w-20 #approvalDropdown a:hover {
-        background-color: #2C3E50;
-        color: #FFD100;
     }
 
     /* Sembunyikan ikon panah dropdown saat sidebar kolaps di desktop */

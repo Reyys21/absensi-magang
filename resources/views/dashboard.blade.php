@@ -5,8 +5,6 @@
     {{-- Ini adalah div pembungkus utama yang akan memiliki tata letak flex --}}
     <div class="flex flex-col md:flex-row min-h-screen font-[Inter]">
 
-        {{-- sidebar (akan fixed) --}}
-        @include('layouts.sidebar')
 
         {{-- Main content area --}}
         {{-- id="main-content" sangat penting untuk JavaScript --}}

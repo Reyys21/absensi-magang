@@ -6,7 +6,7 @@
         {{-- Header Halaman --}}
         <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-10">
             <h1 class="text-4xl sm:text-5xl font-extrabold text-slate-800 dark:text-white leading-tight mb-4 sm:mb-0">
-                Edit Profil
+                Ubah Password
             </h1>
             <a href="{{ url()->previous() }}"
                 class="inline-flex items-center px-5 py-2.5 border border-transparent text-sm font-semibold rounded-lg shadow-sm
@@ -100,16 +100,16 @@
                 <div class="w-full flex flex-col space-y-3 mt-6">
                     <a href="{{ route('profile.edit') }}"
                         class="w-full text-left py-3 px-5 rounded-xl font-semibold transition-colors duration-200 ease-in-out
-                        bg-indigo-600 text-white shadow-md
-                        hover:bg-indigo-700 dark:bg-indigo-700 dark:hover:bg-indigo-600 dark:text-white
+                        bg-slate-100 text-slate-700 hover:bg-slate-200 shadow-sm
+                        dark:bg-slate-700 dark:text-slate-200 dark:hover:bg-slate-600
                         flex items-center">
                         <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
                         Informasi Umum
                     </a>
                     <a href="{{ route('profile.change-password') }}"
                         class="w-full text-left py-3 px-5 rounded-xl font-semibold transition-colors duration-200 ease-in-out
-                        bg-slate-100 text-slate-700 hover:bg-slate-200 shadow-sm
-                        dark:bg-slate-700 dark:text-slate-200 dark:hover:bg-slate-600
+                        bg-indigo-600 text-white shadow-md
+                        hover:bg-indigo-700 dark:bg-indigo-700 dark:hover:bg-indigo-600 dark:text-white
                         flex items-center">
                         <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2v5a2 2 0 01-2 2h-5a2 2 0 01-2-2V9a2 2 0 012-2h5z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6"></path></svg>
                         Ubah Password
@@ -117,117 +117,69 @@
                 </div>
             </div>
 
-            {{-- KOLOM KANAN (FORM INFORMASI DASAR) --}}
+            {{-- KOLOM KANAN (FORM UBAH PASSWORD) --}}
             <div class="md:col-span-2 space-y-8">
-                {{-- Bagian: Informasi Dasar Profil --}}
-                <div id="general-info-content" class="bg-slate-50 dark:bg-slate-700/50 p-7 rounded-xl shadow-md border border-slate-200 dark:border-slate-700">
+                <div class="bg-slate-50 dark:bg-slate-700/50 p-7 rounded-xl shadow-md border border-slate-200 dark:border-slate-700">
                     <h2
                         class="text-2xl font-bold mb-6 text-slate-700 dark:text-slate-200 border-b border-slate-300 dark:border-slate-600 pb-4">
-                        Informasi Umum
+                        Perbarui Password
                     </h2>
-                    <form method="POST" action="{{ route('profile.update-information') }}" class="space-y-6">
+                    <form method="POST" action="{{ route('profile.update-password') }}" class="space-y-6">
                         @csrf
                         @method('patch')
 
                         <div>
-                            <label for="name"
-                                class="block text-slate-700 dark:text-slate-300 text-sm font-medium mb-2">Nama Lengkap:</label>
-                            <input type="text" name="name" id="name"
-                                value="{{ old('name', optional($user)->name) }}"
+                            <label for="current_password"
+                                class="block text-slate-700 dark:text-slate-300 text-sm font-medium mb-2">Password Saat
+                                Ini:</label>
+                            <input type="password" name="current_password" id="current_password"
                                 class="w-full px-4 py-2.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-200
                                        placeholder-slate-400 dark:placeholder-slate-500
                                        focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500
                                        transition duration-150 ease-in-out text-base"
                                 required>
-                            @error('name')
+                            @error('current_password')
                                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                             @enderror
                         </div>
 
                         <div>
-                            <label for="email"
-                                class="block text-slate-700 dark:text-slate-300 text-sm font-medium mb-2">Alamat Email:</label>
-                            <input type="email" name="email" id="email"
-                                value="{{ old('email', optional($user)->email) }}"
+                            <label for="password"
+                                class="block text-slate-700 dark:text-slate-300 text-sm font-medium mb-2">Password
+                                Baru:</label>
+                            <input type="password" name="password" id="password"
                                 class="w-full px-4 py-2.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-200
                                        placeholder-slate-400 dark:placeholder-slate-500
                                        focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500
                                        transition duration-150 ease-in-out text-base"
                                 required>
-                            @error('email')
+                            @error('password')
                                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                             @enderror
                         </div>
 
                         <div>
-                            <label for="role"
-                                class="block text-slate-700 dark:text-slate-300 text-sm font-medium mb-2">Daftar sebagai:</label>
-                            <select name="role" id="role"
+                            <label for="password_confirmation"
+                                class="block text-slate-700 dark:text-slate-300 text-sm font-medium mb-2">Konfirmasi
+                                Password Baru:</label>
+                            <input type="password" name="password_confirmation" id="password_confirmation"
                                 class="w-full px-4 py-2.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-200
+                                       placeholder-slate-400 dark:placeholder-slate-500
                                        focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500
                                        transition duration-150 ease-in-out text-base"
                                 required>
-                                <option value="">Pilih Role</option>
-                                <option value="mahasiswa" {{ optional($user)->role == 'mahasiswa' ? 'selected' : '' }}>
-                                    Mahasiswa</option>
-                                <option value="siswa" {{ optional($user)->role == 'siswa' ? 'selected' : '' }}>Siswa
-                                </option>
-                            </select>
-                            @error('role')
+                            @error('password_confirmation')
                                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                             @enderror
                         </div>
-
-                        <div>
-                            <label for="asal_kampus"
-                                class="block text-slate-700 dark:text-slate-300 text-sm font-medium mb-2">Asal Kampus/Sekolah:</label>
-                            <input type="text" name="asal_kampus" id="asal_kampus"
-                                value="{{ old('asal_kampus', optional($user)->asal_kampus) }}"
-                                class="w-full px-4 py-2.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-200
-                                       placeholder-slate-400 dark:placeholder-slate-500
-                                       focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500
-                                       transition duration-150 ease-in-out text-base">
-                            @error('asal_kampus')
-                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                            @enderror
-                        </div>
-
-                        <div>
-                            <label for="phone"
-                                class="block text-slate-700 dark:text-slate-300 text-sm font-medium mb-2">Nomor Telepon:</label>
-                            <input type="text" name="phone" id="phone"
-                                value="{{ old('phone', optional($user)->phone) }}"
-                                class="w-full px-4 py-2.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-200
-                                       placeholder-slate-400 dark:placeholder-slate-500
-                                       focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500
-                                       transition duration-150 ease-in-out text-base">
-                            @error('phone')
-                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                            @enderror
-                        </div>
-
-                        <div>
-                            <label for="nim"
-                                class="block text-slate-700 dark:text-slate-300 text-sm font-medium mb-2">NIM (Opsional):</label>
-                            <input type="text" name="nim" id="nim"
-                                value="{{ old('nim', optional($user)->nim) }}"
-                                class="w-full px-4 py-2.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-200
-                                       placeholder-slate-400 dark:placeholder-slate-500
-                                       focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500
-                                       transition duration-150 ease-in-out text-base">
-                            @error('nim')
-                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                            @enderror
-                        </div>
-
                         <div class="pt-4">
                             <button type="submit"
                                 class="inline-flex items-center px-6 py-3 border border-transparent text-base font-semibold rounded-lg shadow-md
-                                   bg-green-600 text-white hover:bg-green-700
-                                   focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 dark:focus:ring-offset-slate-800
+                                   bg-indigo-600 text-white hover:bg-indigo-700
+                                   focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-slate-800
                                    transition-colors duration-200 ease-in-out">
-                                <svg class="w-5 h-5 mr-2 -ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path></svg>
-                                Simpan Perubahan
+                                <svg class="w-5 h-5 mr-2 -ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0v4m-4 2v5m-4-5h8m-4-5h8m-4-5h8m-4-5h8m-4-5h8"></path></svg>
+                                Perbarui Password
                             </button>
                         </div>
                     </form>
@@ -236,7 +188,7 @@
         </div>
     </div>
 
-    {{-- MODAL UBAH FOTO PROFIL --}}
+    {{-- MODAL UBAH FOTO PROFIL (Tetap sama, karena ini modal global) --}}
     <div id="photoModal" class="fixed inset-0 bg-gray-900 bg-opacity-80 flex items-center justify-center z-50 hidden p-4">
         <div class="bg-white dark:bg-slate-800 rounded-xl shadow-2xl p-7 sm:p-9 max-w-2xl w-full transform transition-all duration-300 ease-out scale-95 opacity-0" id="modal-content-wrapper">
             <div class="flex justify-between items-center mb-6 pb-4 border-b border-slate-200 dark:border-slate-700">
@@ -446,7 +398,6 @@
             }
 
             window.selectDefaultAvatar = function(radioId, N_this_element) {
-                // Better way to reset active state using closest() and forEach()
                 const avatarContainers = defaultAvatarForm.querySelectorAll('[type="radio"]').forEach(radio => {
                     radio.closest('div').classList.remove('border-indigo-500', 'ring-2', 'ring-indigo-300',
                         'bg-indigo-50', 'dark:bg-indigo-900/50', 'dark:border-indigo-600');

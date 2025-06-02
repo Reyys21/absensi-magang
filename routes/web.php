@@ -30,15 +30,28 @@ Route::middleware('auth')->group(function () {
         Route::get('/checkout', 'checkoutForm')->name('checkout.form');
         Route::post('/checkout', 'storeCheckout')->name('checkout.store');
     });
-   Route::middleware('auth')->group(function () {
-    // Pastikan rute ini ada di sini
-    Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::post('/profile/update-photo', [ProfileController::class, 'updateProfilePhoto'])->name('profile.update-photo');
-    Route::post('/profile/delete-photo', [ProfileController::class, 'deleteProfilePhoto'])->name('profile.delete-photo');
-});
+
+    // Rute-rute terkait Profil
+    Route::controller(ProfileController::class)->group(function () {
+        // Rute untuk menampilkan form edit informasi umum
+        Route::get('/profile/edit', 'edit')->name('profile.edit');
+        // Rute untuk proses update informasi umum
+        Route::patch('/profile/update-information', 'updateProfileInformation')->name('profile.update-information');
+
+        // Rute untuk menampilkan form ubah password
+        Route::get('/profile/change-password', 'showChangePasswordForm')->name('profile.change-password');
+        // Rute untuk proses update password
+        Route::patch('/profile/update-password', 'updatePassword')->name('profile.update-password');
+
+        // Rute untuk update foto profil
+        Route::post('/profile/update-photo', 'updateProfilePhoto')->name('profile.update-photo');
+        // Rute untuk hapus foto profil
+        Route::post('/profile/delete-photo', 'deleteProfilePhoto')->name('profile.delete-photo');
+    });
+
     // Attendance lainnya
     Route::get('/attendance/my', [AttendanceController::class, 'myAttendance'])->name('attendance.my');
-    Route::get('/attendance/history', [AttendanceController::class, 'history'])->name('attendance.history'); // <--- TAMBAHKAN BARIS INI
+    Route::get('/attendance/history', [AttendanceController::class, 'history'])->name('attendance.history');
     Route::get('/attendance/export', [AttendanceController::class, 'export'])->name('attendance.export');
 
     Route::get('/attendance/create', [AttendanceController::class, 'create'])->name('attendance.create');

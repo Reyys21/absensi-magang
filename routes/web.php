@@ -6,6 +6,21 @@ use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\RegisteredUserController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\HomepageController; // <--- TAMBAHKAN IMPORT INI
+
+/*
+|--------------------------------------------------------------------------
+| Web Routes
+|--------------------------------------------------------------------------
+|
+| Here is where you can register web routes for your application. These
+| routes are loaded by the RouteServiceProvider and all of them will
+| be assigned to the "web" middleware group. Make something great!
+|
+*/
+
+// Rute untuk Homepage (halaman pertama yang dilihat semua orang)
+Route::get('/', [HomepageController::class, 'index'])->name('home'); // <--- UBAH INI
 
 // Routes untuk guest (belum login)
 Route::middleware('guest')->group(function () {
@@ -20,10 +35,9 @@ Route::middleware('guest')->group(function () {
 Route::middleware('auth')->group(function () {
 
     // Dashboard
-    // DashboardController mungkin tidak menggunakan struktur 'fold_dashboard', jadi biarkan terpisah jika DashboardController beda
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-    // Semua Rute terkait Absensi, Koreksi, dan Approval Requests dikelompokkan di sini
+    // Semua Rute terkait Absensi, Koreksi, dan Approval Requests
     Route::controller(AttendanceController::class)->group(function () {
         Route::get('/checkin', 'checkinForm')->name('checkin.form');
         Route::post('/checkin', 'storeCheckin')->name('checkin.store');
@@ -31,26 +45,20 @@ Route::middleware('auth')->group(function () {
         Route::get('/checkout', 'checkoutForm')->name('checkout.form');
         Route::post('/checkout', 'storeCheckout')->name('checkout.store');
 
-        // My Attendance
         Route::get('/my-attendance', 'myAttendance')->name('attendance.my');
-
-        // History Attendance
         Route::get('/attendance-history', 'history')->name('attendance.history');
 
-        // Correction Form
         Route::get('/correction-form', 'showCorrectionForm')->name('correction.form');
         Route::post('/correction-request', 'storeCorrectionRequest')->name('correction.store');
 
-        // Approval Requests for User
         Route::get('/approval-requests', 'showApprovalRequests')->name('approval.requests');
 
-        // Export, Create, Store (Jika ini juga di AttendanceController)
         Route::get('/attendance/export', 'export')->name('attendance.export');
-        Route::get('/attendance/create', 'create')->name('attendance.create');
-        Route::post('/attendance/store', 'store')->name('attendance.store');
+        Route::get('/attendance/create', 'create')->name('attendance.create'); // Jika ada
+        Route::post('/attendance/store', 'store')->name('attendance.store'); // Jika ada
     });
 
-    // Rute-rute terkait Profil (menggunakan prefix dan name group)
+    // Rute-rute terkait Profil
     Route::prefix('profile')->name('profile.')->controller(ProfileController::class)->group(function () {
         Route::get('/edit', 'edit')->name('edit');
         Route::patch('/update-information', 'updateProfileInformation')->name('update-information');
@@ -64,7 +72,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 });
 
-// Jika Anda memiliki halaman landing page tanpa otentikasi
-Route::get('/', function () {
-    return view('welcome');
-});
+// Hapus rute welcome lama jika sudah digantikan oleh homepage
+// Route::get('/welcome-test', function () { // Anda bisa menamainya lain jika masih butuh view welcome
+//     return view('welcome');
+// })->name('welcome.page');

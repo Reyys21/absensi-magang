@@ -56,9 +56,7 @@
                     <a href="{{ route('attendance.my') }}"
                         class="block px-6 py-2 text-sm {{ request()->routeIs('attendance.my') ? 'bg-[#2C3E50] text-[#FFD100]' : 'hover:bg-[#2C3E50] hover:text-[#FFD100]' }} rounded">My
                         Attendance</a>
-                    <a href="#"
-                        class="block px-6 py-2 text-sm hover:bg-[#2C3E50] hover:text-[#FFD100] rounded">Attendance
-                        Records</a>
+                  
                 </div>
             </div>
 

@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Carbon\Carbon;
+use Carbon\Carbon; // Pastikan ini ada
 
 class Attendance extends Model
 {
@@ -17,64 +17,62 @@ class Attendance extends Model
         'check_out',
         'activity_title',
         'activity_description',
-        'status',
+        // 'status', // Hapus jika ini tidak digunakan untuk status utama absensi
     ];
 
+    // Kolom yang akan di-cast ke tipe data tertentu.
+    // Ini berarti kolom check_in dan check_out di DB Anda harus bertipe DATETIME.
     protected $casts = [
         'date' => 'date',
         'check_in' => 'datetime',
         'check_out' => 'datetime',
     ];
 
+    // '$appends' berguna agar accessor ini selalu disertakan saat model di-convert ke array/JSON
     protected $appends = ['attendance_status', 'formatted_date', 'day_name'];
 
     /**
      * Get the attendance status.
+     * Logika disederhanakan menjadi hanya "Complete" dan "Absent (Belum Lengkap)".
      *
      * @return string
      */
     public function getAttendanceStatusAttribute()
     {
-        $today = Carbon::now()->toDateString();
-        $recordDate = $this->date->toDateString();
-
-        // Jika tidak ada check-in dan tidak ada check-out
-        if (empty($this->check_in) && empty($this->check_out)) {
-            // Jika tanggalnya hari ini dan belum ada data, anggap belum ada data
-            if ($recordDate == $today) {
-                return 'No Data Yet'; // Atau bisa juga 'Waiting'
-            }
-            // Jika tanggalnya di masa lalu dan tidak ada data, berarti Absent
-            if ($this->date->isPast() && $recordDate != $today) {
-                return 'Absent';
-            }
-            // Untuk tanggal di masa depan (jika ada data kosong untuk masa depan)
-            return 'Upcoming';
-        }
-
-        // Jika hanya check-in (tidak ada check-out) ATAU hanya check-out (tidak ada check-in)
-        if ((!empty($this->check_in) && empty($this->check_out)) || (empty($this->check_in) && !empty($this->check_out))) {
-            return 'Absent (Belum Lengkap)'; // Menggabungkan "Not Checked In" dan "Not Checked Out"
-        }
-
-        // Jika check-in dan check-out sudah ada
-        if (!empty($this->check_in) && !empty($this->check_out)) {
+        // Jika check_in dan check_out keduanya terisi (tidak null)
+        if ($this->check_in && $this->check_out) {
             return 'Complete';
         }
 
-        // Default jika ada kondisi lain yang tidak terduga
-        return 'Unknown';
+        // Jika salah satu (check_in atau check_out) kosong, berarti "Absent (Belum Lengkap)"
+        // Ini akan mencakup:
+        // - Hanya check_in ada, check_out kosong
+        // - Hanya check_out ada, check_in kosong
+        // - Keduanya kosong (untuk record yang ada tapi tidak ada data absen sama sekali)
+        return 'Absent (Belum Lengkap)';
     }
 
-    // Accessor untuk mendapatkan format tanggal 'DD Month YYYY'
+    /**
+     * Accessor untuk mendapatkan format tanggal 'DD Month YYYY'
+     * Contoh: '03 Juni 2025'
+     *
+     * @return string
+     */
     public function getFormattedDateAttribute()
     {
+        // Pastikan Carbon::setLocale('id') sudah diatur di AppServiceProvider atau di tempat lain
         return $this->date->translatedFormat('d F Y');
     }
 
-    // Accessor untuk mendapatkan nama hari (Senin, Selasa, dst.)
+    /**
+     * Accessor untuk mendapatkan nama hari (Senin, Selasa, dst.)
+     * Contoh: 'Selasa'
+     *
+     * @return string
+     */
     public function getDayNameAttribute()
     {
+        // Pastikan Carbon::setLocale('id') sudah diatur di AppServiceProvider atau di tempat lain
         return $this->date->translatedFormat('l');
     }
 

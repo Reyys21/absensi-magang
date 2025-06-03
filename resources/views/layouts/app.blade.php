@@ -49,6 +49,7 @@
         <main id="main-content" class="flex-1 overflow-y-auto transition-all duration-300 ease-in-out">
             {{-- Konten utama dari view turunan akan di-yield di sini --}}
             @yield('content')
+            @yield('scripts')
         </main>
     </div>
 

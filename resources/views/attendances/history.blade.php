@@ -1,28 +1,27 @@
+{{-- resources/views/attendances/history.blade.php --}}
 @extends('layouts.app')
 
 @section('content')
-    {{-- Ini adalah div pembungkus utama yang akan memiliki tata letak flex --}}
-    {{-- Ini sangat penting untuk sidebarn dan main content agar sejajar --}}
     <div class="flex flex-col md:flex-row min-h-screen font-[Inter]">
 
-   
-
-        {{-- Main content area --}}
         <main id="main-content" class="flex-1 p-4 md:p-6 transition-all duration-300 ease-in-out">
-            {{-- Isi konten utama Anda dari sini --}}
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
-                <h1 class="text-xl sm:text-2xl font-bold mb-3 sm:mb-0">My Attendance</h1>
-                @include('layouts.profile') {{-- Asumsi ini adalah file yang menampilkan profil --}}
+                <h1 class="text-xl sm:text-2xl font-bold mb-3 sm:mb-0">My Attendance History</h1>
+                @include('layouts.profile')
             </div>
 
-            {{-- History Section --}}
             <div class="bg-white rounded-lg shadow-md p-4 md:p-6 mb-6">
                 <h2 class="text-lg font-semibold mb-4">History</h2>
 
                 <div class="mb-4">
-                    <button class="bg-purple-500 text-white px-4 py-2 rounded-md text-sm font-medium w-full sm:w-auto">Correction</button>
+                    {{-- Tombol Correction --}}
+                    <button id="openCorrectionModalButton"
+                            class="bg-purple-500 text-white px-4 py-2 rounded-md text-sm font-medium w-full sm:w-auto hover:bg-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50">
+                        Correction
+                    </button>
                 </div>
 
+                {{-- Legenda Status Absensi --}}
                 <div class="flex flex-wrap items-center gap-x-4 gap-y-2 mb-6 text-sm">
                     <div class="flex items-center gap-2">
                         <div class="w-4 h-4 rounded-full" style="background-color: #28CB6E;" title="Complete"></div>
@@ -32,12 +31,9 @@
                         <div class="w-4 h-4 rounded-full" style="background-color: #f86917;" title="Absent (Belum Lengkap)"></div>
                         <span>Absent (Belum Lengkap)</span>
                     </div>
-                    <div class="flex items-center gap-2">
-                        <div class="w-4 h-4 rounded-full" style="background-color: #E61126;" title="Absent"></div>
-                        <span>Absent</span>
-                    </div>
                 </div>
 
+                {{-- Navigasi Bulan --}}
                 <div class="flex flex-col sm:flex-row justify-between items-center mb-4 gap-2 sm:gap-0">
                     <a href="{{ route('attendance.history', ['year' => $date->copy()->subMonth()->year, 'month' => $date->copy()->subMonth()->month, 'selected_date' => Request::get('selected_date')]) }}"
                        class="px-3 py-1 bg-gray-200 text-gray-700 rounded-md text-sm hover:bg-gray-300 w-full text-center sm:w-auto">
@@ -45,7 +41,7 @@
                     </a>
 
                     <button class="bg-black text-white px-6 py-2 rounded-md text-sm font-medium w-full sm:w-auto">
-                        {{ $date->format('F Y') }}
+                        {{ $date->translatedFormat('F Y') }}
                     </button>
 
                     <a href="{{ route('attendance.history', ['year' => $date->copy()->addMonth()->year, 'month' => $date->copy()->addMonth()->month, 'selected_date' => Request::get('selected_date')]) }}"
@@ -54,6 +50,7 @@
                     </a>
                 </div>
 
+                {{-- Kalender --}}
                 <div class="grid grid-cols-7 gap-0.5 sm:gap-1 text-center">
                     @php
                         use Carbon\Carbon;
@@ -61,61 +58,73 @@
                         $startOfMonth = $date->copy()->startOfMonth();
                         $firstDayOfWeek = $startOfMonth->dayOfWeekIso;
                         $offset = $firstDayOfWeek - 1;
-
-                        $calendarStart = $startOfMonth->copy()->subDays($offset);
-                        $today = Carbon::now()->toDateString();
+                        $todayCarbon = Carbon::now()->tz('Asia/Makassar'); // Pastikan timezone
+                        $userRegistrationDate = Auth::user()->created_at->startOfDay()->tz('Asia/Makassar'); // Pastikan timezone
                     @endphp
 
-                    @foreach(['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] as $dayName)
+                    @foreach(['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'] as $dayName)
                         <div class="text-gray-500 font-semibold py-2 text-xs sm:text-base">{{ $dayName }}</div>
                     @endforeach
 
                     @for ($i = 0; $i < 42; $i++)
                         @php
-                            $loopDate = $calendarStart->copy()->addDays($i);
-                            $currentDayString = $loopDate->format('Y-m-d');
-                            $attendance = $monthlyAttendances->get($currentDayString);
-                            $attendanceStatus = $attendance ? $attendance->attendance_status : '';
+                            $loopDate = $startOfMonth->copy()->subDays($offset)->addDays($i);
+                            $currentDayString = $loopDate->toDateString();
+
+                            $attendanceData = $monthlyAttendances->get($currentDayString);
+
+                            $status = $attendanceData ? $attendanceData->attendance_status : '';
 
                             $bgColor = '';
                             $textColor = 'text-gray-700';
+                            $isCurrentMonth = ($loopDate->month == $date->month);
+                            $isToday = ($currentDayString == $todayCarbon->toDateString());
+                            $isSelected = (Request::get('selected_date') == $currentDayString);
+                            $isBeforeRegistration = $loopDate->lt($userRegistrationDate);
+                            $isFutureDate = $loopDate->gt($todayCarbon->endOfDay());
 
-                            if ($loopDate->month != $date->month) {
+                            if (!$isCurrentMonth || $isBeforeRegistration || $isFutureDate) {
                                 $textColor = 'text-gray-400';
-                            } elseif ($loopDate->isSaturday()) {
-                                $textColor = 'text-blue-600';
-                            } elseif ($loopDate->isSunday()) {
-                                $textColor = 'text-red-600';
-                            }
-
-                            if ($attendance) {
-                                switch ($attendanceStatus) {
+                                $bgColor = 'transparent';
+                                $status_display = ($isBeforeRegistration) ? 'N/A' : 'Future';
+                            } else {
+                                $status_display = $status;
+                                switch ($status) {
                                     case 'Complete':
                                         $bgColor = '#28CB6E';
+                                        $textColor = 'text-white';
                                         break;
-                                    case 'Absent (Belum Lengkap)': // Status baru
-                                        $bgColor = '#f86917'; // Warna untuk status belum lengkap
+                                    case 'Absent (Belum Lengkap)':
+                                        $bgColor = '#f86917';
+                                        $textColor = 'text-white';
                                         break;
-                                    case 'Absent':
-                                        $bgColor = '#E61126';
+                                    case 'Incomplete':
+                                        $bgColor = '#FFD700';
+                                        $textColor = 'text-gray-800';
                                         break;
                                     default:
-                                        $bgColor = '#A0AEC0'; // Warna default jika ada status yang tidak terdefinisi
+                                        $bgColor = 'transparent';
+                                        $textColor = 'text-gray-700';
                                         break;
                                 }
-                                $textColor = 'text-white';
-                            }
 
-                            $isSelected = (Request::get('selected_date') == $currentDayString);
+                                if ($loopDate->isSaturday() && $isCurrentMonth && !$isBeforeRegistration && !$isFutureDate) {
+                                    $textColor = 'text-blue-600';
+                                } elseif ($loopDate->isSunday() && $isCurrentMonth && !$isBeforeRegistration && !$isFutureDate) {
+                                    $textColor = 'text-red-600';
+                                }
+                            }
                         @endphp
 
                         <div class="py-1">
-                            <a href="{{ route('attendance.history', ['year' => $date->year, 'month' => $date->month, 'selected_date' => $currentDayString]) }}"
+                            <a href="{{ ($status_display === 'N/A' || $status_display === 'Future') ? '#' : route('attendance.history', ['year' => $date->year, 'month' => $date->month, 'selected_date' => $currentDayString]) }}"
                                class="inline-flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-full text-xs sm:text-base
-                                       {{ $isSelected ? 'bg-black text-white' : '' }}
-                                       font-medium cursor-pointer relative
-                                       {{ $textColor }}"
-                                       @if (!$isSelected && $bgColor) style="background-color: {{ $bgColor }}; color: white;" @endif>
+                                            font-medium cursor-pointer relative
+                                            {{ $isSelected ? 'bg-black text-white' : '' }}
+                                            {{ $isToday && !$isSelected && !$isBeforeRegistration && !$isFutureDate ? 'border-2 border-black' : '' }}
+                                            {{ $textColor }}"
+                               data-date="{{ $currentDayString }}"
+                               @if (!$isSelected && $bgColor && $bgColor != 'transparent') style="background-color: {{ $bgColor }}; color: white;" @endif>
                                 {{ $loopDate->day }}
                             </a>
                         </div>
@@ -123,9 +132,10 @@
                 </div>
             </div>
 
+            {{-- Daily History Section --}}
             <div class="bg-white rounded-lg shadow-md p-4 md:p-6">
                 <h2 class="text-lg font-semibold mb-4">Daily History</h2>
-                @if ($dailyAttendances->isEmpty())
+                @if ($dailyAttendances->isEmpty() && !Request::filled('selected_date'))
                     <p class="text-gray-600 text-center text-sm">Tidak ada data absensi untuk periode ini.</p>
                 @else
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
@@ -138,6 +148,14 @@
                                     <div>
                                         <p class="text-sm font-semibold">{{ $attendance->day_name }}</p>
                                         <p class="text-xs text-gray-500">{{ $attendance->formatted_date }}</p>
+                                        <p class="text-xs text-gray-500">Check-In: {{ $attendance->check_in ? $attendance->check_in->tz('Asia/Makassar')->format('H:i') : '--.--' }}</p>
+                                        <p class="text-xs text-gray-500">Check-Out: {{ $attendance->check_out ? $attendance->check_out->tz('Asia/Makassar')->format('H:i') : '--.--' }}</p>
+                                        @if ($attendance->activity_title)
+                                            <p class="text-xs text-gray-500">Aktivitas: {{ $attendance->activity_title }}</p>
+                                        @endif
+                                        @if ($attendance->activity_description)
+                                            <p class="text-xs text-gray-500">Deskripsi: {{ $attendance->activity_description }}</p>
+                                        @endif
                                     </div>
                                 </div>
                                 <div class="w-3 h-3 sm:w-4 sm:h-4 rounded-full"
@@ -147,11 +165,11 @@
                                             case 'Complete':
                                                 $indicatorColor = '#28CB6E';
                                                 break;
-                                            case 'Absent (Belum Lengkap)': // Status baru
+                                            case 'Absent (Belum Lengkap)':
                                                 $indicatorColor = '#f86917';
                                                 break;
-                                            case 'Absent':
-                                                $indicatorColor = '#E61126';
+                                            case 'Incomplete':
+                                                $indicatorColor = '#FFD700';
                                                 break;
                                             default:
                                                 $indicatorColor = '#A0AEC0';
@@ -166,15 +184,166 @@
                 @endif
             </div>
         </main>
-    </div> {{-- Penutup div flex --}}
+    </div>
+
+    {{-- MODAL KOREKSI ABSENSI --}}
+    <div id="correctionModal" class="fixed inset-0 bg-gray-600 bg-opacity-75 hidden items-center justify-center z-50 p-4">
+        {{-- Modal Content Container --}}
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-lg md:max-w-xl lg:max-w-2xl mx-auto overflow-y-auto max-h-[90vh] flex flex-col"> {{-- Added flex flex-col --}}
+            {{-- Modal Header --}}
+            <div class="flex justify-between items-center px-6 py-4 border-b border-gray-200 sticky top-0 bg-white z-10"> {{-- Added sticky top-0 bg-white z-10 --}}
+                <h3 class="text-lg font-bold text-gray-800">Ajukan Koreksi Absensi</h3>
+                <button id="closeCorrectionModalButton" class="text-gray-500 hover:text-gray-700 text-2xl font-bold leading-none">&times;</button> {{-- Added leading-none --}}
+            </div>
+            {{-- Modal Body (where form content is loaded) --}}
+            <div id="correctionFormContent" class="flex-grow p-6 md:p-8"> {{-- Added flex-grow and proper padding --}}
+                <p class="text-center text-gray-600 py-8">Memuat form koreksi...</p>
+            </div>
+        </div>
+    </div>
 @endsection
 
-@section('Script')
-    {{-- KOSONGKAN SEPENUHNYA ATAU ISI DENGAN HANYA SCRIPT JS KHUSUS HISTORY --}}
-    {{-- Contoh:
-    <script>
-        console.log("Halaman history dimuat!");
-        // Skrip khusus history di sini
-    </script>
-    --}}
+@section('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const correctionModal = document.getElementById('correctionModal');
+    const openCorrectionModalButton = document.getElementById('openCorrectionModalButton');
+    const closeCorrectionModalButton = document.getElementById('closeCorrectionModalButton');
+    const correctionFormContent = document.getElementById('correctionFormContent');
+
+    // Ensure the modal is hidden on initial page load
+    if (correctionModal) {
+        correctionModal.classList.add('hidden');
+        correctionModal.classList.remove('flex');
+    }
+
+    if (openCorrectionModalButton) {
+        openCorrectionModalButton.addEventListener('click', function() {
+            console.log('Correction button clicked!');
+
+            let defaultDate = '{{ \Carbon\Carbon::now('Asia/Makassar')->format('Y-m-d') }}'; // Use server's timezone
+
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.has('selected_date')) {
+                defaultDate = urlParams.get('selected_date');
+            }
+
+            console.log('Fetching correction form for date:', defaultDate);
+
+            // Show loading state and modal
+            if (correctionFormContent) {
+                correctionFormContent.innerHTML = '<p class="text-center text-gray-600 py-8">Memuat form koreksi...</p>';
+            }
+            if (correctionModal) {
+                correctionModal.classList.remove('hidden');
+                correctionModal.classList.add('flex');
+            }
+
+            fetch(`{{ route('correction.form') }}?date=${defaultDate}`)
+                .then(response => {
+                    console.log('AJAX Response Status:', response.status);
+                    if (!response.ok) {
+                        return response.text().then(text => {
+                            throw new Error(`HTTP error! status: ${response.status}, message: ${text}`);
+                        });
+                    }
+                    return response.text();
+                })
+                .then(html => {
+                    console.log('AJAX Success! HTML received. Length:', html.length);
+                    if (correctionFormContent) {
+                        if (html.trim().length === 0) {
+                            correctionFormContent.innerHTML = '<p class="text-red-500 text-center py-8">Form koreksi kosong atau tidak valid.</p>';
+                            console.warn('Received empty HTML for correction form.');
+                        } else {
+                            correctionFormContent.innerHTML = html;
+                            attachFormSubmitListener(); // Re-attach listeners after content update
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading correction form:', error);
+                    if (correctionFormContent) {
+                        correctionFormContent.innerHTML = `<p class="text-red-500 text-center py-8">Gagal memuat form koreksi.<br>Detail: ${error.message}. Cek konsol browser untuk lebih lanjut.</p>`;
+                    }
+                });
+        });
+    } else {
+        console.error('Error: openCorrectionModalButton element not found, cannot attach event listener.');
+    }
+
+
+    if (closeCorrectionModalButton) {
+        closeCorrectionModalButton.addEventListener('click', function() {
+            console.log('Close button clicked.');
+            if (correctionModal) {
+                correctionModal.classList.add('hidden');
+                correctionModal.classList.remove('flex');
+            }
+        });
+    }
+
+    function attachFormSubmitListener() {
+        const form = correctionFormContent.querySelector('form');
+        if (form) {
+            console.log('Form found, attaching submit listener.');
+            // Remove any existing submit listeners to prevent multiple calls
+            form.removeEventListener('submit', handleFormSubmit);
+            form.addEventListener('submit', handleFormSubmit);
+
+            // Add an event listener to the date input to re-fetch form content
+            const dateToCorrectInput = document.getElementById('date_to_correct');
+            if (dateToCorrectInput) {
+                // Remove existing change listener to prevent multiple calls
+                dateToCorrectInput.removeEventListener('change', handleDateChange);
+                dateToCorrectInput.addEventListener('change', handleDateChange);
+            }
+        } else {
+            console.warn('Form not found inside correctionFormContent.');
+        }
+    }
+
+    function handleFormSubmit(event) {
+        event.preventDefault(); // Prevent default form submission
+
+        const confirmSend = confirm('Apakah Anda yakin ingin mengirimkan koreksinya?');
+        if (confirmSend) {
+            event.target.submit();
+        }
+    }
+
+    function handleDateChange() {
+        const selectedDate = this.value;
+        console.log('Date input changed to:', selectedDate);
+
+        if (correctionFormContent) {
+            correctionFormContent.innerHTML = '<p class="text-center text-gray-600 py-8">Memuat data absensi...</p>';
+        }
+        fetch(`{{ route('correction.form') }}?date=${selectedDate}`)
+            .then(response => {
+                if (!response.ok) {
+                    return response.text().then(text => { throw new Error(text); });
+                }
+                return response.text();
+            })
+            .then(html => {
+                if (correctionFormContent) {
+                    correctionFormContent.innerHTML = html;
+                    attachFormSubmitListener();
+                    const newDateToCorrectInput = document.getElementById('date_to_correct');
+                    if (newDateToCorrectInput) {
+                        newDateToCorrectInput.setAttribute('max', '{{ \Carbon\Carbon::now('Asia/Makassar')->format('Y-m-d') }}');
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error re-loading form for new date:', error);
+                if (correctionFormContent) {
+                    correctionFormContent.innerHTML = `<p class="text-red-500 text-center py-8">Gagal memuat data koreksi untuk tanggal ini.<br>Detail: ${error.message}</p>`;
+                }
+            });
+    }
+
+});
+</script>
 @endsection

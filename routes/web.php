@@ -29,6 +29,10 @@ Route::middleware('auth')->group(function () {
 
         Route::get('/checkout', 'checkoutForm')->name('checkout.form');
         Route::post('/checkout', 'storeCheckout')->name('checkout.store');
+
+        // PERBAIKAN DI SINI: Hanya sebutkan nama metode karena sudah di dalam Route::controller(AttendanceController::class)
+        Route::get('/correction-form', 'showCorrectionForm')->name('correction.form');
+        Route::post('/correction-request', 'storeCorrectionRequest')->name('correction.store');
     });
 
     // Rute-rute terkait Profil
@@ -49,7 +53,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/profile/delete-photo', 'deleteProfilePhoto')->name('profile.delete-photo');
     });
 
-    // Attendance lainnya
+    // Attendance lainnya (Ini sudah benar karena tidak di dalam grouping AttendanceController lagi)
     Route::get('/attendance/my', [AttendanceController::class, 'myAttendance'])->name('attendance.my');
     Route::get('/attendance/history', [AttendanceController::class, 'history'])->name('attendance.history');
     Route::get('/attendance/export', [AttendanceController::class, 'export'])->name('attendance.export');

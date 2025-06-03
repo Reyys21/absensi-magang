@@ -4,11 +4,11 @@
     <div class="flex flex-col md:flex-row min-h-screen font-[Inter]">
 
         {{-- sidebar --}}
-   
+    
 
-        <main id="main-content"  class="flex-1 p-4 md:p-6 bg-gray-100">
+        <main id="main-content" class="flex-1 p-4 md:p-6 bg-gray-100">
             <div class="flex justify-between items-center mb-6">
-                <h1 class="text-xl sm:text-2xl font-bold">My Attendance</h1>
+                <h1 class="text-xl sm:text-2xl font-bold">Kehadiran Saya</h1>
                 {{-- Ini dia! Sertakan komponen profil di sini --}}
                 @include('layouts.profile')
             </div>
@@ -17,7 +17,7 @@
                 <div class="relative">
                     <button onclick="toggleDropdown('exportDropdown')"
                         class="bg-[#A74FDE] text-white px-4 py-2 rounded hover:bg-[#c98ef2] text-sm border-2 border-black ">
-                        Export <i class="fa-solid fa-chevron-down ml-2"></i>
+                        Ekspor <i class="fa-solid fa-chevron-down ml-2"></i>
                     </button>
                     <div id="exportDropdown"
                         class="dropdown absolute mt-2 bg-[#A74FDE] text-white shadow-lg z-10 w-48 text-left px-4 py-2 rounded text-sm border-2 border-black transition-all duration-300 ease-out transform opacity-0 scale-95 pointer-events-none">
@@ -36,7 +36,7 @@
                         </a>
                         <a href="#" onclick="printTable('attendanceTable')"
                             class="block px-4 py-2 text-white hover:bg-[#debaf8] hover:text-black hover:rounded">
-                            Print
+                            Cetak
                         </a>
                     </div>
                 </div>
@@ -65,7 +65,7 @@
 
                         <a href="{{ route('attendance.my') }}"
                             class="block text-center mt-2 bg-red-500 hover:bg-[#aeb1ff] hover:text-black text-white rounded px-2 py-1 text-sm cursor-pointer hover:rounded">
-                            Clear Filter
+                            Hapus Filter
                         </a>
                     </form>
 
@@ -78,13 +78,13 @@
                     <thead class="bg-white text-black uppercase text-xs tracking-wider">
                         <tr>
                             <th class="py-3 px-4 whitespace-nowrap">No</th>
-                            <th class="py-3 px-4 whitespace-nowrap">Date</th>
+                            <th class="py-3 px-4 whitespace-nowrap">Tanggal</th>
                             <th class="py-3 px-4 whitespace-nowrap">Check-In</th>
                             <th class="py-3 px-4 whitespace-nowrap">Check-Out</th>
                             {{-- Removed whitespace-nowrap to allow text wrapping for Activity Title --}}
-                            <th class="py-3 px-4">Activity Title</th>
+                            <th class="py-3 px-4">Judul Aktivitas</th>
                             {{-- Removed whitespace-nowrap to allow text wrapping for Activity Description and adjusted width --}}
-                            <th class="py-3 px-4 w-full md:w-[35%]">Activity Description</th>
+                            <th class="py-3 px-4 w-full md:w-[35%]">Deskripsi Aktivitas</th>
                             <th class="py-3 px-4 whitespace-nowrap">Status</th>
                         </tr>
                     </thead>
@@ -124,9 +124,9 @@
 
                                         @if ($isLongDescription)
                                             <a href="#" class="text-[#8180ff] hover:underline see-more-btn"
-                                                data-id="{{ $item->id }}">See More</a>
+                                                data-id="{{ $item->id }}">Lihat Selengkapnya</a>
                                             <a href="#" class="text-blue-500 hover:underline see-less-btn hidden"
-                                                data-id="{{ $item->id }}">Summary</a>
+                                                data-id="{{ $item->id }}">Ringkasan</a>
                                         @endif
                                     @else
                                         <span class="text-gray-400 italic">—</span>
@@ -163,8 +163,8 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="7" class="text-center py-6 text-gray-500 italic">No attendance records
-                                    found.</td>
+                                <td colspan="7" class="text-center py-6 text-gray-500 italic">Tidak ada catatan kehadiran
+                                    ditemukan.</td>
                             </tr>
                         @endforelse
                     </tbody>
@@ -175,12 +175,12 @@
             <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
             <script>
-                // Function to toggle dropdown visibility
+                // Fungsi untuk mengaktifkan/menonaktifkan visibilitas dropdown
                 function toggleDropdown(id) {
                     const dropdown = document.getElementById(id);
                     const allDropdowns = document.querySelectorAll('.dropdown');
 
-                    // Close other open dropdowns
+                    // Tutup dropdown lain yang terbuka
                     allDropdowns.forEach(d => {
                         if (d.id !== id && !d.classList.contains('hidden')) {
                             d.classList.remove('opacity-100', 'scale-100', 'pointer-events-auto');
@@ -189,7 +189,7 @@
                         }
                     });
 
-                    // Toggle the clicked dropdown
+                    // Alihkan dropdown yang diklik
                     if (dropdown.classList.contains('hidden')) {
                         dropdown.classList.remove('hidden', 'pointer-events-none');
                         setTimeout(() => {
@@ -205,7 +205,7 @@
                     }
                 }
 
-                // Close dropdowns when clicking outside
+                // Tutup dropdown saat mengklik di luar area
                 document.addEventListener('click', function(e) {
                     const isDropdownButton = e.target.closest('button[onclick^="toggleDropdown"]');
                     const isDropdownContent = e.target.closest('.dropdown');
@@ -222,7 +222,7 @@
                 });
 
 
-                // See More / See Less functionality for activity description
+                // Fungsionalitas Lihat Selengkapnya / Ringkasan untuk deskripsi aktivitas
                 document.querySelectorAll('.see-more-btn').forEach(button => {
                     button.addEventListener('click', function(e) {
                         e.preventDefault();
@@ -246,7 +246,7 @@
                         const itemId = this.dataset.id;
                         const shortDescriptionSpan = document.querySelector(
                             `.activity-short-description-${itemId}`);
-                        // Retrieve the original short text from the data attribute
+                        // Ambil teks pendek asli dari atribut data
                         const originalShortText = shortDescriptionSpan.dataset.shortText;
                         const seeMoreBtn = document.querySelector(`.see-more-btn[data-id="${itemId}"]`);
 
@@ -258,38 +258,38 @@
                     });
                 });
 
-                // --- Export Functions ---
+                // --- Fungsi Ekspor ---
 
                 function exportToExcel() {
                     const table = document.getElementById('attendanceTable');
-                    // Create a new workbook and sheet
+                    // Buat workbook dan sheet baru
                     const wb = XLSX.utils.book_new();
                     const ws_data = [];
 
-                    // Add header row manually, removing whitespace-nowrap effect
-                    const headerNames = ["No", "Date", "Check-In", "Check-Out", "Activity Title",
-                        "Activity Description", "Status"
+                    // Tambahkan baris header secara manual, hilangkan efek whitespace-nowrap
+                    const headerNames = ["No", "Tanggal", "Check-In", "Check-Out", "Judul Aktivitas",
+                        "Deskripsi Aktivitas", "Status"
                     ];
                     ws_data.push(headerNames);
 
-                    // Iterate over table rows to get the full text for Activity Description
+                    // Iterasi baris tabel untuk mendapatkan teks lengkap Deskripsi Aktivitas
                     const rows = table.querySelectorAll('tbody tr');
                     rows.forEach(row => {
                         const rowData = [];
-                        // Get data for fixed columns
+                        // Dapatkan data untuk kolom tetap
                         rowData.push(row.cells[0].innerText.trim()); // No
-                        rowData.push(row.cells[1].innerText.trim()); // Date
+                        rowData.push(row.cells[1].innerText.trim()); // Tanggal
                         rowData.push(row.cells[2].innerText.trim()); // Check-In
                         rowData.push(row.cells[3].innerText.trim()); // Check-Out
 
-                        // Get full text for Activity Title and Description
+                        // Dapatkan teks lengkap untuk Judul dan Deskripsi Aktivitas
                         const activityTitleElement = row.querySelector('.activity-cell-title span');
                         const activityDescriptionElement = row.querySelector('.activity-cell-description .activity-content');
                         const statusElement = row.querySelector('td:last-child span');
 
                         const activityTitle = activityTitleElement ? activityTitleElement.innerText.trim() : '';
                         let activityDescription = activityDescriptionElement ? activityDescriptionElement.dataset.fullText || activityDescriptionElement.innerText.trim() : '';
-                        activityDescription = activityDescription.replace(/(\r\n|\n|\r)/gm, " ").replace(/\s\s+/g, " "); // Clean newlines for Excel
+                        activityDescription = activityDescription.replace(/(\r\n|\n|\r)/gm, " ").replace(/\s\s+/g, " "); // Bersihkan baris baru untuk Excel
 
                         const status = statusElement ? statusElement.innerText.trim() : '';
 
@@ -300,8 +300,8 @@
                     });
 
                     const ws = XLSX.utils.aoa_to_sheet(ws_data);
-                    XLSX.utils.book_append_sheet(wb, ws, "Attendance");
-                    XLSX.writeFile(wb, "my_attendance.xlsx");
+                    XLSX.utils.book_append_sheet(wb, ws, "Kehadiran");
+                    XLSX.writeFile(wb, "kehadiran_saya.xlsx");
                 }
 
 
@@ -309,15 +309,15 @@
                     const table = document.getElementById('attendanceTable');
                     let csv = [];
 
-                    const headerNames = ["No", "Date", "Check-In", "Check-Out", "Activity Title",
-                        "Activity Description", "Status"
+                    const headerNames = ["No", "Tanggal", "Check-In", "Check-Out", "Judul Aktivitas",
+                        "Deskripsi Aktivitas", "Status"
                     ];
                     csv.push(headerNames.map(h => cleanTextForCSV(h)).join(','));
 
                     table.querySelectorAll('tbody tr').forEach(row => {
                         let rowData = [];
                         rowData.push(cleanTextForCSV(row.cells[0].innerText)); // No
-                        rowData.push(cleanTextForCSV(row.cells[1].innerText)); // Date
+                        rowData.push(cleanTextForCSV(row.cells[1].innerText)); // Tanggal
                         rowData.push(cleanTextForCSV(row.cells[2].innerText)); // Check-In
                         rowData.push(cleanTextForCSV(row.cells[3].innerText)); // Check-Out
 
@@ -346,7 +346,7 @@
                         type: 'text/csv'
                     });
                     const downloadLink = document.createElement('a');
-                    downloadLink.download = "my_attendance.csv";
+                    downloadLink.download = "kehadiran_saya.csv";
                     downloadLink.href = window.URL.createObjectURL(csvFile);
                     downloadLink.style.display = 'none';
                     document.body.appendChild(downloadLink);
@@ -366,10 +366,10 @@
                     const {
                         jsPDF
                     } = window.jspdf;
-                    const doc = new jsPDF('l', 'pt', 'a4'); // 'l' for landscape, 'pt' for points, 'a4' for A4 size
+                    const doc = new jsPDF('l', 'pt', 'a4'); // 'l' untuk lanskap, 'pt' untuk poin, 'a4' untuk ukuran A4
                     const table = document.getElementById('attendanceTable');
 
-                    // 1. Store initial states and expand all "Activity" content
+                    // 1. Simpan status awal dan perluas semua konten "Aktivitas"
                     const initialStates = [];
                     document.querySelectorAll('.activity-cell-description').forEach(cell => {
                         const shortDescriptionSpan = cell.querySelector('.activity-content');
@@ -392,24 +392,24 @@
                         }
                     });
 
-                    // Temporarily adjust table width or container overflow to ensure all content is rendered for html2canvas
+                    // Sesuaikan sementara lebar tabel atau overflow kontainer untuk memastikan semua konten dirender untuk html2canvas
                     const tableContainer = document.getElementById('tableContainer');
                     const originalTableContainerStyle = tableContainer.style.cssText;
                     tableContainer.style.overflowX = 'visible';
-                    tableContainer.style.width = 'fit-content'; // Crucial for PDF export
+                    tableContainer.style.width = 'fit-content'; // Penting untuk ekspor PDF
 
                     const originalTableStyle = table.style.cssText;
                     table.style.width = 'fit-content';
-                    table.style.tableLayout = 'auto'; // Allow columns to size based on content
+                    table.style.tableLayout = 'auto'; // Izinkan kolom untuk menyesuaikan ukuran berdasarkan konten
 
-                    // Wait for DOM to render changes
+                    // Tunggu DOM untuk merender perubahan
                     await new Promise(resolve => setTimeout(resolve, 300));
 
                     doc.html(table, {
                         callback: function(doc) {
-                            doc.save('My_Attendance.pdf');
+                            doc.save('Kehadiran_Saya.pdf');
 
-                            // Revert "Activity" content to original state
+                            // Kembalikan konten "Aktivitas" ke status asli
                             initialStates.forEach(state => {
                                 state.shortDescriptionSpan.innerHTML = state.originalContent;
                                 if (state.seeMoreBtn && !state.seeMoreHidden) state.seeMoreBtn.classList
@@ -418,14 +418,14 @@
                                     .remove('hidden');
                             });
 
-                            // Revert table container styles
+                            // Kembalikan gaya kontainer tabel
                             tableContainer.style.cssText = originalTableContainerStyle;
                             table.style.cssText = originalTableStyle;
                         },
                         x: 10,
                         y: 10,
                         html2canvas: {
-                            scale: 0.6, // Adjusted scale to fit more content on the page
+                            scale: 0.6, // Skala disesuaikan agar lebih banyak konten muat di halaman
                             logging: true,
                             allowTaint: true,
                             useCORS: true,
@@ -438,7 +438,7 @@
                     const table = document.getElementById(tableID);
                     const originalBodyHtml = document.body.innerHTML;
 
-                    // Store initial states and expand all "Activity" content for printing
+                    // Simpan status awal dan perluas semua konten "Aktivitas" untuk dicetak
                     const initialStates = [];
                     document.querySelectorAll('.activity-cell-description').forEach(cell => {
                         const shortDescriptionSpan = cell.querySelector('.activity-content');
@@ -461,10 +461,10 @@
                         }
                     });
 
-                    // Create a temporary element to hold the table for printing
+                    // Buat elemen sementara untuk menampung tabel untuk dicetak
                     const printWindow = window.open('', '', 'height=600,width=800');
-                    printWindow.document.write('<html><head><title>Print</title>');
-                    // Link to the main app's CSS for consistent styling
+                    printWindow.document.write('<html><head><title>Cetak</title>');
+                    // Tautkan ke CSS aplikasi utama untuk gaya yang konsisten
                     printWindow.document.write('<link href="{{ asset('build/assets/app.css') }}" rel="stylesheet">');
                     printWindow.document.write('<style>');
                     printWindow.document.write('body { font-family: sans-serif; margin: 20px; }');
@@ -475,15 +475,15 @@
                         'th, td { border: 1px solid #ccc; padding: 5px; text-align: left; vertical-align: top;}'
                     );
                     printWindow.document.write('thead { background-color: #f2f2f2; }');
-                    // Hide "See More/Less" buttons in print
+                    // Sembunyikan tombol "Lihat Selengkapnya/Ringkasan" saat dicetak
                     printWindow.document.write('.see-more-btn, .see-less-btn { display: none !important; }');
-                    // Ensure text wraps in description cells for printing
+                    // Pastikan teks melengkung di sel deskripsi saat dicetak
                     printWindow.document.write('td.activity-cell-description { white-space: normal; }');
-                    // Print-specific styles for table layout and word wrapping
+                    // Gaya khusus cetak untuk tata letak tabel dan pembungkus kata
                     printWindow.document.write('@media print { body { -webkit-print-color-adjust: exact; } table { table-layout: fixed; width: 100%; } td { word-wrap: break-word; } }');
                     printWindow.document.write('</style>');
                     printWindow.document.write('</head><body>');
-                    printWindow.document.write('<h1>My Attendance Records</h1>');
+                    printWindow.document.write('<h1>Catatan Kehadiran Saya</h1>');
                     printWindow.document.write(table.outerHTML);
                     printWindow.document.write('</body></html>');
                     printWindow.document.close();
@@ -493,7 +493,7 @@
                         printWindow.print();
                         printWindow.close();
 
-                        // Revert "Activity" content to original state after printing
+                        // Kembalikan konten "Aktivitas" ke status asli setelah dicetak
                         initialStates.forEach(state => {
                             state.shortDescriptionSpan.innerHTML = state.originalContent;
                             if (state.seeMoreBtn && !state.seeMoreHidden) state.seeMoreBtn.classList.remove(

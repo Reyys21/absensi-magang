@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Carbon;
+use Illuminate\Support\Carbon; // Pastikan ini di-import
 
 class CorrectionRequest extends Model
 {
@@ -50,6 +50,7 @@ class CorrectionRequest extends Model
     }
 
     // Accessor untuk mendapatkan waktu check-in lama dalam format H:i
+    // Karena $casts, $this->old_check_in sudah objek Carbon dalam timezone aplikasi.
     public function getOldCheckInTimeAttribute()
     {
         return $this->old_check_in ? $this->old_check_in->format('H:i') : '--.--';

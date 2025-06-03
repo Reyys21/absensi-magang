@@ -20,10 +20,10 @@ Route::middleware('guest')->group(function () {
 Route::middleware('auth')->group(function () {
 
     // Dashboard
-    // The URL path should ideally be just '/dashboard' and the view returned will be 'fold_dashboard.dashboard'
+    // DashboardController mungkin tidak menggunakan struktur 'fold_dashboard', jadi biarkan terpisah jika DashboardController beda
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-    // Absensi Check-in dan Check-out dengan controller grouping
+    // Semua Rute terkait Absensi, Koreksi, dan Approval Requests dikelompokkan di sini
     Route::controller(AttendanceController::class)->group(function () {
         Route::get('/checkin', 'checkinForm')->name('checkin.form');
         Route::post('/checkin', 'storeCheckin')->name('checkin.store');
@@ -31,43 +31,40 @@ Route::middleware('auth')->group(function () {
         Route::get('/checkout', 'checkoutForm')->name('checkout.form');
         Route::post('/checkout', 'storeCheckout')->name('checkout.store');
 
+        // My Attendance
+        Route::get('/my-attendance', 'myAttendance')->name('attendance.my');
+
+        // History Attendance
+        Route::get('/attendance-history', 'history')->name('attendance.history');
+
         // Correction Form
         Route::get('/correction-form', 'showCorrectionForm')->name('correction.form');
         Route::post('/correction-request', 'storeCorrectionRequest')->name('correction.store');
 
-        // My Attendance (moved here for consistency with AttendanceController grouping)
-        Route::get('/my-attendance', 'myAttendance')->name('attendance.my');
+        // Approval Requests for User
+        Route::get('/approval-requests', 'showApprovalRequests')->name('approval.requests');
 
-        // History Attendance (moved here for consistency with AttendanceController grouping)
-        Route::get('/attendance-history', 'history')->name('attendance.history');
+        // Export, Create, Store (Jika ini juga di AttendanceController)
+        Route::get('/attendance/export', 'export')->name('attendance.export');
+        Route::get('/attendance/create', 'create')->name('attendance.create');
+        Route::post('/attendance/store', 'store')->name('attendance.store');
     });
 
-
-    // Rute-rute terkait Profil
+    // Rute-rute terkait Profil (menggunakan prefix dan name group)
     Route::prefix('profile')->name('profile.')->controller(ProfileController::class)->group(function () {
-        // Rute untuk menampilkan form edit informasi umum
         Route::get('/edit', 'edit')->name('edit');
-        // Rute untuk proses update informasi umum
         Route::patch('/update-information', 'updateProfileInformation')->name('update-information');
-
-        // Rute untuk menampilkan form ubah password
         Route::get('/change-password', 'showChangePasswordForm')->name('change-password');
-        // Rute untuk proses update password
         Route::patch('/update-password', 'updatePassword')->name('update-password');
-
-        // Rute untuk update foto profil
         Route::post('/update-photo', 'updateProfilePhoto')->name('update-photo');
-        // Rute untuk hapus foto profil
         Route::post('/delete-photo', 'deleteProfilePhoto')->name('delete-photo');
     });
 
     // Logout
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+});
 
-    // Routes that don't directly map to the new "fold_" structure but still use existing controllers
-    // You might want to reconsider if these are still needed or if they should be integrated
-    // into the 'AttendanceController' group or a new controller if they represent a new feature.
-    Route::get('/attendance/export', [AttendanceController::class, 'export'])->name('attendance.export');
-    Route::get('/attendance/create', [AttendanceController::class, 'create'])->name('attendance.create');
-    Route::post('/attendance/store', [AttendanceController::class, 'store'])->name('attendance.store');
+// Jika Anda memiliki halaman landing page tanpa otentikasi
+Route::get('/', function () {
+    return view('welcome');
 });

@@ -36,7 +36,7 @@
         <nav class="mt-6 px-4 space-y-2 pb-4">
             <a href="{{ route('dashboard') }}"
                 class="flex items-center gap-3 px-4 py-2 rounded-xl transition duration-150 {{ request()->routeIs('dashboard') ? 'bg-[#FFD100] text-black active-link-indicator' : 'hover:bg-[#3C5A6D]' }}">
-                <i class="fa-solid fa-house"></i> <span class="nav-text">Dashboard</span>
+                <i class="fa-solid fa-house"></i> <span class="nav-text">Dasboard</span>
             </a>
 
             <div class="relative">
@@ -44,7 +44,7 @@
                     class="flex items-center justify-between w-full px-4 py-2 rounded-xl transition duration-150 cursor-pointer
                     {{ request()->routeIs('attendance.*') ? 'bg-[#FFD100] text-black active-link-indicator' : 'hover:bg-[#3C5A6D]' }}">
                     <div class="flex items-center gap-3">
-                        <i class="fa-solid fa-user-check"></i> <span class="nav-text">Attendance</span>
+                        <i class="fa-solid fa-user-check"></i> <span class="nav-text">Absensi</span>
                     </div>
                     <i class="fa-solid fa-chevron-down transition-transform duration-300 arrow-icon"></i>
                 </button>
@@ -52,11 +52,11 @@
                 <div id="attendanceDropdown"
                     class="{{ request()->routeIs('attendance.*') ? 'mt-2 space-y-1 rounded-xl bg-[#34495E] block' : 'hidden mt-2 space-y-1 rounded-xl bg-[#34495E]' }}">
                     <a href="{{ route('attendance.history') }}"
-                        class="block px-6 py-2 text-sm {{ request()->routeIs('attendance.history') ? 'bg-[#2C3E50] text-[#FFD100]' : 'hover:bg-[#2C3E50] hover:text-[#FFD100]' }} rounded">History</a>
+                        class="block px-6 py-2 text-sm {{ request()->routeIs('attendance.history') ? 'bg-[#2C3E50] text-[#FFD100]' : 'hover:bg-[#2C3E50] hover:text-[#FFD100]' }} rounded">Riwayat</a>
                     <a href="{{ route('attendance.my') }}"
-                        class="block px-6 py-2 text-sm {{ request()->routeIs('attendance.my') ? 'bg-[#2C3E50] text-[#FFD100]' : 'hover:bg-[#2C3E50] hover:text-[#FFD100]' }} rounded">My
-                        Attendance</a>
-                  
+                        class="block px-6 py-2 text-sm {{ request()->routeIs('attendance.my') ? 'bg-[#2C3E50] text-[#FFD100]' : 'hover:bg-[#2C3E50] hover:text-[#FFD100]' }} rounded">Absensi
+                        Saya</a>
+                    
                 </div>
             </div>
 
@@ -65,28 +65,25 @@
                     class="flex items-center justify-between w-full px-4 py-2 rounded-xl transition duration-150 cursor-pointer
                     {{ request()->routeIs('approval.*') ? 'bg-[#FFD100] text-black active-link-indicator' : 'hover:bg-[#3C5A6D]' }}">
                     <div class="flex items-center gap-3">
-                        <i class="fa-solid fa-thumbs-up"></i> <span class="nav-text">Approval</span>
+                        <i class="fa-solid fa-thumbs-up"></i> <span class="nav-text">Persetujuan</span>
                     </div>
                     <i class="fa-solid fa-chevron-down transition-transform duration-300 arrow-icon"></i>
                 </button>
                 <div id="approvalDropdown"
                     class="{{ request()->routeIs('approval.*') ? 'mt-2 space-y-1 rounded-xl bg-[#34495E] block' : 'hidden mt-2 space-y-1 rounded-xl bg-[#34495E]' }}">
-                    <a href="#"
-                        class="block px-6 py-2 text-sm hover:bg-[#2C3E50] hover:text-[#FFD100] rounded">Attendance
-                        Approval</a>
+                    <a href="{{ route('approval.requests') }}"
+                        class="block px-6 py-2 text-sm {{ request()->routeIs('approval.requests') ? 'bg-[#2C3E50] text-[#FFD100]' : 'hover:bg-[#2C3E50] hover:text-[#FFD100]' }} rounded">Persetujuan
+                        Absensi</a>
                 </div>
             </div>
 
-            <a href="#"
-                class="flex items-center gap-3 px-4 py-2 rounded-xl transition duration-150 hover:bg-[#3C5A6D]">
-                <i class="fa-solid fa-cog"></i> <span class="nav-text">Settings</span>
-            </a>
+            
 
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
                 <button type="submit"
                     class="w-full flex items-center gap-3 px-4 py-2 rounded-xl text-sm transition duration-150 hover:bg-[#3C5A6D]">
-                    <i class="fa-solid fa-right-from-bracket"></i> <span class="nav-text">Log Out</span>
+                    <i class="fa-solid fa-right-from-bracket"></i> <span class="nav-text">Keluar</span>
                 </button>
             </form>
         </nav>

@@ -5,13 +5,12 @@
     <div
         class="w-full max-w-6xl flex flex-col md:flex-row items-center justify-between px-6 md:px-12 py-12 space-y-8 md:space-y-0">
 
-        <!-- Left Side: Text -->
         <div class="w-full md:w-1/2 space-y-4">
             <h1 class="text-2xl md:text-3xl font-extrabold text-black leading-tight">
-                Welcome To Attendance<br>Check-In
+                Selamat Datang di Absensi<br>Check-In
             </h1>
             <p class="text-sm md:text-base text-gray-600">
-                Just Press the Check-In Button to<br>Fill Your Attendance Today :)
+                Cukup Tekan Tombol Check-In untuk<br>Mengisi Kehadiran Anda Hari Ini :)
             </p>
 
             <form action="{{ route('checkin.store') }}" method="POST" id="checkin-form" class="mt-4">
@@ -27,9 +26,8 @@
             </form>
         </div>
 
-        <!-- Right Side: Image -->
         <div class="w-full md:w-1/2 flex justify-center">
-            <img src="{{ asset('assets/images/undraw_filing-system_e3yo.svg') }}" alt="Check-In Illustration"
+            <img src="{{ asset('assets/images/undraw_filing-system_e3yo.svg') }}" alt="Ilustrasi Check-In"
                 class="w-full max-w-md object-contain">
         </div>
     </div>

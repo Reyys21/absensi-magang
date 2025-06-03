@@ -6,20 +6,20 @@
     <div class="flex flex-col md:flex-row min-h-screen font-[Inter]">
 
 
-        {{-- Main content area --}}
+        {{-- Area konten utama --}}
         {{-- id="main-content" sangat penting untuk JavaScript --}}
         {{-- transition-all duration-300 ease-in-out untuk transisi margin --}}
         <main id="main-content" class="flex-1 p-4 sm:p-6 md:p-10 bg-white shadow-lg transition-all duration-300 ease-in-out">
             {{-- Flex container untuk judul dan profil --}}
             <div class="flex justify-between items-center mb-6">
-                <h1 class="text-xl sm:text-2xl font-bold">Dashboard Mahasiswa/Siswa</h1>
+                <h1 class="text-xl sm:text-2xl font-bold">Dasboard Mahasiswa/Siswa</h1>
                 @include('layouts.profile')
             </div>
 
-           <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 mb-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 mb-6">
                 <div
                     class="bg-[#0B849F] text-white rounded-[20px] px-4 sm:px-6 py-5 shadow-lg border flex flex-col justify-between md:col-span-2 relative overflow-hidden">
-                    <h2 class="text-white text-base sm:text-lg font-semibold mb-4">Today’s Attendance</h2>
+                    <h2 class="text-white text-base sm:text-lg font-semibold mb-4">Absensi Hari Ini</h2>
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
                         <div class="flex flex-col gap-4 sm:gap-6">
                             <div class="flex flex-col items-start">
@@ -40,7 +40,7 @@
                             </div>
                         </div>
                         <div class="block absolute bottom-0 right-0 w-[45%] md:w-[30%] animate-bounce-slow">
-                            <img src="{{ asset('assets/images/undraw_relaxed-reading_wfkr.svg') }}" alt="Reading"
+                            <img src="{{ asset('assets/images/undraw_relaxed-reading_wfkr.svg') }}" alt="Membaca"
                                 class="w-full" style="transform: scaleX(1) ">
                         </div>
                     </div>
@@ -49,8 +49,8 @@
                 <div
                     class="bg-[#0B849F] text-white rounded-[20px] p-4 sm:p-6 shadow-lg flex flex-col items-center justify-center text-center">
                     <a class="flex flex-col items-center justify-center w-full h-full" href="{{ route('attendance.my') }}">
-                        <h2 class="text-base font-semibold mb-2">My Attendance</h2>
-                        <p class="text-3xl font-bold">{{ $attendanceCount }} days</p>
+                        <h2 class="text-base font-semibold mb-2">Absensi Saya</h2>
+                        <p class="text-3xl font-bold">{{ $attendanceCount }} hari</p>
                     </a>
                 </div>
             </div>
@@ -99,7 +99,7 @@
             animation: bounce-slow 3s infinite;
         }
 
-        /* Custom Responsive Illustration Fixes */
+        /* Perbaikan Ilustrasi Responsif Kustom */
         @media only screen and (min-width: 320px) {
             .reading-illustration {
                 display: block;

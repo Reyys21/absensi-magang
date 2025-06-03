@@ -251,6 +251,7 @@
                             <option value="">Register as</option>
                             <option value="mahasiswa">Mahasiswa</option>
                             <option value="siswa">Siswa</option>
+                            <option value="siswa">admin</option>
                         </select>
                     </div>
 

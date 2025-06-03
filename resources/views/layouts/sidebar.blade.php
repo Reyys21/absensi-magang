@@ -1,4 +1,4 @@
-{{-- resources/views/layouts/sidebar.blade.php --}}
+{{-- resources/views/layouts/sidebar_admin.blade.php --}}
 
 {{-- Tombol toggle untuk mobile (di luar sidebar, fixed di pojok kanan bawah) --}}
 {{-- Class 'fixed bottom-4 right-4 z-50' sangat penting --}}

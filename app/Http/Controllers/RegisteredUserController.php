@@ -19,7 +19,7 @@ class RegisteredUserController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'role' => 'required|in:mahasiswa,siswa',
+            'role' => 'required|in:mahasiswa,siswa,admin',
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'asal_kampus' => 'required|string|max:255',

@@ -31,7 +31,8 @@ class DashboardController extends Controller
             ->unique()
             ->count();
 
-        return view('dashboard', compact(
+        // Path baru: resources/views/fold_dashboard/dashboard.blade.php
+        return view('fold_dashboard.dashboard', compact(
             'attendances',
             'attendanceCount',
             'firstCheckIn',

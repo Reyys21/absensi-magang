@@ -28,7 +28,8 @@ class ProfileController extends Controller
     public function edit()
     {
         $user = Auth::user();
-        return view('profile.edit', [
+        // Path baru: resources/views/fold_profile/edit.blade.php
+        return view('fold_profile.edit', [
             'user' => $user,
             'defaultAvatars' => $this->defaultAvatars,
         ]);
@@ -41,7 +42,8 @@ class ProfileController extends Controller
     public function showChangePasswordForm()
     {
         $user = Auth::user();
-        return view('profile.change-password', [
+        // Path baru: resources/views/fold_profile/change-password.blade.php
+        return view('fold_profile.change-password', [
             'user' => $user,
             'defaultAvatars' => $this->defaultAvatars,
         ]);

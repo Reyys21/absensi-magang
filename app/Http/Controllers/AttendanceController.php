@@ -20,7 +20,8 @@ class AttendanceController extends Controller
      */
     public function checkinForm()
     {
-        return view('checkin');
+        // Path baru: resources/views/fold_dashboard/checkin.blade.php
+        return view('fold_dashboard.checkin');
     }
 
     /**
@@ -84,7 +85,8 @@ class AttendanceController extends Controller
      */
     public function checkoutForm()
     {
-        return view('checkout');
+        // Path baru: resources/views/fold_dashboard/checkout.blade.php
+        return view('fold_dashboard.checkout');
     }
 
     /**
@@ -158,8 +160,8 @@ class AttendanceController extends Controller
         $today = Carbon::now()->toDateString();
 
         $attendanceToday = Attendance::where('user_id', $userId)
-                                         ->whereDate('date', $today)
-                                         ->first();
+                                     ->whereDate('date', $today)
+                                     ->first();
 
         $firstCheckIn = $attendanceToday ? $attendanceToday->check_in : null;
         $lastCheckOut = $attendanceToday ? $attendanceToday->check_out : null;
@@ -191,7 +193,8 @@ class AttendanceController extends Controller
             }
         }
 
-        return view('dashboard', compact('firstCheckIn', 'lastCheckOut', 'attendanceCount'));
+        // Path baru: resources/views/fold_dashboard/dashboard.blade.php
+        return view('fold_dashboard.dashboard', compact('firstCheckIn', 'lastCheckOut', 'attendanceCount'));
     }
 
     /**
@@ -216,7 +219,8 @@ class AttendanceController extends Controller
         // Ambil data kehadiran
         $attendances = $query->paginate(10); // Gunakan paginate jika Anda menampilkan banyak data
 
-        return view('attendances.myattendance', compact('attendances'));
+        // Path baru: resources/views/fold_my_attendance/myattendance.blade.php
+        return view('fold_my_attendance.myattendance', compact('attendances'));
     }
 
     /**
@@ -333,7 +337,8 @@ class AttendanceController extends Controller
             $dailyAttendances = $processedDailyAttendances;
         }
 
-        return view('attendances.history', compact('date', 'monthlyAttendances', 'dailyAttendances', 'selectedDate'));
+        // Path baru: resources/views/fold_history/history.blade.php
+        return view('fold_history.history', compact('date', 'monthlyAttendances', 'dailyAttendances', 'selectedDate'));
     }
 
     /**
@@ -409,8 +414,8 @@ class AttendanceController extends Controller
         $displayOldActivityTitle = $attendance ? ($attendance->activity_title ?: '--') : '--';
         $displayOldActivityDescription = $attendance ? ($attendance->activity_description ?: '--') : '--';
 
-
-        return view('attendances.correction_form', compact(
+        // Path baru: resources/views/fold_history/correction_form.blade.php (sesuai folder history)
+        return view('fold_history.correction_form', compact(
             'dateToCorrect', // Ini yang akan menjadi nilai default di input tanggal
             'oldCheckIn', // Ini akan menjadi nilai default di input new_check_in
             'oldCheckOut', // Ini akan menjadi nilai default di input new_check_out
@@ -460,15 +465,14 @@ class AttendanceController extends Controller
         }
         
         // Cek apakah ada perubahan yang diajukan. Jika tidak ada perubahan, tidak perlu membuat permintaan.
-        $isSameCheckIn = ($attendance && $attendance->check_in && $attendance->check_in->tz('Asia/Makassar')->format('H:i') === $validated['new_check_in']) || (!$attendance || !$attendance->check_in && empty($validated['new_check_in']));
-        $isSameCheckOut = ($attendance && $attendance->check_out && $attendance->check_out->tz('Asia/Makassar')->format('H:i') === $validated['new_check_out']) || (!$attendance || !$attendance->check_out && empty($validated['new_check_out']));
-        $isSameActivityTitle = ($attendance && $attendance->activity_title === $validated['new_activity_title']) || (!$attendance || empty($attendance->activity_title) && empty($validated['new_activity_title']));
-        $isSameActivityDescription = ($attendance && $attendance->activity_description === $validated['new_activity_description']) || (!$attendance || empty($attendance->activity_description) && empty($validated['new_activity_description']));
+        $isSameCheckIn = ($attendance && $attendance->check_in && $attendance->check_in->tz('Asia/Makassar')->format('H:i') === $validated['new_check_in']) || (!$attendance || (!$attendance->check_in && empty($validated['new_check_in'])));
+        $isSameCheckOut = ($attendance && $attendance->check_out && $attendance->check_out->tz('Asia/Makassar')->format('H:i') === $validated['new_check_out']) || (!$attendance || (!$attendance->check_out && empty($validated['new_check_out'])));
+        $isSameActivityTitle = ($attendance && $attendance->activity_title === $validated['new_activity_title']) || (!$attendance || (empty($attendance->activity_title) && empty($validated['new_activity_title'])));
+        $isSameActivityDescription = ($attendance && $attendance->activity_description === $validated['new_activity_description']) || (!$attendance || (empty($attendance->activity_description) && empty($validated['new_activity_description'])));
 
         if ($isSameCheckIn && $isSameCheckOut && $isSameActivityTitle && $isSameActivityDescription) {
             return redirect()->back()->with('info', 'Tidak ada perubahan yang diajukan untuk koreksi.');
         }
-
 
         // Siapkan waktu check-in/out baru dengan tanggal lengkap untuk disimpan
         $newCheckInDateTime = !empty($validated['new_check_in']) ?
@@ -499,6 +503,12 @@ class AttendanceController extends Controller
     // asumsikan ini untuk manajemen absensi oleh admin atau untuk entri manual.
     public function create()
     {
+        // Path baru: resources/views/attendances/create.blade.php
+        // Perhatikan: Dalam struktur folder yang Anda berikan, tidak ada folder 'attendances' langsung di bawah 'views',
+        // jadi saya mengasumsikan ini seharusnya ada di tempat lain atau Anda perlu membuat folder 'attendances'
+        // atau memindahkannya ke salah satu folder 'fold_' yang sudah ada.
+        // Jika Anda memiliki folder 'attendances' di level yang sama dengan 'fold_dashboard', maka ini benar.
+        // Jika tidak, perlu penyesuaian lagi.
         return view('attendances.create');
     }
 

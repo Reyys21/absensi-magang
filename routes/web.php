@@ -20,6 +20,7 @@ Route::middleware('guest')->group(function () {
 Route::middleware('auth')->group(function () {
 
     // Dashboard
+    // The URL path should ideally be just '/dashboard' and the view returned will be 'fold_dashboard.dashboard'
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     // Absensi Check-in dan Check-out dengan controller grouping
@@ -30,37 +31,43 @@ Route::middleware('auth')->group(function () {
         Route::get('/checkout', 'checkoutForm')->name('checkout.form');
         Route::post('/checkout', 'storeCheckout')->name('checkout.store');
 
-        // PERBAIKAN DI SINI: Hanya sebutkan nama metode karena sudah di dalam Route::controller(AttendanceController::class)
+        // Correction Form
         Route::get('/correction-form', 'showCorrectionForm')->name('correction.form');
         Route::post('/correction-request', 'storeCorrectionRequest')->name('correction.store');
+
+        // My Attendance (moved here for consistency with AttendanceController grouping)
+        Route::get('/my-attendance', 'myAttendance')->name('attendance.my');
+
+        // History Attendance (moved here for consistency with AttendanceController grouping)
+        Route::get('/attendance-history', 'history')->name('attendance.history');
     });
+
 
     // Rute-rute terkait Profil
-    Route::controller(ProfileController::class)->group(function () {
+    Route::prefix('profile')->name('profile.')->controller(ProfileController::class)->group(function () {
         // Rute untuk menampilkan form edit informasi umum
-        Route::get('/profile/edit', 'edit')->name('profile.edit');
+        Route::get('/edit', 'edit')->name('edit');
         // Rute untuk proses update informasi umum
-        Route::patch('/profile/update-information', 'updateProfileInformation')->name('profile.update-information');
+        Route::patch('/update-information', 'updateProfileInformation')->name('update-information');
 
         // Rute untuk menampilkan form ubah password
-        Route::get('/profile/change-password', 'showChangePasswordForm')->name('profile.change-password');
+        Route::get('/change-password', 'showChangePasswordForm')->name('change-password');
         // Rute untuk proses update password
-        Route::patch('/profile/update-password', 'updatePassword')->name('profile.update-password');
+        Route::patch('/update-password', 'updatePassword')->name('update-password');
 
         // Rute untuk update foto profil
-        Route::post('/profile/update-photo', 'updateProfilePhoto')->name('profile.update-photo');
+        Route::post('/update-photo', 'updateProfilePhoto')->name('update-photo');
         // Rute untuk hapus foto profil
-        Route::post('/profile/delete-photo', 'deleteProfilePhoto')->name('profile.delete-photo');
+        Route::post('/delete-photo', 'deleteProfilePhoto')->name('delete-photo');
     });
-
-    // Attendance lainnya (Ini sudah benar karena tidak di dalam grouping AttendanceController lagi)
-    Route::get('/attendance/my', [AttendanceController::class, 'myAttendance'])->name('attendance.my');
-    Route::get('/attendance/history', [AttendanceController::class, 'history'])->name('attendance.history');
-    Route::get('/attendance/export', [AttendanceController::class, 'export'])->name('attendance.export');
-
-    Route::get('/attendance/create', [AttendanceController::class, 'create'])->name('attendance.create');
-    Route::post('/attendance/store', [AttendanceController::class, 'store'])->name('attendance.store');
 
     // Logout
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+    // Routes that don't directly map to the new "fold_" structure but still use existing controllers
+    // You might want to reconsider if these are still needed or if they should be integrated
+    // into the 'AttendanceController' group or a new controller if they represent a new feature.
+    Route::get('/attendance/export', [AttendanceController::class, 'export'])->name('attendance.export');
+    Route::get('/attendance/create', [AttendanceController::class, 'create'])->name('attendance.create');
+    Route::post('/attendance/store', [AttendanceController::class, 'store'])->name('attendance.store');
 });

@@ -10,10 +10,10 @@
             </h1>
             <a href="{{ url()->previous() }}"
                 class="inline-flex items-center px-5 py-2.5 border border-transparent text-sm font-semibold rounded-lg shadow-sm
-                       bg-slate-100 text-slate-700 hover:bg-slate-200
-                       dark:bg-slate-700 dark:text-slate-200 dark:hover:bg-slate-600
-                       focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-slate-900
-                       transition-colors duration-200 ease-in-out">
+                    bg-slate-100 text-slate-700 hover:bg-slate-200
+                    dark:bg-slate-700 dark:text-slate-200 dark:hover:bg-slate-600
+                    focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-slate-900
+                    transition-colors duration-200 ease-in-out">
                 <svg class="w-5 h-5 mr-2 -ml-1 text-slate-600 dark:text-slate-300" fill="none" stroke="currentColor"
                     viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18">
@@ -66,15 +66,15 @@
         <div
             class="bg-white dark:bg-slate-800 p-8 rounded-2xl shadow-xl border border-slate-100 dark:border-slate-700 grid grid-cols-1 md:grid-cols-3 gap-10 min-w-0">
             {{-- KOLOM KIRI (FOTO PROFIL & NAVIGASI LINK) --}}
-            <div class="md:col-span-1 flex flex-col items-center md:items-start space-y-6">
+            <div class="md:col-span-1 flex flex-col items-center md:items-center space-y-6"> {{-- Changed md:items-start to md:items-center --}}
                 <div id="profile-image-wrapper"
                     class="relative h-48 w-48 rounded-full overflow-hidden ring-4 ring-offset-4 ring-indigo-500 dark:ring-offset-slate-800 cursor-pointer shadow-lg group">
                     <img id="main-profile-image" class="w-full h-full object-cover"
                         src="{{ optional($user)->profile_photo_path
-                            ? (Str::startsWith(optional($user)->profile_photo_path, 'profile_photos/')
-                                ? asset(optional($user)->profile_photo_path)
-                                : asset('storage/' . optional($user)->profile_photo_path))
-                            : asset('profile_photos/avatar_1 (1).jpg') }}"
+                                ? (Str::startsWith(optional($user)->profile_photo_path, 'profile_photos/')
+                                    ? asset(optional($user)->profile_photo_path)
+                                    : asset('storage/' . optional($user)->profile_photo_path))
+                                : asset('profile_photos/avatar_1 (1).jpg') }}"
                         alt="{{ optional($user)->name ?: 'Pengguna' }}">
                     <div
                         class="absolute inset-0 bg-black bg-opacity-50 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-white text-base font-medium">
@@ -89,7 +89,7 @@
                         Ganti Foto
                     </div>
                 </div>
-                <p class="text-2xl font-bold text-slate-800 dark:text-slate-100 text-center md:text-left">
+                <p class="text-2xl font-bold text-slate-800 dark:text-slate-100 text-center"> {{-- Removed md:text-left --}}
                     {{ optional($user)->name }}</p>
                 <span
                     class="inline-block px-4 py-1.5 rounded-full text-sm font-semibold bg-rose-100 dark:bg-rose-700 text-rose-700 dark:text-rose-100">
@@ -146,9 +146,9 @@
                             <input type="text" name="name" id="name"
                                 value="{{ old('name', optional($user)->name) }}"
                                 class="w-full px-4 py-2.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-200
-                                       placeholder-slate-400 dark:placeholder-slate-500
-                                       focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500
-                                       transition duration-150 ease-in-out text-base"
+                                    placeholder-slate-400 dark:placeholder-slate-500
+                                    focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500
+                                    transition duration-150 ease-in-out text-base"
                                 required>
                             @error('name')
                                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
@@ -162,9 +162,9 @@
                             <input type="email" name="email" id="email"
                                 value="{{ old('email', optional($user)->email) }}"
                                 class="w-full px-4 py-2.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-200
-                                       placeholder-slate-400 dark:placeholder-slate-500
-                                       focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500
-                                       transition duration-150 ease-in-out text-base"
+                                    placeholder-slate-400 dark:placeholder-slate-500
+                                    focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500
+                                    transition duration-150 ease-in-out text-base"
                                 required>
                             @error('email')
                                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
@@ -177,8 +177,8 @@
                                 sebagai:</label>
                             <select name="role" id="role"
                                 class="w-full px-4 py-2.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-200
-                                       focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500
-                                       transition duration-150 ease-in-out text-base"
+                                    focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500
+                                    transition duration-150 ease-in-out text-base"
                                 required>
                                 <option value="">Pilih Role</option>
                                 <option value="mahasiswa" {{ optional($user)->role == 'mahasiswa' ? 'selected' : '' }}>
@@ -198,9 +198,9 @@
                             <input type="text" name="asal_kampus" id="asal_kampus"
                                 value="{{ old('asal_kampus', optional($user)->asal_kampus) }}"
                                 class="w-full px-4 py-2.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-200
-                                       placeholder-slate-400 dark:placeholder-slate-500
-                                       focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500
-                                       transition duration-150 ease-in-out text-base">
+                                    placeholder-slate-400 dark:placeholder-slate-500
+                                    focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500
+                                    transition duration-150 ease-in-out text-base">
                             @error('asal_kampus')
                                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                             @enderror
@@ -213,9 +213,9 @@
                             <input type="text" name="phone" id="phone"
                                 value="{{ old('phone', optional($user)->phone) }}"
                                 class="w-full px-4 py-2.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-200
-                                       placeholder-slate-400 dark:placeholder-slate-500
-                                       focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500
-                                       transition duration-150 ease-in-out text-base">
+                                    placeholder-slate-400 dark:placeholder-slate-500
+                                    focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500
+                                    transition duration-150 ease-in-out text-base">
                             @error('phone')
                                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                             @enderror
@@ -228,9 +228,9 @@
                             <input type="text" name="nim" id="nim"
                                 value="{{ old('nim', optional($user)->nim) }}"
                                 class="w-full px-4 py-2.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-200
-                                       placeholder-slate-400 dark:placeholder-slate-500
-                                       focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500
-                                       transition duration-150 ease-in-out text-base">
+                                    placeholder-slate-400 dark:placeholder-slate-500
+                                    focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500
+                                    transition duration-150 ease-in-out text-base">
                             @error('nim')
                                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                             @enderror
@@ -239,9 +239,9 @@
                         <div class="pt-4">
                             <button type="submit"
                                 class="inline-flex items-center px-6 py-3 border border-transparent text-base font-semibold rounded-lg shadow-md
-                                   bg-green-600 text-white hover:bg-green-700
-                                   focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 dark:focus:ring-offset-slate-800
-                                   transition-colors duration-200 ease-in-out">
+                                    bg-green-600 text-white hover:bg-green-700
+                                    focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 dark:focus:ring-offset-slate-800
+                                    transition-colors duration-200 ease-in-out">
                                 <svg class="w-5 h-5 mr-2 -ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                                     xmlns="http://www.w3.org/2000/svg">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -286,20 +286,20 @@
                                 Gambar:</label>
                             <input type="file" name="profile_photo" id="profile_photo" accept="image/*"
                                 class="block w-full text-sm text-slate-600 dark:text-slate-300
-                                       file:mr-4 file:py-2.5 file:px-5
-                                       file:rounded-md file:border-0
-                                       file:text-sm file:font-semibold
-                                       file:bg-indigo-100 dark:file:bg-indigo-800 file:text-indigo-700 dark:file:text-indigo-200
-                                       hover:file:bg-indigo-200 dark:hover:file:bg-indigo-700 cursor-pointer
-                                       border border-slate-300 dark:border-slate-600 rounded-lg p-1 transition-all duration-200 ease-in-out">
+                                    file:mr-4 file:py-2.5 file:px-5
+                                    file:rounded-md file:border-0
+                                    file:text-sm file:font-semibold
+                                    file:bg-indigo-100 dark:file:bg-indigo-800 file:text-indigo-700 dark:file:text-indigo-200
+                                    hover:file:bg-indigo-200 dark:hover:file:bg-indigo-700 cursor-pointer
+                                    border border-slate-300 dark:border-slate-600 rounded-lg p-1 transition-all duration-200 ease-in-out">
                             <p class="text-xs text-slate-500 dark:text-slate-400 mt-2">Maksimal 2MB, format JPG, PNG, GIF.
                             </p>
                         </div>
                         <button type="submit"
                             class="w-full inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-semibold rounded-lg shadow-sm
-                                   bg-indigo-600 text-white hover:bg-indigo-700
-                                   focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-slate-800
-                                   transition-colors duration-200 ease-in-out">
+                                    bg-indigo-600 text-white hover:bg-indigo-700
+                                    focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-slate-800
+                                    transition-colors duration-200 ease-in-out">
                             <svg class="w-5 h-5 mr-2 -ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                                 xmlns="http://www.w3.org/2000/svg">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -341,9 +341,9 @@
                     @csrf
                     <button type="submit"
                         class="w-full sm:w-auto inline-flex items-center justify-center px-5 py-2.5 border border-transparent text-base font-semibold rounded-lg shadow-sm
-                               bg-red-600 text-white hover:bg-red-700
-                               focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 dark:focus:ring-offset-slate-800
-                               transition-colors duration-200 ease-in-out">
+                            bg-red-600 text-white hover:bg-red-700
+                            focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 dark:focus:ring-offset-slate-800
+                            transition-colors duration-200 ease-in-out">
                         <svg class="w-5 h-5 mr-2 -ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                             xmlns="http://www.w3.org/2000/svg">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

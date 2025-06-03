@@ -66,7 +66,7 @@
         <div
             class="bg-white dark:bg-slate-800 p-8 rounded-2xl shadow-xl border border-slate-100 dark:border-slate-700 grid grid-cols-1 md:grid-cols-3 gap-10 min-w-0">
             {{-- KOLOM KIRI (FOTO PROFIL & NAVIGASI LINK) --}}
-            <div class="md:col-span-1 flex flex-col items-center md:items-start space-y-6">
+            <div class="md:col-span-1 flex flex-col items-center md:items-center space-y-6">
                 <div id="profile-image-wrapper"
                     class="relative h-48 w-48 rounded-full overflow-hidden ring-4 ring-offset-4 ring-indigo-500 dark:ring-offset-slate-800 cursor-pointer shadow-lg group">
                     <img id="main-profile-image" class="w-full h-full object-cover"

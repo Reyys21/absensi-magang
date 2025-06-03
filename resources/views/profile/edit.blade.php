@@ -14,8 +14,8 @@
                        dark:bg-slate-700 dark:text-slate-200 dark:hover:bg-slate-600
                        focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-slate-900
                        transition-colors duration-200 ease-in-out">
-                <svg class="w-5 h-5 mr-2 -ml-1 text-slate-600 dark:text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg">
+                <svg class="w-5 h-5 mr-2 -ml-1 text-slate-600 dark:text-slate-300" fill="none" stroke="currentColor"
+                    viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18">
                     </path>
                 </svg>
@@ -103,7 +103,11 @@
                         bg-indigo-600 text-white shadow-md
                         hover:bg-indigo-700 dark:bg-indigo-700 dark:hover:bg-indigo-600 dark:text-white
                         flex items-center">
-                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                        </svg>
                         Informasi Umum
                     </a>
                     <a href="{{ route('profile.change-password') }}"
@@ -111,7 +115,12 @@
                         bg-slate-100 text-slate-700 hover:bg-slate-200 shadow-sm
                         dark:bg-slate-700 dark:text-slate-200 dark:hover:bg-slate-600
                         flex items-center">
-                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2v5a2 2 0 01-2 2h-5a2 2 0 01-2-2V9a2 2 0 012-2h5z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6"></path></svg>
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M15 7a2 2 0 012 2v5a2 2 0 01-2 2h-5a2 2 0 01-2-2V9a2 2 0 012-2h5z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6"></path>
+                        </svg>
                         Ubah Password
                     </a>
                 </div>
@@ -120,7 +129,8 @@
             {{-- KOLOM KANAN (FORM INFORMASI DASAR) --}}
             <div class="md:col-span-2 space-y-8">
                 {{-- Bagian: Informasi Dasar Profil --}}
-                <div id="general-info-content" class="bg-slate-50 dark:bg-slate-700/50 p-7 rounded-xl shadow-md border border-slate-200 dark:border-slate-700">
+                <div id="general-info-content"
+                    class="bg-slate-50 dark:bg-slate-700/50 p-7 rounded-xl shadow-md border border-slate-200 dark:border-slate-700">
                     <h2
                         class="text-2xl font-bold mb-6 text-slate-700 dark:text-slate-200 border-b border-slate-300 dark:border-slate-600 pb-4">
                         Informasi Umum
@@ -131,7 +141,8 @@
 
                         <div>
                             <label for="name"
-                                class="block text-slate-700 dark:text-slate-300 text-sm font-medium mb-2">Nama Lengkap:</label>
+                                class="block text-slate-700 dark:text-slate-300 text-sm font-medium mb-2">Nama
+                                Lengkap:</label>
                             <input type="text" name="name" id="name"
                                 value="{{ old('name', optional($user)->name) }}"
                                 class="w-full px-4 py-2.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-200
@@ -146,7 +157,8 @@
 
                         <div>
                             <label for="email"
-                                class="block text-slate-700 dark:text-slate-300 text-sm font-medium mb-2">Alamat Email:</label>
+                                class="block text-slate-700 dark:text-slate-300 text-sm font-medium mb-2">Alamat
+                                Email:</label>
                             <input type="email" name="email" id="email"
                                 value="{{ old('email', optional($user)->email) }}"
                                 class="w-full px-4 py-2.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-200
@@ -161,7 +173,8 @@
 
                         <div>
                             <label for="role"
-                                class="block text-slate-700 dark:text-slate-300 text-sm font-medium mb-2">Daftar sebagai:</label>
+                                class="block text-slate-700 dark:text-slate-300 text-sm font-medium mb-2">Daftar
+                                sebagai:</label>
                             <select name="role" id="role"
                                 class="w-full px-4 py-2.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-200
                                        focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500
@@ -180,7 +193,8 @@
 
                         <div>
                             <label for="asal_kampus"
-                                class="block text-slate-700 dark:text-slate-300 text-sm font-medium mb-2">Asal Kampus/Sekolah:</label>
+                                class="block text-slate-700 dark:text-slate-300 text-sm font-medium mb-2">Asal
+                                Kampus/Sekolah:</label>
                             <input type="text" name="asal_kampus" id="asal_kampus"
                                 value="{{ old('asal_kampus', optional($user)->asal_kampus) }}"
                                 class="w-full px-4 py-2.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-200
@@ -194,7 +208,8 @@
 
                         <div>
                             <label for="phone"
-                                class="block text-slate-700 dark:text-slate-300 text-sm font-medium mb-2">Nomor Telepon:</label>
+                                class="block text-slate-700 dark:text-slate-300 text-sm font-medium mb-2">Nomor
+                                Telepon:</label>
                             <input type="text" name="phone" id="phone"
                                 value="{{ old('phone', optional($user)->phone) }}"
                                 class="w-full px-4 py-2.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-200
@@ -208,7 +223,8 @@
 
                         <div>
                             <label for="nim"
-                                class="block text-slate-700 dark:text-slate-300 text-sm font-medium mb-2">NIM (Opsional):</label>
+                                class="block text-slate-700 dark:text-slate-300 text-sm font-medium mb-2">NIM
+                                (Opsional):</label>
                             <input type="text" name="nim" id="nim"
                                 value="{{ old('nim', optional($user)->nim) }}"
                                 class="w-full px-4 py-2.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-200
@@ -226,7 +242,12 @@
                                    bg-green-600 text-white hover:bg-green-700
                                    focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 dark:focus:ring-offset-slate-800
                                    transition-colors duration-200 ease-in-out">
-                                <svg class="w-5 h-5 mr-2 -ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path></svg>
+                                <svg class="w-5 h-5 mr-2 -ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4">
+                                    </path>
+                                </svg>
                                 Simpan Perubahan
                             </button>
                         </div>
@@ -238,7 +259,8 @@
 
     {{-- MODAL UBAH FOTO PROFIL --}}
     <div id="photoModal" class="fixed inset-0 bg-gray-900 bg-opacity-80 flex items-center justify-center z-50 hidden p-4">
-        <div class="bg-white dark:bg-slate-800 rounded-xl shadow-2xl p-7 sm:p-9 max-w-2xl w-full transform transition-all duration-300 ease-out scale-95 opacity-0" id="modal-content-wrapper">
+        <div class="bg-white dark:bg-slate-800 rounded-xl shadow-2xl p-7 sm:p-9 max-w-2xl w-full transform transition-all duration-300 ease-out scale-95 opacity-0"
+            id="modal-content-wrapper">
             <div class="flex justify-between items-center mb-6 pb-4 border-b border-slate-200 dark:border-slate-700">
                 <h2 class="text-2xl font-bold text-slate-800 dark:text-slate-100">Ubah Foto Profil</h2>
                 <button id="closeModalBtn"
@@ -278,7 +300,11 @@
                                    bg-indigo-600 text-white hover:bg-indigo-700
                                    focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-slate-800
                                    transition-colors duration-200 ease-in-out">
-                            <svg class="w-5 h-5 mr-2 -ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                            <svg class="w-5 h-5 mr-2 -ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
+                            </svg>
                             Unggah & Terapkan
                         </button>
                     </form>
@@ -318,7 +344,12 @@
                                bg-red-600 text-white hover:bg-red-700
                                focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 dark:focus:ring-offset-slate-800
                                transition-colors duration-200 ease-in-out">
-                        <svg class="w-5 h-5 mr-2 -ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                        <svg class="w-5 h-5 mr-2 -ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
+                            </path>
+                        </svg>
                         Hapus Foto Profil
                     </button>
                 </form>
@@ -339,20 +370,24 @@
         }
 
         .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: #94a3b8; /* slate-400 */
+            background: #94a3b8;
+            /* slate-400 */
             border-radius: 4px;
         }
 
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-            background: #64748b; /* slate-500 */
+            background: #64748b;
+            /* slate-500 */
         }
 
         .dark .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: #475569; /* slate-600 */
+            background: #475569;
+            /* slate-600 */
         }
 
         .dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-            background: #334155; /* slate-700 */
+            background: #334155;
+            /* slate-700 */
         }
 
         /* Animasi modal */
@@ -448,7 +483,8 @@
             window.selectDefaultAvatar = function(radioId, N_this_element) {
                 // Better way to reset active state using closest() and forEach()
                 const avatarContainers = defaultAvatarForm.querySelectorAll('[type="radio"]').forEach(radio => {
-                    radio.closest('div').classList.remove('border-indigo-500', 'ring-2', 'ring-indigo-300',
+                    radio.closest('div').classList.remove('border-indigo-500', 'ring-2',
+                        'ring-indigo-300',
                         'bg-indigo-50', 'dark:bg-indigo-900/50', 'dark:border-indigo-600');
                     radio.closest('div').classList.add('border-slate-200', 'dark:border-slate-600');
                 });
@@ -456,7 +492,6 @@
                 N_this_element.classList.add('border-indigo-500', 'ring-2', 'ring-indigo-300', 'bg-indigo-50',
                     'dark:bg-indigo-900/50', 'dark:border-indigo-600');
                 N_this_element.classList.remove('border-slate-200', 'dark:border-slate-600');
-
 
                 const radioInput = document.getElementById('radio-' + radioId);
                 if (radioInput) {

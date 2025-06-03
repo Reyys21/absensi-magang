@@ -96,53 +96,54 @@
                 height: 45px;
             }
         }
-@media only screen and (max-width: 768px) {
-    .bg-left {
-        background-color: #0B849F;
-        background-image: none;
-        text-align: center;
-        padding: 2rem 1rem;
-    }
 
-    .pln-brand {
-        justify-content: center;
-        align-items: center;
-        display: flex;
-        flex-direction: column;
-    }
+        @media only screen and (max-width: 768px) {
+            .bg-left {
+                background-color: #0B849F;
+                background-image: none;
+                text-align: center;
+                padding: 2rem 1rem;
+            }
 
-    .custom-travel-img {
-        max-width: 200px;
-        margin-top: 1rem;
-    }
+            .pln-brand {
+                justify-content: center;
+                align-items: center;
+                display: flex;
+                flex-direction: column;
+            }
 
-    .form-container h4 {
-        font-size: 22px;
-    }
+            .custom-travel-img {
+                max-width: 200px;
+                margin-top: 1rem;
+            }
 
-    .top-signup {
-        top: 15px;
-        right: 15px;
-        font-size: 13px;
-        color: white; /* <-- Tambahan: ini membuat teks span putih */
-    }
+            .form-container h4 {
+                font-size: 22px;
+            }
 
-    .top-signup span {
-        color: white; /* <-- Ini yang membuat tulisan 'Don't have an account yet?' menjadi putih */
-    }
+            .top-signup {
+                top: 15px;
+                right: 15px;
+                font-size: 13px;
+                color: white;
+            }
 
-    .top-signup a {
-        padding: 4px 10px;
-        font-size: 13px;
-        color: white;
-        border-color: white;
-    }
+            .top-signup span {
+                color: white;
+            }
 
-    .top-signup a:hover {
-        background-color: white;
-        color: #0B849F;
-    }
-}
+            .top-signup a {
+                padding: 4px 10px;
+                font-size: 13px;
+                color: white;
+                border-color: white;
+            }
+
+            .top-signup a:hover {
+                background-color: white;
+                color: #0B849F;
+            }
+        }
 
 
         @media only screen and (min-width: 992px) {
@@ -218,7 +219,6 @@
 
     <div class="d-flex flex-column flex-md-row h-100">
 
-        <!-- Left Side -->
         <div class="bg-left d-flex flex-column justify-content-center align-items-start w-100 w-md-50 p-4">
             <div class="pln-brand mb-3 text-white">
                 <img src="{{ asset('assets/images/Logo_PLN.png') }}" alt="Logo PLN" class="mb-2">
@@ -232,7 +232,6 @@
             </div>
         </div>
 
-        <!-- Right Side -->
         <div class="d-flex flex-column justify-content-center align-items-center w-100 w-md-50 px-4 py-5">
             <div class="form-container">
                 <h4 class="text-center fw-bold mb-2">WELCOME</h4>
@@ -246,8 +245,9 @@
                 <form method="POST" action="/login" class="login-form">
                     @csrf
                     <div class="mb-3">
-                        <input type="email" name="email" class="form-control" placeholder="Enter Your Gmail" required
-                            autofocus>
+                        {{-- Perubahan di sini: Ubah type dari "email" menjadi "text" dan sesuaikan placeholder --}}
+                        <input type="text" name="email" class="form-control" placeholder="Enter Your Email or Name" required
+                            autofocus value="{{ old('email') }}"> {{-- Menambahkan value="{{ old('email') }}" untuk mempertahankan input --}}
                     </div>
                     <div class="mb-4">
                         <input type="password" name="password" class="form-control" placeholder="Enter Your Password"

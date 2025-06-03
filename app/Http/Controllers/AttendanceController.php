@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Carbon; // Ini adalah alias yang umum digunakan di Laravel untuk Carbon
+use Illuminate\Support\Carbon;
 use App\Models\Attendance;
 use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Facades\Excel;
@@ -32,6 +32,18 @@ class AttendanceController extends Controller
         $userId = Auth::id();
         $today = $request->local_date; // Menggunakan local_date dari request
 
+        // --- DEBUGGING SEMENTARA ---
+        // Anda bisa mengaktifkan ini untuk melihat data yang masuk
+        // dd([
+        //     'message' => 'Inside storeCheckin method',
+        //     'user_id' => $userId,
+        //     'request_all' => $request->all(),
+        //     'local_date' => $request->local_date,
+        //     'local_time' => $request->local_time,
+        //     'carbon_parsed_time' => Carbon::parse($request->local_time),
+        // ]);
+        // ---------------------------
+
         // Cari data kehadiran untuk hari ini yang mungkin sudah ada
         $attendance = Attendance::where('user_id', $userId)
             ->whereDate('date', $today)
@@ -50,7 +62,7 @@ class AttendanceController extends Controller
                 return redirect()->route('dashboard')->with('success', 'Check-in berhasil!');
             } else {
                 // Jika check_in sudah ada, bandingkan dengan waktu check-in yang sudah ada
-                // $attendance->check_in sudah menjadi objek Carbon karena $casts di model
+                // $attendance->check_in sudah menjadi objek Carbon karena $casts di model (asumsi)
                 $existingCheckInTime = $attendance->check_in;
 
                 // Jika waktu check-in yang baru LEBIH AWAL dari yang sudah ada, update
@@ -193,9 +205,9 @@ class AttendanceController extends Controller
                                      ->whereMonth('date', $month)
                                      ->get()
                                      ->keyBy(function($item) {
-                                         // Karena 'date' sekarang otomatis di-cast ke Carbon di model
-                                         return $item->date->format('Y-m-d');
-                                     });
+                                            // Karena 'date' sekarang otomatis di-cast ke Carbon di model
+                                            return $item->date->format('Y-m-d');
+                                        });
 
         // Ambil data absensi untuk daftar vertikal (jika ada tanggal terpilih)
         // Jika tidak ada tanggal terpilih, tampilkan absensi untuk hari ini atau 7 hari terakhir

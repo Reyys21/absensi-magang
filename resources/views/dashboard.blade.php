@@ -16,7 +16,7 @@
                 @include('layouts.profile')
             </div>
 
-       <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 mb-6">
+           <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 mb-6">
                 <div
                     class="bg-[#0B849F] text-white rounded-[20px] px-4 sm:px-6 py-5 shadow-lg border flex flex-col justify-between md:col-span-2 relative overflow-hidden">
                     <h2 class="text-white text-base sm:text-lg font-semibold mb-4">Today’s Attendance</h2>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portal Absensi Magang - Edisi Terang</title>
+    <title>Portal Absensi Magang</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -311,7 +311,7 @@
     <main>
         <section class="hero">
             <div class="container">
-                <h1>Portal <span class="highlight">Absensi Magang</span> Modern & Bersih</h1>
+                <h1>Selamat Datang Di Web <span class="highlight">Absensi Magang</span></h1>
                 <p>Lacak absensi magang Anda dengan mudah, tetap terinformasi detail penting secara instan.</p>
                 <div class="buttons">
                     <a href="{{ route('login') }}" class="btn btn-get-started">Mulai Sekarang</a>

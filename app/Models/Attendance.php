@@ -41,7 +41,7 @@ class Attendance extends Model
     {
         // Jika check_in dan check_out keduanya terisi (tidak null)
         if ($this->check_in && $this->check_out) {
-            return 'Complete';
+            return 'Lengkap';
         }
 
         // Jika salah satu (check_in atau check_out) kosong, berarti "Absent (Belum Lengkap)"
@@ -49,7 +49,7 @@ class Attendance extends Model
         // - Hanya check_in ada, check_out kosong
         // - Hanya check_out ada, check_in kosong
         // - Keduanya kosong (untuk record yang ada tapi tidak ada data absen sama sekali)
-        return 'Absent (Belum Lengkap)';
+        return 'Tidak Hadir (Belum Lengkap)';
     }
 
     /**

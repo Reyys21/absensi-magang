@@ -137,17 +137,12 @@
                                         $attendanceStatus = $item->attendance_status;
                                         $customColor = '';
                                         switch ($attendanceStatus) {
-                                            case 'Complete':
+                                            case 'Lengkap':
                                                 $customColor = '#28CB6E';
                                                 break;
-                                            case 'Not Checked In':
-                                                $customColor = '#E7E015';
-                                                break;
-                                            case 'Not Checked Out':
+                                            
+                                            case 'Tidak Hadir (Belum Lengkap)':
                                                 $customColor = '#f86917';
-                                                break;
-                                            case 'Absent':
-                                                $customColor = '#E61126';
                                                 break;
                                             default:
                                                 $customColor = '#A0AEC0'; // warna default (abu-abu)

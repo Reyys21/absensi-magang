@@ -176,7 +176,7 @@ class AttendanceController extends Controller
 
             foreach ($allDatesInRange as $dateString) {
                 $attendanceRecord = $userAttendances->get($dateString);
-                if ($attendanceRecord && $attendanceRecord->attendance_status === 'Complete') {
+                if ($attendanceRecord && $attendanceRecord->attendance_status === 'Lengkap') {
                     $attendanceCount++;
                 }
             }
@@ -253,7 +253,7 @@ class AttendanceController extends Controller
                 if ($attendance) {
                     $status = $attendance->attendance_status;
                 } else {
-                    $status = 'Absent (Belum Lengkap)';
+                    $status = 'Tidak Hadir (Belum Lengkap)';
                 }
             }
             $monthlyAttendances->put($currentLoopDateString, (object)['attendance_status' => $status]);
@@ -277,7 +277,7 @@ class AttendanceController extends Controller
                     'user_id' => $userId,
                     'is_dummy' => true,
                 ];
-                $dummyAttendance->attendance_status = 'Absent (Belum Lengkap)';
+                $dummyAttendance->attendance_status = 'Tidak Hadir (Belum Lengkap)';
                 $dummyAttendance->day_name = Carbon::parse($selectedDate, $appTimezone)->translatedFormat('l');
                 $dummyAttendance->formatted_date = Carbon::parse($selectedDate, $appTimezone)->translatedFormat('d F Y');
                 $dailyAttendances->push($dummyAttendance);
@@ -315,7 +315,7 @@ class AttendanceController extends Controller
                         'user_id' => $userId,
                         'is_dummy' => true,
                     ];
-                    $dummyAttendance->attendance_status = 'Absent (Belum Lengkap)';
+                    $dummyAttendance->attendance_status = 'Tidak Hadir (Belum Lengkap)';
                     $dummyAttendance->day_name = $d->translatedFormat('l');
                     $dummyAttendance->formatted_date = $d->translatedFormat('d F Y');
                     $processedDailyAttendances->push($dummyAttendance);

@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Carbon; // Pastikan menggunakan alias ini
+use Illuminate\Support\Carbon;
 use App\Models\Attendance;
 use App\Models\User;
 use App\Models\CorrectionRequest;
@@ -32,38 +32,26 @@ class AttendanceController extends Controller
     public function storeCheckin(Request $request)
     {
         $userId = Auth::id();
-        $appTimezone = config('app.timezone'); // Dapatkan timezone aplikasi
+        $appTimezone = config('app.timezone');
 
-        // Menggunakan local_date dari request (format YYYY-MM-DD)
-        // Menggabungkan tanggal dari request dengan waktu dari request
-        // Pastikan input form Anda mengirimkan 'local_date' dan 'local_time'
-        // Jika tidak, Anda mungkin ingin menggunakan Carbon::now($appTimezone)->toDateString()
-        // untuk $today dan $request->current_time untuk waktu.
         $today = $request->local_date ?? Carbon::now($appTimezone)->toDateString();
-        $checkInTimeInput = $request->local_time ?? Carbon::now($appTimezone)->format('H:i:s'); // Default jika tidak ada input waktu
+        $checkInTimeInput = $request->local_time ?? Carbon::now($appTimezone)->format('H:i:s');
 
-        // Waktu check-in baru, dibuat dengan tanggal dan waktu input, serta timezone aplikasi
         $newCheckInDateTime = Carbon::createFromFormat('Y-m-d H:i:s', $today . ' ' . $checkInTimeInput, $appTimezone);
 
-        // Cari data kehadiran untuk hari ini yang mungkin sudah ada
         $attendance = Attendance::where('user_id', $userId)
             ->whereDate('date', $today)
             ->first();
 
         if ($attendance) {
-            // Jika sudah ada record untuk hari ini
             if (empty($attendance->check_in)) {
-                // Jika check_in masih kosong, catat waktu check-in ini
                 $attendance->update([
-                    'check_in' => $newCheckInDateTime, // Simpan sebagai objek Carbon, akan di-cast oleh model
+                    'check_in' => $newCheckInDateTime,
                 ]);
                 return redirect()->route('dashboard')->with('success', 'Check-in berhasil!');
             } else {
-                // Jika check_in sudah ada, bandingkan dengan waktu check-in yang sudah ada
-                // $attendance->check_in adalah objek Carbon karena $casts di model, sudah dalam timezone aplikasi
                 $existingCheckInTime = $attendance->check_in;
 
-                // Jika waktu check-in yang baru LEBIH AWAL dari yang sudah ada, update
                 if ($newCheckInDateTime->lt($existingCheckInTime)) {
                     $attendance->update([
                         'check_in' => $newCheckInDateTime,
@@ -74,7 +62,6 @@ class AttendanceController extends Controller
                 }
             }
         } else {
-            // Jika belum ada record untuk hari ini, buat record baru
             Attendance::create([
                 'user_id' => $userId,
                 'date' => $today,
@@ -103,24 +90,19 @@ class AttendanceController extends Controller
     public function storeCheckout(Request $request)
     {
         $userId = Auth::id();
-        $appTimezone = config('app.timezone'); // Dapatkan timezone aplikasi
+        $appTimezone = config('app.timezone');
 
-        // Menggunakan Carbon untuk tanggal hari ini di timezone aplikasi
         $today = Carbon::now($appTimezone)->toDateString();
-        $checkOutTimeInput = $request->current_time ?? Carbon::now($appTimezone)->format('H:i:s'); // Default jika tidak ada input waktu
+        $checkOutTimeInput = $request->current_time ?? Carbon::now($appTimezone)->format('H:i:s');
 
-        // Waktu check-out baru, dibuat dengan tanggal dan waktu input, serta timezone aplikasi
         $newCheckOutDateTime = Carbon::createFromFormat('Y-m-d H:i:s', $today . ' ' . $checkOutTimeInput, $appTimezone);
 
-        // Cari data kehadiran untuk hari ini
         $attendance = Attendance::where('user_id', $userId)
             ->whereDate('date', $today)
             ->first();
 
         if ($attendance) {
-            // Jika record ditemukan
             if (empty($attendance->check_out)) {
-                // Jika check_out masih kosong, catat waktu check-out ini
                 $attendance->update([
                     'check_out' => $newCheckOutDateTime,
                     'activity_title' => $request->activity_title,
@@ -128,11 +110,8 @@ class AttendanceController extends Controller
                 ]);
                 return redirect()->route('dashboard')->with('success', 'Check-out berhasil!');
             } else {
-                // Jika check_out sudah ada, bandingkan dengan waktu check-out yang sudah ada
-                // $attendance->check_out adalah objek Carbon karena $casts di model, sudah dalam timezone aplikasi
                 $existingCheckOutTime = $attendance->check_out;
 
-                // Jika waktu check-out yang baru LEBIH AKHIR dari yang sudah ada, update
                 if ($newCheckOutDateTime->gt($existingCheckOutTime)) {
                     $attendance->update([
                         'check_out' => $newCheckOutDateTime,
@@ -145,8 +124,6 @@ class AttendanceController extends Controller
                 }
             }
         } else {
-            // Ini adalah kasus di mana user hanya melakukan check-out tanpa check-in di hari yang sama.
-            // Buat record baru dengan check_out saja.
             Attendance::create([
                 'user_id' => $userId,
                 'date' => $today,
@@ -169,25 +146,21 @@ class AttendanceController extends Controller
         $userId = Auth::id();
         $appTimezone = config('app.timezone');
 
-        // Gunakan Carbon::now() dengan timezone aplikasi
         $today = Carbon::now($appTimezone)->toDateString();
 
         $attendanceToday = Attendance::where('user_id', $userId)
-                                     ->whereDate('date', $today)
-                                     ->first();
+                                    ->whereDate('date', $today)
+                                    ->first();
 
-        // Karena model memiliki $casts='datetime', $attendanceToday->check_in dan check_out
-        // sudah menjadi objek Carbon dalam timezone aplikasi.
         $firstCheckIn = $attendanceToday ? $attendanceToday->check_in : null;
         $lastCheckOut = $attendanceToday ? $attendanceToday->check_out : null;
 
         $user = Auth::user();
-        // created_at dari model User juga akan di-cast otomatis ke timezone aplikasi jika ada di $casts User model
         $registrationDate = $user->created_at->startOfDay();
 
         $attendanceCount = 0;
         if ($registrationDate) {
-            $currentDate = Carbon::now($appTimezone)->endOfDay(); // Gunakan timezone aplikasi
+            $currentDate = Carbon::now($appTimezone)->endOfDay();
 
             $allDatesInRange = collect();
             for ($date = $registrationDate->copy(); $date->lte($currentDate); $date->addDay()) {
@@ -195,11 +168,11 @@ class AttendanceController extends Controller
             }
 
             $userAttendances = Attendance::where('user_id', $userId)
-                                         ->whereBetween('date', [$registrationDate, $currentDate])
-                                         ->get()
-                                         ->keyBy(function($item) {
-                                             return $item->date->toDateString();
-                                         });
+                                        ->whereBetween('date', [$registrationDate, $currentDate])
+                                        ->get()
+                                        ->keyBy(function($item) {
+                                            return $item->date->toDateString();
+                                        });
 
             foreach ($allDatesInRange as $dateString) {
                 $attendanceRecord = $userAttendances->get($dateString);
@@ -246,22 +219,21 @@ class AttendanceController extends Controller
         $user = Auth::user();
         $appTimezone = config('app.timezone');
 
-        // Pastikan created_at di model User juga di-cast agar timezone-aware
         $registrationDate = $user->created_at->startOfDay();
 
         $year = $request->input('year', Carbon::now($appTimezone)->year);
         $month = $request->input('month', Carbon::now($appTimezone)->month);
 
-        $date = Carbon::createFromDate($year, $month, 1, $appTimezone); // Buat tanggal di timezone aplikasi
-        $currentDay = Carbon::now($appTimezone)->startOfDay(); // Hari ini di timezone aplikasi
+        $date = Carbon::createFromDate($year, $month, 1, $appTimezone);
+        $currentDay = Carbon::now($appTimezone)->startOfDay();
 
         $existingAttendances = Attendance::where('user_id', $userId)
-                                         ->whereYear('date', $year)
-                                         ->whereMonth('date', $month)
-                                         ->get()
-                                         ->keyBy(function($item) {
-                                             return $item->date->toDateString();
-                                         });
+                                        ->whereYear('date', $year)
+                                        ->whereMonth('date', $month)
+                                        ->get()
+                                        ->keyBy(function($item) {
+                                            return $item->date->toDateString();
+                                        });
 
         $monthlyAttendances = collect();
 
@@ -272,8 +244,7 @@ class AttendanceController extends Controller
             $currentLoopDateString = $d->toDateString();
 
             $status = '';
-            // Perbandingan tanggal harus selalu timezone-aware
-            if ($d->lt($registrationDate->copy()->startOfDay())) { // Copy to avoid modifying original
+            if ($d->lt($registrationDate->copy()->startOfDay())) {
                 $status = 'N/A';
             } elseif ($d->gt($currentDay)) {
                 $status = 'Future';
@@ -293,10 +264,9 @@ class AttendanceController extends Controller
 
         if ($selectedDate) {
             $dailyAttendances = Attendance::where('user_id', $userId)
-                                          ->whereDate('date', Carbon::parse($selectedDate, $appTimezone)->toDateString())
-                                          ->get();
+                                        ->whereDate('date', Carbon::parse($selectedDate, $appTimezone)->toDateString())
+                                        ->get();
 
-            // Ini harus diperbaiki agar konsisten dengan timezone
             if ($dailyAttendances->isEmpty() && Carbon::parse($selectedDate, $appTimezone)->lte(Carbon::now($appTimezone)) && Carbon::parse($selectedDate, $appTimezone)->gte($registrationDate)) {
                 $dummyAttendance = (object)[
                     'date' => Carbon::parse($selectedDate, $appTimezone),
@@ -315,13 +285,12 @@ class AttendanceController extends Controller
         } else {
             $sevenDaysAgo = Carbon::now($appTimezone)->subDays(6)->startOfDay();
             $rawDailyAttendances = Attendance::where('user_id', $userId)
-                                             ->whereBetween('date', [$sevenDaysAgo, Carbon::now($appTimezone)->endOfDay()])
-                                             ->orderBy('date', 'desc')
-                                             ->get();
+                                            ->whereBetween('date', [$sevenDaysAgo, Carbon::now($appTimezone)->endOfDay()])
+                                            ->orderBy('date', 'desc')
+                                            ->get();
 
             $currentDailyAttendancesMap = [];
             foreach ($rawDailyAttendances as $att) {
-                // Ensure date is a Carbon instance before toDateString()
                 $currentDailyAttendancesMap[$att->date->toDateString()] = $att;
             }
 
@@ -338,7 +307,7 @@ class AttendanceController extends Controller
                     $processedDailyAttendances->push($attendanceRecord);
                 } else {
                     $dummyAttendance = (object)[
-                        'date' => $d, // $d already a Carbon instance in app timezone
+                        'date' => $d,
                         'check_in' => null,
                         'check_out' => null,
                         'activity_title' => null,
@@ -357,7 +326,6 @@ class AttendanceController extends Controller
 
         return view('fold_history.history', compact('date', 'monthlyAttendances', 'dailyAttendances', 'selectedDate'));
     }
-
 
     /**
      * Export data absensi.
@@ -401,38 +369,32 @@ class AttendanceController extends Controller
         $userId = Auth::id();
         $appTimezone = config('app.timezone');
 
-        // Default ke tanggal hari ini di timezone aplikasi
         $dateToCorrect = Carbon::now($appTimezone);
 
-        // Coba parse tanggal dari request jika ada
         if ($request->filled('date')) {
             try {
-                // Pastikan tanggal diparse dengan timezone aplikasi
                 $dateToCorrect = Carbon::parse($request->input('date'), $appTimezone);
             } catch (\Exception $e) {
                 Log::error('Invalid date provided for correction form: ' . $request->input('date') . ' - ' . $e->getMessage());
-                // Tetap gunakan Carbon::now() jika tanggal tidak valid
             }
         }
 
-        // Dapatkan data absensi untuk tanggal tersebut.
-        // Karena model memiliki $casts, check_in/out akan otomatis dalam timezone aplikasi.
         $attendance = Attendance::where('user_id', $userId)
                                 ->whereDate('date', $dateToCorrect->toDateString())
                                 ->first();
 
-        // Siapkan data lama untuk form input HTML (value) dan tampilan
-        $oldCheckIn = $attendance && $attendance->check_in ? $attendance->check_in->format('H:i') : ''; // Format untuk input type="time"
-        $oldCheckOut = $attendance && $attendance->check_out ? $attendance->check_out->format('H:i') : '';
+        // Ambil data dari permintaan koreksi yang 'pending' atau 'rejected' jika ada, untuk menampilkan data terbaru.
+        $pendingOrRejectedCorrection = CorrectionRequest::where('user_id', $userId)
+                                                        ->where('attendance_date', $dateToCorrect->toDateString())
+                                                        ->whereIn('status', ['pending', 'rejected'])
+                                                        ->latest() // Ambil yang terbaru
+                                                        ->first();
 
-        $oldActivityTitle = $attendance ? $attendance->activity_title : '';
-        $oldActivityDescription = $attendance ? $attendance->activity_description : '';
-
-        // Untuk tampilan di "lama": (tidak lagi digunakan di view correction_form tapi tetap di sini)
-        $displayOldCheckIn = $attendance && $attendance->check_in ? $attendance->check_in->format('H:i') : '--.--';
-        $displayOldCheckOut = $attendance && $attendance->check_out ? $attendance->check_out->format('H:i') : '--.--';
-        $displayOldActivityTitle = $attendance ? ($attendance->activity_title ?: '--') : '--';
-        $displayOldActivityDescription = $attendance ? ($attendance->activity_description ?: '--') : '--';
+        // Gunakan data dari permintaan koreksi jika ada, jika tidak, gunakan data absensi
+        $oldCheckIn = ($pendingOrRejectedCorrection && $pendingOrRejectedCorrection->new_check_in) ? $pendingOrRejectedCorrection->new_check_in->format('H:i') : ($attendance && $attendance->check_in ? $attendance->check_in->format('H:i') : '');
+        $oldCheckOut = ($pendingOrRejectedCorrection && $pendingOrRejectedCorrection->new_check_out) ? $pendingOrRejectedCorrection->new_check_out->format('H:i') : ($attendance && $attendance->check_out ? $attendance->check_out->format('H:i') : '');
+        $oldActivityTitle = ($pendingOrRejectedCorrection && $pendingOrRejectedCorrection->new_activity_title) ? $pendingOrRejectedCorrection->new_activity_title : ($attendance ? $attendance->activity_title : '');
+        $oldActivityDescription = ($pendingOrRejectedCorrection && $pendingOrRejectedCorrection->new_activity_description) ? $pendingOrRejectedCorrection->new_activity_description : ($attendance ? $attendance->activity_description : '');
 
 
         return view('fold_history.correction_form', compact(
@@ -441,11 +403,7 @@ class AttendanceController extends Controller
             'oldCheckOut',
             'oldActivityTitle',
             'oldActivityDescription',
-            'displayOldCheckIn',
-            'displayOldCheckOut',
-            'displayOldActivityTitle',
-            'displayOldActivityDescription',
-            'attendance'
+            'attendance' // Tetap sertakan attendance untuk referensi data asli jika diperlukan
         ));
     }
 
@@ -469,11 +427,9 @@ class AttendanceController extends Controller
             'reason' => 'required|string|max:1000',
         ]);
 
-        // Parse tanggal koreksi, pastikan di timezone aplikasi
         $dateToCorrect = Carbon::parse($validated['date_to_correct'], $appTimezone)->startOfDay();
 
         // Dapatkan data absensi lama untuk perbandingan
-        // Ini akan menjadi objek Carbon di timezone aplikasi karena $casts di model
         $attendance = Attendance::where('user_id', $userId)
                                 ->whereDate('date', $dateToCorrect->toDateString())
                                 ->first();
@@ -502,47 +458,82 @@ class AttendanceController extends Controller
             return redirect()->back()->withErrors(['new_check_out' => 'Waktu check-out baru harus setelah waktu check-in baru.'])->withInput();
         }
 
-        // Cek apakah ada perubahan yang diajukan.
-        // Format waktu lama dari objek Carbon ($attendance->check_in) agar konsisten dengan input form ('H:i').
-        $oldCheckInFormatted = $attendance && $attendance->check_in ? $attendance->check_in->format('H:i') : null;
-        $oldCheckOutFormatted = $attendance && $attendance->check_out ? $attendance->check_out->format('H:i') : null;
+        // Dapatkan data permintaan koreksi yang sudah ada (pending atau rejected) untuk tanggal ini
+        // Kita perlu mencari yang terbaru jika ada lebih dari satu yang ditolak
+        $existingCorrectionRequest = CorrectionRequest::where('user_id', $userId)
+            ->where('attendance_date', $dateToCorrect->toDateString())
+            ->whereIn('status', ['pending', 'rejected'])
+            ->latest() // Ambil yang terbaru jika ada beberapa yang rejected
+            ->first();
 
-        $isSameCheckIn = ( $oldCheckInFormatted === $validated['new_check_in'] ) || ( !$oldCheckInFormatted && empty($validated['new_check_in']) );
-        $isSameCheckOut = ( $oldCheckOutFormatted === $validated['new_check_out'] ) || ( !$oldCheckOutFormatted && empty($validated['new_check_out']) );
-        $isSameActivityTitle = ($attendance && $attendance->activity_title === $validated['new_activity_title']) || (!$attendance || (empty($attendance->activity_title) && empty($validated['new_activity_title'])));
-        $isSameActivityDescription = ($attendance && $attendance->activity_description === $validated['new_activity_description']) || (!$attendance || (empty($attendance->activity_description) && empty($validated['new_activity_description'])));
+        // Tentukan nilai "old" yang akan digunakan untuk perbandingan.
+        // Jika ada existingCorrectionRequest, gunakan 'new_check_in'/'new_check_out' dari situ
+        // sebagai nilai "lama" yang sedang dikoreksi ulang.
+        // Jika tidak ada, gunakan data dari attendance asli.
+        $currentOldCheckIn = $attendance ? $attendance->check_in : null;
+        $currentOldCheckOut = $attendance ? $attendance->check_out : null;
+        $currentOldActivityTitle = $attendance ? $attendance->activity_title : null;
+        $currentOldActivityDescription = $attendance ? $attendance->activity_description : null;
 
-        if ($isSameCheckIn && $isSameCheckOut && $isSameActivityTitle && $isSameActivityDescription) {
+        if ($existingCorrectionRequest) {
+            // Jika ada permintaan koreksi yang sudah ada, ambil nilai 'new' dari permintaan itu sebagai 'old'
+            // untuk perbandingan saat ini. Ini memastikan kita membandingkan dengan permintaan koreksi terakhir.
+            $currentOldCheckIn = $existingCorrectionRequest->new_check_in;
+            $currentOldCheckOut = $existingCorrectionRequest->new_check_out;
+            $currentOldActivityTitle = $existingCorrectionRequest->new_activity_title;
+            $currentOldActivityDescription = $existingCorrectionRequest->new_activity_description;
+        }
+
+        // Format waktu 'old' saat ini untuk perbandingan dengan input form
+        $currentOldCheckInFormatted = $currentOldCheckIn ? $currentOldCheckIn->format('H:i') : null;
+        $currentOldCheckOutFormatted = $currentOldCheckOut ? $currentOldCheckOut->format('H:i') : null;
+
+        // Tentukan apakah ada perubahan yang diajukan dengan membandingkan semua field
+        $hasChanges = false;
+        if (
+            ($currentOldCheckInFormatted !== $validated['new_check_in'] && !($currentOldCheckInFormatted === null && empty($validated['new_check_in']))) ||
+            ($currentOldCheckOutFormatted !== $validated['new_check_out'] && !($currentOldCheckOutFormatted === null && empty($validated['new_check_out']))) ||
+            ($currentOldActivityTitle !== $validated['new_activity_title'] && !($currentOldActivityTitle === null && empty($validated['new_activity_title']))) ||
+            ($currentOldActivityDescription !== $validated['new_activity_description'] && !($currentOldActivityDescription === null && empty($validated['new_activity_description'])))
+        ) {
+            $hasChanges = true;
+        }
+
+        if (!$hasChanges) {
             return redirect()->back()->with('info', 'Tidak ada perubahan yang diajukan untuk koreksi.');
         }
 
-        // Buat permintaan koreksi baru
-        CorrectionRequest::create([
+        // Data yang akan disimpan/diperbarui
+        $correctionData = [
             'user_id' => $userId,
-            'attendance_date' => $dateToCorrect->toDateString(), // Cukup simpan tanggal
-            'old_check_in' => $attendance ? $attendance->check_in : null, // Ini sudah objek Carbon dari DB, akan disimpan sebagai UTC
-            'old_check_out' => $attendance ? $attendance->check_out : null, // Ini sudah objek Carbon dari DB, akan disimpan sebagai UTC
-            'new_check_in' => $newCheckInTime, // Ini adalah objek Carbon di timezone aplikasi, akan disimpan sebagai UTC
-            'new_check_out' => $newCheckOutTime, // Ini adalah objek Carbon di timezone aplikasi, akan disimpan sebagai UTC
+            'attendance_date' => $dateToCorrect->toDateString(),
+            // Simpan 'old_check_in' dan 'old_check_out' berdasarkan data absensi ASLI.
+            // Ini penting untuk audit trail, selalu bandingkan dengan data kehadiran yang tercatat.
+            'old_check_in' => $attendance ? $attendance->check_in : null,
+            'old_check_out' => $attendance ? $attendance->check_out : null,
+            'new_check_in' => $newCheckInTime,
+            'new_check_out' => $newCheckOutTime,
             'new_activity_title' => $validated['new_activity_title'],
             'new_activity_description' => $validated['new_activity_description'],
             'reason' => $validated['reason'],
             'status' => 'pending',
-        ]);
+        ];
 
-        return redirect()->route('dashboard')->with('success', 'Data koreksi sudah terkirim, silahkan menunggu admin mengkonfirmasinya.');
+        if ($existingCorrectionRequest) {
+            // Jika ada permintaan koreksi yang sudah ada (pending atau rejected), update saja
+            $existingCorrectionRequest->update($correctionData);
+            return redirect()->route('dashboard')->with('success', 'Permintaan koreksi Anda telah diperbarui dan dikirim ulang.');
+        } else {
+            // Jika tidak ada, buat permintaan koreksi baru
+            CorrectionRequest::create($correctionData);
+            return redirect()->route('dashboard')->with('success', 'Data koreksi sudah terkirim, silahkan menunggu admin mengkonfirmasinya.');
+        }
     }
 
     // Ini adalah placeholder untuk metode create dan store,
     // asumsikan ini untuk manajemen absensi oleh admin atau untuk entri manual.
     public function create()
     {
-        // Path baru: resources/views/attendances/create.blade.php
-        // Perhatikan: Dalam struktur folder yang Anda berikan, tidak ada folder 'attendances' langsung di bawah 'views',
-        // jadi saya mengasumsikan ini seharusnya ada di tempat lain atau Anda perlu membuat folder 'attendances'
-        // atau memindahkannya ke salah satu folder 'fold_' yang sudah ada.
-        // Jika Anda memiliki folder 'attendances' di level yang sama dengan 'fold_dashboard', maka ini benar.
-        // Jika tidak, perlu penyesuaian lagi.
         return view('attendances.create');
     }
 
@@ -559,7 +550,6 @@ class AttendanceController extends Controller
             'activity_description' => 'nullable|string',
         ]);
 
-        // Gabungkan tanggal dengan waktu untuk check_in/check_out jika ada
         if ($validated['check_in']) {
             $validated['check_in'] = Carbon::createFromFormat(
                 'Y-m-d H:i:s',
@@ -588,11 +578,9 @@ class AttendanceController extends Controller
     public function showApprovalRequests()
     {
         $userId = Auth::id();
-        // Ketika mengambil dari database, karena $casts di model CorrectionRequest,
-        // Laravel akan secara otomatis mengonversi dari UTC ke timezone aplikasi (Asia/Makassar).
         $requests = CorrectionRequest::where('user_id', $userId)
-                                     ->orderBy('created_at', 'desc')
-                                     ->paginate(10);
+                                    ->orderBy('created_at', 'desc')
+                                    ->paginate(10);
 
         return view('fold_AttendanceApproval.Attendance Approval', compact('requests'));
     }

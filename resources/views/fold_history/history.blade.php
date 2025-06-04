@@ -192,14 +192,11 @@
 $indicatorColor = '';
                                         $statusTitle = $attendance->attendance_status; // Default title for tooltip
                                         switch ($attendance->attendance_status) {
-                                            case 'Complete':
+                                            case 'Lengkap':
                                                 $indicatorColor = '#28CB6E';
                                                 break;
-                                            case 'Absent (Belum Lengkap)':
+                                            case 'Tidak Hadir (Belum Lengkap)':
                                                 $indicatorColor = '#f86917';
-                                                break;
-                                            case 'Incomplete':
-                                                $indicatorColor = '#FFD700';
                                                 break;
                                             default:
                                                 $indicatorColor = '#A0AEC0'; // Default gray for unknown status

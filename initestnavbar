@@ -1,0 +1,248 @@
+{{-- resources/views/layouts/navbar_admin.blade.php --}}
+
+<nav id="navbar"
+    class="bg-[#2C3E50] text-white shadow-lg
+           fixed top-0 left-0 w-full z-40
+           transition-all duration-300 ease-in-out">
+    <div class="container mx-auto px-4 py-3 flex items-center justify-between">
+
+        {{-- Logo dan Teks PLN --}}
+        <div id="pln-logo-text" class="flex items-center space-x-3">
+            <img src="{{ asset('assets/images/Logo_PLN.png') }}" alt="Logo PLN" class="w-10 h-10 object-contain" />
+            <div id="pln-text" class="text-base font-bold leading-5">
+                <p>PLN UID KALSELTENG</p>
+            </div>
+        </div>
+
+        {{-- Tombol Toggle Menu Mobile (Hamburger) --}}
+        <button id="mobile-menu-toggle"
+            class="md:hidden p-2 text-white rounded-md hover:bg-[#3C5A6D] focus:outline-none">
+            <i class="fa-solid fa-bars text-xl"></i>
+        </button>
+
+        {{-- Menu Navigasi (untuk Desktop dan Mobile) --}}
+        <div id="navbar-menu"
+            class="hidden md:flex md:items-center md:space-x-6 flex-1 justify-end">
+            <a href="{{ route('dashboard') }}"
+                class="px-3 py-2 rounded-md transition duration-150 flex items-center gap-2
+                {{ request()->routeIs('dashboard') ? 'bg-[#FFD100] text-black' : 'hover:bg-[#3C5A6D]' }}">
+                <i class="fa-solid fa-house"></i> <span class="nav-text">Dasboard</span>
+            </a>
+
+            {{-- Dropdown Absensi --}}
+            <div class="relative group">
+                <button id="btn-attendance" type="button"
+                    class="flex items-center gap-2 px-3 py-2 rounded-md transition duration-150 cursor-pointer
+                    {{ request()->routeIs('attendance.*') ? 'bg-[#FFD100] text-black' : 'hover:bg-[#3C5A6D]' }}">
+                    <i class="fa-solid fa-user-check"></i> <span class="nav-text">Absensi</span>
+                    <i class="fa-solid fa-chevron-down text-xs transition-transform duration-300 arrow-icon"></i>
+                </button>
+                <div id="attendanceDropdown"
+                    class="absolute hidden right-0 mt-2 w-48 rounded-md shadow-lg bg-[#34495E] ring-1 ring-black ring-opacity-5 focus:outline-none z-50">
+                    <a href="{{ route('attendance.history') }}"
+                        class="block px-4 py-2 text-sm text-white {{ request()->routeIs('attendance.history') ? 'bg-[#2C3E50] text-[#FFD100]' : 'hover:bg-[#2C3E50] hover:text-[#FFD100]' }}">Riwayat</a>
+                    <a href="{{ route('attendance.my') }}"
+                        class="block px-4 py-2 text-sm text-white {{ request()->routeIs('attendance.my') ? 'bg-[#2C3E50] text-[#FFD100]' : 'hover:bg-[#2C3E50] hover:text-[#FFD100]' }}">Absensi Saya</a>
+                </div>
+            </div>
+
+            {{-- Dropdown Persetujuan --}}
+            <div class="relative group">
+                <button id="btn-approval" type="button"
+                    class="flex items-center gap-2 px-3 py-2 rounded-md transition duration-150 cursor-pointer
+                    {{ request()->routeIs('approval.*') ? 'bg-[#FFD100] text-black' : 'hover:bg-[#3C5A6D]' }}">
+                    <i class="fa-solid fa-thumbs-up"></i> <span class="nav-text">Persetujuan</span>
+                    <i class="fa-solid fa-chevron-down text-xs transition-transform duration-300 arrow-icon"></i>
+                </button>
+                <div id="approvalDropdown"
+                    class="absolute hidden right-0 mt-2 w-48 rounded-md shadow-lg bg-[#34495E] ring-1 ring-black ring-opacity-5 focus:outline-none z-50">
+                    <a href="{{ route('approval.requests') }}"
+                        class="block px-4 py-2 text-sm text-white {{ request()->routeIs('approval.requests') ? 'bg-[#2C3E50] text-[#FFD100]' : 'hover:bg-[#2C3E50] hover:text-[#FFD100]' }}">Persetujuan Absensi</a>
+                </div>
+            </div>
+
+            {{-- Logout --}}
+            <form method="POST" action="{{ route('logout') }}">
+                @csrf
+                <button type="submit"
+                    class="flex items-center gap-2 px-3 py-2 rounded-md transition duration-150 hover:bg-[#3C5A6D]">
+                    <i class="fa-solid fa-right-from-bracket"></i> <span class="nav-text">Keluar</span>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    {{-- Menu Mobile (muncul di bawah navbar utama saat toggle) --}}
+    <div id="mobile-menu"
+        class="md:hidden hidden bg-[#2C3E50] pb-4">
+        <div class="px-4 space-y-2">
+            <a href="{{ route('dashboard') }}"
+                class="block px-4 py-2 rounded-md transition duration-150 flex items-center gap-3
+                {{ request()->routeIs('dashboard') ? 'bg-[#FFD100] text-black' : 'hover:bg-[#3C5A6D]' }}">
+                <i class="fa-solid fa-house"></i> Dasboard
+            </a>
+
+            {{-- Dropdown Absensi Mobile --}}
+            <div class="relative">
+                <button id="mobile-btn-attendance" type="button"
+                    class="flex items-center justify-between w-full px-4 py-2 rounded-md transition duration-150 cursor-pointer
+                    {{ request()->routeIs('attendance.*') ? 'bg-[#FFD100] text-black' : 'hover:bg-[#3C5A6D]' }}">
+                    <div class="flex items-center gap-3">
+                        <i class="fa-solid fa-user-check"></i> Absensi
+                    </div>
+                    <i class="fa-solid fa-chevron-down transition-transform duration-300 arrow-icon"></i>
+                </button>
+                <div id="mobileAttendanceDropdown"
+                    class="{{ request()->routeIs('attendance.*') ? 'mt-2 space-y-1 rounded-xl bg-[#34495E] block' : 'hidden mt-2 space-y-1 rounded-xl bg-[#34495E]' }}">
+                    <a href="{{ route('attendance.history') }}"
+                        class="block px-6 py-2 text-sm {{ request()->routeIs('attendance.history') ? 'bg-[#2C3E50] text-[#FFD100]' : 'hover:bg-[#2C3E50] hover:text-[#FFD100]' }} rounded">Riwayat</a>
+                    <a href="{{ route('attendance.my') }}"
+                        class="block px-6 py-2 text-sm {{ request()->routeIs('attendance.my') ? 'bg-[#2C3E50] text-[#FFD100]' : 'hover:bg-[#2C3E50] hover:text-[#FFD100]' }} rounded">Absensi Saya</a>
+                </div>
+            </div>
+
+            {{-- Dropdown Persetujuan Mobile --}}
+            <div class="relative">
+                <button id="mobile-btn-approval" type="button"
+                    class="flex items-center justify-between w-full px-4 py-2 rounded-md transition duration-150 cursor-pointer
+                    {{ request()->routeIs('approval.*') ? 'bg-[#FFD100] text-black' : 'hover:bg-[#3C5A6D]' }}">
+                    <div class="flex items-center gap-3">
+                        <i class="fa-solid fa-thumbs-up"></i> Persetujuan
+                    </div>
+                    <i class="fa-solid fa-chevron-down transition-transform duration-300 arrow-icon"></i>
+                </button>
+                <div id="mobileApprovalDropdown"
+                    class="{{ request()->routeIs('approval.*') ? 'mt-2 space-y-1 rounded-xl bg-[#34495E] block' : 'hidden mt-2 space-y-1 rounded-xl bg-[#34495E]' }}">
+                    <a href="{{ route('approval.requests') }}"
+                        class="block px-6 py-2 text-sm {{ request()->routeIs('approval.requests') ? 'bg-[#2C3E50] text-[#FFD100]' : 'hover:bg-[#2C3E50] hover:text-[#FFD100]' }} rounded">Persetujuan Absensi</a>
+                </div>
+            </div>
+
+            <form method="POST" action="{{ route('logout') }}">
+                @csrf
+                <button type="submit"
+                    class="w-full flex items-center gap-3 px-4 py-2 rounded-md transition duration-150 hover:bg-[#3C5A6D]">
+                    <i class="fa-solid fa-right-from-bracket"></i> Keluar
+                </button>
+            </form>
+        </div>
+    </div>
+</nav>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+        const navbarMenu = document.getElementById('navbar-menu');
+        const mobileMenu = document.getElementById('mobile-menu'); // Tambahan untuk menu mobile
+
+        // Dropdown desktop
+        const btnAttendance = document.getElementById('btn-attendance');
+        const attendanceDropdown = document.getElementById('attendanceDropdown');
+        const btnApproval = document.getElementById('btn-approval');
+        const approvalDropdown = document.getElementById('approvalDropdown');
+
+        // Dropdown mobile
+        const mobileBtnAttendance = document.getElementById('mobile-btn-attendance');
+        const mobileAttendanceDropdown = document.getElementById('mobileAttendanceDropdown');
+        const mobileBtnApproval = document.getElementById('mobile-btn-approval');
+        const mobileApprovalDropdown = document.getElementById('mobileApprovalDropdown');
+
+
+        // Toggle menu mobile
+        mobileMenuToggle.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+            const icon = mobileMenuToggle.querySelector('i');
+            if (mobileMenu.classList.contains('hidden')) {
+                icon.classList.remove('fa-times');
+                icon.classList.add('fa-bars');
+            } else {
+                icon.classList.remove('fa-bars');
+                icon.classList.add('fa-times');
+            }
+        });
+
+        // Fungsi untuk menangani dropdown
+        function setupDropdown(button, dropdown) {
+            if (button && dropdown) {
+                button.addEventListener('click', (event) => {
+                    event.stopPropagation(); // Mencegah event bubbling
+                    dropdown.classList.toggle('hidden');
+                    const arrow = button.querySelector('.arrow-icon');
+                    if (arrow) {
+                        arrow.classList.toggle('rotate-180');
+                    }
+                });
+
+                // Tutup dropdown jika klik di luar dropdown
+                document.addEventListener('click', (event) => {
+                    if (!button.contains(event.target) && !dropdown.contains(event.target)) {
+                        dropdown.classList.add('hidden');
+                        const arrow = button.querySelector('.arrow-icon');
+                        if (arrow) {
+                            arrow.classList.remove('rotate-180');
+                        }
+                    }
+                });
+            }
+        }
+
+        // Setup dropdown untuk desktop
+        setupDropdown(btnAttendance, attendanceDropdown);
+        setupDropdown(btnApproval, approvalDropdown);
+
+        // Setup dropdown untuk mobile
+        setupDropdown(mobileBtnAttendance, mobileAttendanceDropdown);
+        setupDropdown(mobileBtnApproval, mobileApprovalDropdown);
+
+
+        // Menutup menu mobile saat link diklik
+        const mobileNavLinks = mobileMenu.querySelectorAll('a');
+        mobileNavLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                mobileMenu.classList.add('hidden');
+                mobileMenuToggle.querySelector('i').classList.remove('fa-times');
+                mobileMenuToggle.querySelector('i').classList.add('fa-bars');
+            });
+        });
+
+        // Handle resize untuk menyesuaikan tampilan menu
+        window.addEventListener('resize', () => {
+            if (window.innerWidth >= 768) { // Desktop view
+                mobileMenu.classList.add('hidden'); // Sembunyikan menu mobile jika beralih ke desktop
+                navbarMenu.classList.remove('hidden'); // Pastikan menu desktop terlihat
+                mobileMenuToggle.querySelector('i').classList.remove('fa-times');
+                mobileMenuToggle.querySelector('i').classList.add('fa-bars');
+            } else { // Mobile view
+                navbarMenu.classList.add('hidden'); // Sembunyikan menu desktop
+            }
+        });
+
+        // Initialize view on load
+        if (window.innerWidth >= 768) {
+            navbarMenu.classList.remove('hidden');
+            mobileMenu.classList.add('hidden');
+        } else {
+            navbarMenu.classList.add('hidden');
+            mobileMenu.classList.add('hidden'); // Pastikan menu mobile tertutup saat awal
+        }
+
+    });
+</script>
+
+<style>
+    /* CSS tambahan untuk navbar */
+    .arrow-icon {
+        transition: transform 0.3s ease-in-out;
+    }
+
+    .rotate-180 {
+        transform: rotate(180deg);
+    }
+
+    /* Untuk dropdown desktop, saat hover pada parent relative group, tampilkan dropdown */
+    @media (min-width: 768px) {
+        .group:hover .absolute {
+            display: block;
+        }
+    }
+</style>

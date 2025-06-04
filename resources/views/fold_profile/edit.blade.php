@@ -71,10 +71,10 @@
                     class="relative h-48 w-48 rounded-full overflow-hidden ring-4 ring-offset-4 ring-indigo-500 dark:ring-offset-slate-800 cursor-pointer shadow-lg group">
                     <img id="main-profile-image" class="w-full h-full object-cover"
                         src="{{ optional($user)->profile_photo_path
-                                ? (Str::startsWith(optional($user)->profile_photo_path, 'profile_photos/')
-                                    ? asset(optional($user)->profile_photo_path)
-                                    : asset('storage/' . optional($user)->profile_photo_path))
-                                : asset('profile_photos/avatar_1 (1).jpg') }}"
+                            ? (Str::startsWith(optional($user)->profile_photo_path, 'profile_photos/')
+                                ? asset(optional($user)->profile_photo_path)
+                                : asset('storage/' . optional($user)->profile_photo_path))
+                            : asset('profile_photos/avatar_1 (1).jpg') }}"
                         alt="{{ optional($user)->name ?: 'Pengguna' }}">
                     <div
                         class="absolute inset-0 bg-black bg-opacity-50 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-white text-base font-medium">

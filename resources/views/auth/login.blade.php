@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login Mahasiswa</title>
+    <title>Masuk Mahasiswa</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
     <style>
@@ -213,8 +213,8 @@
 
 <body>
     <div class="top-signup">
-        <span>Don't have an account yet?</span>
-        <a href="{{ route('register') }}">SIGN UP</a>
+        <span>Belum punya akun?</span>
+        <a href="{{ route('register') }}">DAFTAR</a>
     </div>
 
     <div class="d-flex flex-column flex-md-row h-100">
@@ -227,16 +227,15 @@
             </div>
 
             <div class="d-flex justify-content-center align-items-center w-100 mt-3">
-                <img src="{{ asset('assets/images/undraw_traveling_c18z (1).svg') }}" alt="Travel"
+                <img src="{{ asset('assets/images/undraw_traveling_c18z (1).svg') }}" alt="Perjalanan"
                     class="custom-travel-img">
             </div>
         </div>
 
         <div class="d-flex flex-column justify-content-center align-items-center w-100 w-md-50 px-4 py-5">
             <div class="form-container">
-                <h4 class="text-center fw-bold mb-2">WELCOME</h4>
-                <p class="text-center text-muted mb-4">Welcome to the Website for Internship Absences. Please Login
-                    First</p>
+                <h4 class="text-center fw-bold mb-2">SELAMAT DATANG</h4>
+                <p class="text-center text-muted mb-4">Di Website Absensi Magang. Silakan Masuk Dulu</p>
 
                 @if ($errors->any())
                 <div class="alert alert-danger">{{ $errors->first() }}</div>
@@ -246,18 +245,18 @@
                     @csrf
                     <div class="mb-3">
                         {{-- Perubahan di sini: Ubah type dari "email" menjadi "text" dan sesuaikan placeholder --}}
-                        <input type="text" name="email" class="form-control" placeholder="Enter Your Email or Name" required
+                        <input type="text" name="email" class="form-control" placeholder="Masukkan Email atau Nama Anda" required
                             autofocus value="{{ old('email') }}"> {{-- Menambahkan value="{{ old('email') }}" untuk mempertahankan input --}}
                     </div>
                     <div class="mb-4">
-                        <input type="password" name="password" class="form-control" placeholder="Enter Your Password"
+                        <input type="password" name="password" class="form-control" placeholder="Masukkan Kata Sandi Anda"
                             required>
                     </div>
                     <div class="d-grid">
-                        <button type="submit" class="btn btn-dark">LOGIN</button>
+                        <button type="submit" class="btn btn-dark">MASUK</button>
                     </div>
                     <div class="mt-3 text-center">
-                        <a href="/forgot-password" class="text-decoration-none">Forgot Password?</a>
+                        <a href="/forgot-password" class="text-decoration-none">Lupa Kata Sandi?</a>
                     </div>
                 </form>
             </div>

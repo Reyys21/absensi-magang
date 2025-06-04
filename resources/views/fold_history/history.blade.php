@@ -254,7 +254,7 @@ $indicatorColor = '';
                     console.log('Tombol Koreksi diklik!');
 
                     let defaultDate =
-                    '{{ \Carbon\Carbon::now('Asia/Makassar')->format('Y-m-d') }}'; // Gunakan zona waktu server
+                        '{{ \Carbon\Carbon::now('Asia/Makassar')->format('Y-m-d') }}'; // Gunakan zona waktu server
 
                     const urlParams = new URLSearchParams(window.location.search);
                     if (urlParams.has('selected_date')) {
@@ -280,7 +280,7 @@ $indicatorColor = '';
                                 return response.text().then(text => {
                                     throw new Error(
                                         `Kesalahan HTTP! status: ${response.status}, pesan: ${text}`
-                                        );
+                                    );
                                 });
                             }
                             return response.text();
@@ -295,7 +295,7 @@ $indicatorColor = '';
                                 } else {
                                     correctionFormContent.innerHTML = html;
                                     attachFormSubmitListener
-                                (); // Lampirkan kembali pendengar setelah konten diperbarui
+                                        (); // Lampirkan kembali pendengar setelah konten diperbarui
                                 }
                             }
                         })
@@ -310,7 +310,7 @@ $indicatorColor = '';
             } else {
                 console.error(
                     'Error: Elemen tombol openCorrectionModalButton tidak ditemukan, tidak dapat melampirkan pendengar acara.'
-                    );
+                );
             }
 
 

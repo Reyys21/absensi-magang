@@ -4,7 +4,7 @@
     <div class="flex flex-col md:flex-row min-h-screen font-[Inter]">
 
         {{-- sidebar --}}
-    
+
 
         <main id="main-content" class="flex-1 p-4 md:p-6 bg-gray-100">
             <div class="flex justify-between items-center mb-6">
@@ -140,7 +140,7 @@
                                             case 'Lengkap':
                                                 $customColor = '#28CB6E';
                                                 break;
-                                            
+
                                             case 'Tidak Hadir (Belum Lengkap)':
                                                 $customColor = '#f86917';
                                                 break;
@@ -279,12 +279,15 @@
 
                         // Dapatkan teks lengkap untuk Judul dan Deskripsi Aktivitas
                         const activityTitleElement = row.querySelector('.activity-cell-title span');
-                        const activityDescriptionElement = row.querySelector('.activity-cell-description .activity-content');
+                        const activityDescriptionElement = row.querySelector(
+                        '.activity-cell-description .activity-content');
                         const statusElement = row.querySelector('td:last-child span');
 
                         const activityTitle = activityTitleElement ? activityTitleElement.innerText.trim() : '';
-                        let activityDescription = activityDescriptionElement ? activityDescriptionElement.dataset.fullText || activityDescriptionElement.innerText.trim() : '';
-                        activityDescription = activityDescription.replace(/(\r\n|\n|\r)/gm, " ").replace(/\s\s+/g, " "); // Bersihkan baris baru untuk Excel
+                        let activityDescription = activityDescriptionElement ? activityDescriptionElement.dataset
+                            .fullText || activityDescriptionElement.innerText.trim() : '';
+                        activityDescription = activityDescription.replace(/(\r\n|\n|\r)/gm, " ").replace(/\s\s+/g,
+                        " "); // Bersihkan baris baru untuk Excel
 
                         const status = statusElement ? statusElement.innerText.trim() : '';
 
@@ -475,7 +478,9 @@
                     // Pastikan teks melengkung di sel deskripsi saat dicetak
                     printWindow.document.write('td.activity-cell-description { white-space: normal; }');
                     // Gaya khusus cetak untuk tata letak tabel dan pembungkus kata
-                    printWindow.document.write('@media print { body { -webkit-print-color-adjust: exact; } table { table-layout: fixed; width: 100%; } td { word-wrap: break-word; } }');
+                    printWindow.document.write(
+                        '@media print { body { -webkit-print-color-adjust: exact; } table { table-layout: fixed; width: 100%; } td { word-wrap: break-word; } }'
+                        );
                     printWindow.document.write('</style>');
                     printWindow.document.write('</head><body>');
                     printWindow.document.write('<h1>Catatan Kehadiran Saya</h1>');

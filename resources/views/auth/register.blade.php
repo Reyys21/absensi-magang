@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register Mahasiswa</title>
+    <title>Daftar Mahasiswa</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
     <style>
@@ -215,12 +215,11 @@
 
 <body>
     <div class="top-signup">
-        <span>Already have an account?</span>
-        <a href="{{ route('login') }}">SIGN IN</a>
+        <span>Sudah punya akun?</span>
+        <a href="{{ route('login') }}">MASUK</a>
     </div>
 
     <div class="d-flex flex-column flex-md-row h-100">
-        <!-- Left Side -->
         <div class="bg-left d-flex flex-column justify-content-center align-items-start w-100 w-md-50 p-4">
             <div class="pln-brand mb-3 text-white">
                 <img src="{{ asset('assets/images/Logo_PLN.png') }}" alt="Logo PLN" class="mb-2">
@@ -228,16 +227,15 @@
                 <p class="m-0">UID KALSELTENG</p>
             </div>
             <div class="d-flex justify-content-center align-items-center w-100 mt-3">
-                <img src="{{ asset('assets/images/undraw_traveling_c18z (1).svg') }}" alt="Travel"
+                <img src="{{ asset('assets/images/undraw_traveling_c18z (1).svg') }}" alt="Perjalanan"
                     class="custom-travel-img">
             </div>
         </div>
 
-        <!-- Right Side -->
         <div class="d-flex flex-column justify-content-center align-items-center w-100 w-md-50 px-4 py-5">
             <div class="form-container">
-                <h4 class="text-center fw-bold mb-2">REGISTER</h4>
-                <p class="text-center text-muted mb-4">Please create your account to continue</p>
+                <h4 class="text-center fw-bold mb-2">DAFTAR</h4>
+                <p class="text-center text-muted mb-4">Silakan buat akun Anda untuk melanjutkan</p>
 
                 @if ($errors->any())
                     <div class="alert alert-danger">{{ $errors->first() }}</div>
@@ -248,10 +246,10 @@
 
                     <div class="mb-3">
                         <select name="role" class="form-control" required>
-                            <option value="">Register as</option>
+                            <option value="">Daftar sebagai</option>
                             <option value="mahasiswa">Mahasiswa</option>
                             <option value="siswa">Siswa</option>
-                            <option value="siswa">admin</option>
+                            <option value="admin">Admin</option>
                         </select>
                     </div>
 
@@ -261,29 +259,30 @@
                     </div>
 
                     <div class="mb-3">
-                        <input type="text" name="asal_kampus" class="form-control" placeholder="Asal Kampus" required>
+                        <input type="text" name="asal_kampus" class="form-control" placeholder="Asal Kampus"
+                            required>
 
                     </div>
 
                     <div class="mb-3">
-                     <input type="text" name="phone" class="form-control" placeholder="Nomor Telepon">
+                        <input type="text" name="phone" class="form-control" placeholder="Nomor Telepon">
                     </div>
 
                     <div class="mb-3">
-                        <input type="text" name="nim" class="form-control" placeholder="NIM (Optional)">
+                        <input type="text" name="nim" class="form-control" placeholder="NIM (Opsional)">
                     </div>
 
                     <div class="mb-3">
-                        <input type="password" name="password" class="form-control" placeholder="Password" required>
+                        <input type="password" name="password" class="form-control" placeholder="Kata Sandi" required>
                     </div>
 
                     <div class="mb-4">
                         <input type="password" name="password_confirmation" class="form-control"
-                            placeholder="Confirm Password" required>
+                            placeholder="Konfirmasi Kata Sandi" required>
                     </div>
 
                     <div class="d-grid">
-                        <button type="submit" class="btn btn-dark">REGISTER</button>
+                        <button type="submit" class="btn btn-dark">DAFTAR</button>
                     </div>
                 </form>
             </div>

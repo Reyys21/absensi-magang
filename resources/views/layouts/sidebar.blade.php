@@ -56,7 +56,7 @@
                     <a href="{{ route('attendance.my') }}"
                         class="block px-6 py-2 text-sm {{ request()->routeIs('attendance.my') ? 'bg-[#2C3E50] text-[#FFD100]' : 'hover:bg-[#2C3E50] hover:text-[#FFD100]' }} rounded">Absensi
                         Saya</a>
-                    
+
                 </div>
             </div>
 
@@ -77,7 +77,7 @@
                 </div>
             </div>
 
-            
+
 
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
@@ -104,7 +104,9 @@
 
         // Hanya inisialisasi jika elemen-elemen penting ditemukan
         if (!sidebar || !mainContent || !mobileMenuToggle || !desktopSidebarToggle || !sidebarOverlay) {
-            console.warn("Satu atau lebih elemen sidebar penting tidak ditemukan. Fungsionalitas sidebar mungkin terbatas atau tidak ada.");
+            console.warn(
+                "Satu atau lebih elemen sidebar penting tidak ditemukan. Fungsionalitas sidebar mungkin terbatas atau tidak ada."
+                );
             return; // Hentikan eksekusi jika elemen penting tidak ada
         }
 
@@ -159,10 +161,12 @@
                 }
 
             } else { // Mobile
-                sidebar.classList.remove('md:relative', 'md:w-64', 'md:w-20', 'md:translate-x-0'); // Hapus kelas desktop
+                sidebar.classList.remove('md:relative', 'md:w-64', 'md:w-20',
+                'md:translate-x-0'); // Hapus kelas desktop
                 sidebar.classList.add('fixed'); // Sidebar fixed di mobile
 
-                sidebar.classList.toggle('-translate-x-full', !isOpen); // Toggle untuk menyembunyikan/menampilkan drawer
+                sidebar.classList.toggle('-translate-x-full', !
+                isOpen); // Toggle untuk menyembunyikan/menampilkan drawer
                 sidebarOverlay.classList.toggle('hidden', !isOpen); // Toggle overlay
 
                 if (mainContent) {
@@ -264,8 +268,9 @@
                 // Juga, jangan tutup sidebar jika klik pada item di dalam dropdown
                 let parent = this.parentElement;
                 let isInsideDropdown = false;
-                while(parent) {
-                    if (parent.id === 'attendanceDropdown' || parent.id === 'approvalDropdown') {
+                while (parent) {
+                    if (parent.id === 'attendanceDropdown' || parent.id ===
+                        'approvalDropdown') {
                         isInsideDropdown = true;
                         break;
                     }
@@ -410,5 +415,6 @@
     main {
         z-index: 10;
     }
+
     /* -- AKHIR CSS SIDEBAR -- */
 </style>

@@ -86,10 +86,12 @@
         /* Anda tidak perlu menyertakan CSS sidebar di sini lagi karena sudah di app.css */
 
         @keyframes bounce-slow {
+
             0%,
             100% {
                 transform: translateY(0) scaleX(-1);
             }
+
             50% {
                 transform: translateY(-10px) scaleX(-1);
             }

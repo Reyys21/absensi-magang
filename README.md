@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://upload.wikimedia.org/wikipedia/commons/2/2e/Logo_PLN.png" alt="PLN Logo" width="100"/>
+  <img src="ublic/assets/images/Logo_PLN.png" alt="PLN Logo" width="100"/>
 </p>
 
 <h1 align="center">Absensi Magang PLN UID KALSELTENG</h1>

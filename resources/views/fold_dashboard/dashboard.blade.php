@@ -41,7 +41,7 @@
                         </div>
                         <div class="block absolute bottom-0 right-0 w-[45%] md:w-[30%] animate-bounce-slow">
                             <img src="{{ asset('assets/images/undraw_relaxed-reading_wfkr.svg') }}" alt="Membaca"
-                                class="w-full" style="transform: scaleX(1) ">
+                                class="w-full" style="transform: scaleX(-1) ">
                         </div>
                     </div>
                 </div>

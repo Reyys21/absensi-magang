@@ -1,5 +1,6 @@
 <?php
-
+use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\Facade; 
 return [
 
     /*
@@ -124,5 +125,34 @@ return [
         'driver' => env('APP_MAINTENANCE_DRIVER', 'file'),
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
+    'providers' => ServiceProvider::defaultProviders()->merge([
+        /*
+         * Package Service Providers...
+         */
+
+        /*
+         * Application Service Providers...
+         */
+        App\Providers\AppServiceProvider::class,
+        App\Providers\AuthServiceProvider::class,
+        // App\Providers\BroadcastServiceProvider::class,
+        // App\Providers\EventServiceProvider::class, // Anda bilang tidak ada, jadi ini mungkin dikomentari atau tidak ada di instalasi Anda
+        // App\Providers\RouteServiceProvider::class, // Anda bilang tidak ada, jadi ini mungkin dikomentari atau tidak ada
+    ])->toArray(),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Class Aliases
+    |--------------------------------------------------------------------------
+    |
+    | This array of class aliases will be registered when this application
+    | is started. However, feel free to register as many as you wish as
+    | the aliases are "lazy" loaded so they don't hinder performance.
+    |
+    */
+
+    'aliases' => Facade::defaultAliases()->merge([
+        // 'Example' => App\Facades\Example::class,
+    ])->toArray(),
 
 ];

@@ -35,41 +35,26 @@ class AttendanceController extends Controller
         $userId = Auth::id();
         $appTimezone = config('app.timezone');
 
-        $today = $request->local_date ?? Carbon::now($appTimezone)->toDateString();
+        // 1. Ambil TANGGAL dari server untuk akurasi.
+        $today = Carbon::now($appTimezone)->toDateString();
+        // 2. Ambil WAKTU dari input form (dikirim oleh JavaScript di browser).
         $checkInTimeInput = $request->local_time ?? Carbon::now($appTimezone)->format('H:i:s');
-
+        // 3. Gabungkan menjadi satu waktu yang utuh.
         $newCheckInDateTime = Carbon::createFromFormat('Y-m-d H:i:s', $today . ' ' . $checkInTimeInput, $appTimezone);
 
-        $attendance = Attendance::where('user_id', $userId)
-            ->whereDate('date', $today)
-            ->first();
+        $attendance = Attendance::firstOrNew([
+            'user_id' => $userId,
+            'date' => $today,
+        ]);
 
-        if ($attendance) {
-            if (empty($attendance->check_in)) {
-                $attendance->update([
-                    'check_in' => $newCheckInDateTime,
-                ]);
-                return redirect()->route('dashboard')->with('success', 'Check-in berhasil!');
-            } else {
-                $existingCheckInTime = $attendance->check_in;
-
-                if ($newCheckInDateTime->lt($existingCheckInTime)) {
-                    $attendance->update([
-                        'check_in' => $newCheckInDateTime,
-                    ]);
-                    return redirect()->route('dashboard')->with('success', 'Check-in Anda telah diperbarui ke waktu yang lebih awal: ' . $newCheckInDateTime->format('H:i'));
-                } else {
-                    return redirect()->route('dashboard')->with('info', 'Anda sudah Check-in. Waktu check-in awal Anda tetap tercatat.');
-                }
-            }
-        } else {
-            Attendance::create([
-                'user_id' => $userId,
-                'date' => $today,
-                'check_in' => $newCheckInDateTime,
-            ]);
-            return redirect()->route('dashboard')->with('success', 'Check-in berhasil!');
+        // Cek jika belum ada check_in, ATAU jika waktu check_in baru lebih awal dari yang sudah ada.
+        if (!$attendance->check_in || $newCheckInDateTime->lt($attendance->check_in)) {
+            $attendance->check_in = $newCheckInDateTime;
+            $attendance->save();
+            return redirect()->route('dashboard')->with('success', 'Check-in Anda telah dicatat pada ' . $newCheckInDateTime->format('H:i'));
         }
+
+        return redirect()->route('dashboard')->with('info', 'Waktu check-in paling awal Anda hari ini sudah tersimpan.');
     }
 
     /**
@@ -93,49 +78,33 @@ class AttendanceController extends Controller
         $userId = Auth::id();
         $appTimezone = config('app.timezone');
 
+        // 1. Ambil TANGGAL dari server untuk akurasi.
         $today = Carbon::now($appTimezone)->toDateString();
+        // 2. Ambil WAKTU dari input form (dikirim oleh JavaScript di browser).
         $checkOutTimeInput = $request->current_time ?? Carbon::now($appTimezone)->format('H:i:s');
-
+        // 3. Gabungkan menjadi satu waktu yang utuh.
         $newCheckOutDateTime = Carbon::createFromFormat('Y-m-d H:i:s', $today . ' ' . $checkOutTimeInput, $appTimezone);
 
         $attendance = Attendance::where('user_id', $userId)
             ->whereDate('date', $today)
             ->first();
 
-        if ($attendance) {
-            if (empty($attendance->check_out)) {
-                $attendance->update([
-                    'check_out' => $newCheckOutDateTime,
-                    'activity_title' => $request->activity_title,
-                    'activity_description' => $request->activity_description,
-                ]);
-                return redirect()->route('dashboard')->with('success', 'Check-out berhasil!');
-            } else {
-                $existingCheckOutTime = $attendance->check_out;
-
-                if ($newCheckOutDateTime->gt($existingCheckOutTime)) {
-                    $attendance->update([
-                        'check_out' => $newCheckOutDateTime,
-                        'activity_title' => $request->activity_title,
-                        'activity_description' => $request->activity_description,
-                    ]);
-                    return redirect()->route('dashboard')->with('success', 'Check-out Anda telah diperbarui ke waktu yang lebih akhir: ' . $newCheckOutDateTime->format('H:i'));
-                } else {
-                    return redirect()->route('dashboard')->with('info', 'Anda sudah Check-out. Waktu check-out terakhir Anda tetap tercatat.');
-                }
-            }
-        } else {
-            Attendance::create([
-                'user_id' => $userId,
-                'date' => $today,
-                'check_out' => $newCheckOutDateTime,
-                'activity_title' => $request->activity_title,
-                'activity_description' => $request->activity_description,
-            ]);
-            return redirect()->route('dashboard')->with('warning', 'Check-out berhasil. Anda belum melakukan Check-in hari ini.');
+        // Mencegah check-out jika belum pernah check-in sama sekali hari ini.
+        if (!$attendance || !$attendance->check_in) {
+            return redirect()->route('dashboard')->with('error', 'Anda harus melakukan Check-in terlebih dahulu.');
         }
-    }
 
+        // Cek jika belum ada check_out, ATAU jika waktu check-out baru lebih akhir dari yang sudah ada.
+        if (!$attendance->check_out || $newCheckOutDateTime->gt($attendance->check_out)) {
+            $attendance->check_out = $newCheckOutDateTime;
+            $attendance->activity_title = $request->activity_title;
+            $attendance->activity_description = $request->activity_description;
+            $attendance->save();
+            return redirect()->route('dashboard')->with('success', 'Check-out Anda telah diperbarui pada ' . $newCheckOutDateTime->format('H:i'));
+        }
+
+        return redirect()->route('dashboard')->with('info', 'Waktu check-out terakhir Anda sudah tersimpan.');
+    }
     /**
      * Menampilkan dashboard dengan data absensi hari ini dan total kehadiran.
      *
@@ -558,24 +527,24 @@ class AttendanceController extends Controller
      *
      * @return \Illuminate\View\View
      */
-   public function showApprovalRequests(Request $request)
+    public function showApprovalRequests(Request $request)
     {
         $user = Auth::user();
 
         if (Gate::allows('access-admin-pages')) {
             // Logika untuk Admin
             $query = CorrectionRequest::with('user')
-                        ->where('status', 'pending')
-                        ->orderBy('created_at', 'desc');
+                ->where('status', 'pending')
+                ->orderBy('created_at', 'desc');
 
             // Logika Pencarian untuk Admin
             if ($request->filled('search')) {
                 $search = $request->input('search');
-                $query->where(function($q) use ($search) {
+                $query->where(function ($q) use ($search) {
                     $q->whereHas('user', function ($userQuery) use ($search) {
                         $userQuery->where('name', 'like', "%{$search}%");
                     })
-                    ->orWhere('attendance_date', 'like', "%{$search}%");
+                        ->orWhere('attendance_date', 'like', "%{$search}%");
                 });
             }
 
@@ -586,20 +555,20 @@ class AttendanceController extends Controller
         } else {
             // Logika untuk User Biasa
             $query = CorrectionRequest::with('user')
-                        ->where('user_id', $user->id)
-                        ->orderBy('created_at', 'desc');
+                ->where('user_id', $user->id)
+                ->orderBy('created_at', 'desc');
 
             // Logika Pencarian untuk User
             if ($request->filled('search')) {
                 $search = $request->input('search');
-                $query->where(function($q) use ($search) {
+                $query->where(function ($q) use ($search) {
                     $q->where('attendance_date', 'like', "%{$search}%")
-                      ->orWhere('status', 'like', "%{$search}%");
+                        ->orWhere('status', 'like', "%{$search}%");
                 });
             }
-            
+
             $requests = $query->paginate(10)->appends($request->only('search'));
-            
+
             return view('fold_AttendanceApproval.Attendance Approval', compact('requests'));
         }
     }
@@ -610,7 +579,7 @@ class AttendanceController extends Controller
      * @param  CorrectionRequest $correctionRequest
      * @return \Illuminate\Http\RedirectResponse
      */
-     public function approveCorrection(CorrectionRequest $correctionRequest)
+    public function approveCorrection(CorrectionRequest $correctionRequest)
     {
         Gate::authorize('access-admin-pages');
 
@@ -631,7 +600,7 @@ class AttendanceController extends Controller
         if ($correctionRequest->new_activity_description) {
             $attendance->activity_description = $correctionRequest->new_activity_description;
         }
-        
+
         $attendance->save();
 
         $correctionRequest->update([

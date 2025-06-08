@@ -9,16 +9,17 @@ use Carbon\Carbon;
 
 class DashboardController extends Controller
 {
-    public function index()
+   public function index()
     {
         $user = Auth::user();
-
         $today = Carbon::today()->toDateString();
+
         $todayAttendances = Attendance::where('user_id', $user->id)
             ->where('date', $today)
             ->orderBy('created_at')
             ->get();
 
+        // Logika untuk mengambil check_in terawal dan check_out terakhir sudah benar.
         $firstCheckIn = $todayAttendances->whereNotNull('check_in')->first()?->check_in;
         $lastCheckOut = $todayAttendances->whereNotNull('check_out')->last()?->check_out;
 
@@ -26,12 +27,13 @@ class DashboardController extends Controller
             ->orderBy('date', 'desc')
             ->paginate(10);
 
+        // REVISI: Hitung hanya hari dimana absensi sudah lengkap
         $attendanceCount = Attendance::where('user_id', $user->id)
-            ->pluck('date')
-            ->unique()
+            ->whereNotNull('check_in')
+            ->whereNotNull('check_out')
+            ->distinct('date')
             ->count();
 
-        // Path baru: resources/views/fold_dashboard/dashboard.blade.php
         return view('fold_dashboard.dashboard', compact(
             'attendances',
             'attendanceCount',

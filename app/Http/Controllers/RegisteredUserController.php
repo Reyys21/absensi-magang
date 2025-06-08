@@ -19,16 +19,18 @@ class RegisteredUserController extends Controller
 
     public function store(Request $request)
     {
-        // <<< VALIDASI DISESUAIKAN, 'role' TIDAK LAGI DIPERLUKAN DARI FORM >>>
+        // REVISI 1: Menambahkan 'role' ke dalam validasi
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
+            'role' => 'required|string|in:mahasiswa,siswa,admin', // <-- Memvalidasi role dari form
             'asal_kampus' => 'required|string|max:255',
-            'nim' => 'nullable|string|max:255|unique:users,nim', // Disederhanakan
+            'nim' => 'nullable|string|max:255|unique:users,nim',
             'phone' => 'nullable|string|max:20',
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
+        // REVISI 2: Menggunakan input 'role' dari form saat membuat user
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
@@ -36,17 +38,26 @@ class RegisteredUserController extends Controller
             'nim' => $request->nim,
             'phone' => $request->phone,
             'password' => Hash::make($request->password),
-            'role' => 'user', // <<< KITA BISA ISI KOLOM LAMA DENGAN 'user' UNTUK KONSISTENSI SEMENTARA >>>
+            'role' => $request->role, // <-- Menggunakan role dari form, bukan 'user'
         ]);
 
-        // <<< TETAPKAN ROLE MENGGUNAKAN SPATIE >>>
-        $user->assignRole('user');
+        // REVISI 3: Memberikan Spatie role yang sesuai berdasarkan pilihan
+        if ($request->role === 'admin') {
+            $user->assignRole('admin');
+        } else {
+            // Untuk 'mahasiswa' dan 'siswa', Spatie role-nya adalah 'user'
+            $user->assignRole('user');
+        }
 
         event(new Registered($user));
 
         IlluminateAuth::login($user);
 
-        // <<< LANGSUNG ARAHKAN KE DASHBOARD USER BIASA >>>
-        return redirect()->route('dashboard');
+        // Arahkan ke dashboard yang sesuai setelah login
+        if ($user->hasRole('admin')) {
+            return redirect()->route('admin.dashboard');
+        } else {
+            return redirect()->route('dashboard');
+        }
     }
 }

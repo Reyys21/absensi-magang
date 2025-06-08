@@ -8,6 +8,7 @@ use App\Http\Controllers\RegisteredUserController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\HomepageController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
+use App\Http\Controllers\Admin\UserController; // <-- PASTIKAN USE STATEMENT INI ADA DI ATAS
 
 // Rute Homepage publik
 Route::get('/', [HomepageController::class, 'index'])->name('home');
@@ -50,6 +51,19 @@ Route::middleware('auth')->group(function () {
         Route::get('/approval-requests', [AttendanceController::class, 'showApprovalRequests'])->name('approval.requests');
         Route::post('/approval-requests/{correctionRequest}/approve', [AttendanceController::class, 'approveCorrection'])->name('approval.approve');
         Route::post('/approval-requests/{correctionRequest}/reject', [AttendanceController::class, 'rejectCorrection'])->name('approval.reject');
+
+        // ===================================================================
+        // === TAMBAHKAN BLOK KODE BARU DI SINI ===
+        // ===================================================================
+        // Rute untuk Fitur MONITORING User
+        Route::get('/monitoring/users', [UserController::class, 'indexMonitoring'])->name('monitoring.users.index');
+        Route::get('/monitoring/users/{user}', [UserController::class, 'showMonitoring'])->name('monitoring.users.show');
+
+        // Rute untuk Fitur MANAJEMEN Akun
+        Route::get('/manajemen/akun', [UserController::class, 'indexManagement'])->name('management.accounts.index');
+        // ===================================================================
+        // === AKHIR DARI BLOK KODE BARU ===
+        // ===================================================================
     });
 
     // --- GRUP RUTE KHUSUS SUPERADMIN ---

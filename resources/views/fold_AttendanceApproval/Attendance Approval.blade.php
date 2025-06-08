@@ -1,12 +1,70 @@
-{{-- resources/views/fold_AttendanceApproval/Attendance Approval.blade.php --}}
 @extends('layouts.app')
+
+@push('styles')
+    <style>
+        /* Sembunyikan header tabel di layar kecil */
+        @media (max-width: 767px) {
+            .responsive-table thead {
+                display: none;
+            }
+
+            .responsive-table,
+            .responsive-table tbody,
+            .responsive-table tr,
+            .responsive-table td {
+                display: block;
+                width: 100%;
+            }
+
+            .responsive-table tr {
+                margin-bottom: 1.5rem;
+                border: 1px solid #e2e8f0;
+                border-radius: 0.5rem;
+                overflow: hidden;
+                box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            }
+
+            .responsive-table td {
+                padding-left: 50%;
+                position: relative;
+                text-align: right;
+                border: none;
+                border-bottom: 1px solid #e2e8f0;
+            }
+
+            .responsive-table td:last-child {
+                border-bottom: none;
+            }
+
+            .responsive-table td:before {
+                content: attr(data-label);
+                position: absolute;
+                left: 0;
+                width: 45%;
+                padding-left: 1rem;
+                font-weight: 600;
+                text-align: left;
+                white-space: nowrap;
+            }
+        }
+
+        .read-more-link {
+            color: #4f46e5; /* indigo-600 */
+            cursor: pointer;
+            font-weight: 500;
+            margin-left: 5px;
+        }
+        .read-more-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+@endpush
 
 @section('content')
     <div class="flex flex-col md:flex-row min-h-screen font-[Inter]">
-
         <main id="main-content" class="flex-1 p-4 md:p-6 transition-all duration-300 ease-in-out">
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
-                <h1 class="text-xl sm:text-2xl font-bold mb-3 sm:mb-0">Approval Requests</h1>
+                <h1 class="text-xl sm:text-2xl font-bold mb-3 sm:mb-0">Permintaan Persetujuan</h1>
                 @include('layouts.profile')
             </div>
 
@@ -16,91 +74,42 @@
                 @if ($requests->isEmpty())
                     <p class="text-gray-600 text-center py-8">Tidak ada permintaan koreksi absensi yang Anda ajukan.</p>
                 @else
-                    <div class="overflow-x-auto rounded-lg border border-gray-200 shadow-sm">
-                        <table class="min-w-full divide-y divide-gray-200">
-                            <thead class="bg-gray-50">
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full responsive-table">
+                            <thead>
                                 <tr>
-                                    <th scope="col"
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        No.
-                                    </th>
-                                    <th scope="col"
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Tanggal
-                                    </th>
-                                    <th scope="col"
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Check-In (Req)
-                                    </th>
-                                    <th scope="col"
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Check-Out (Req)
-                                    </th>
-                                    <th scope="col"
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Judul Aktivitas (Req)
-                                    </th>
-                                    <th scope="col"
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Deskripsi Aktivitas (Req)
-                                    </th>
-                                    <th
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Alasan
-                                    </th>
-                                    <th scope="col"
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Status
-                                    </th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No.</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tanggal</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Check-In (Req)</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Check-Out (Req)</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Alasan Anda</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Catatan Admin</th>
                                 </tr>
                             </thead>
-                            <tbody class="bg-white divide-y divide-gray-200">
+                            <tbody class="bg-white divide-y divide-gray-200 md:divide-y-0">
                                 @foreach ($requests as $index => $requestItem)
-                                    {{-- Ubah nama variabel untuk menghindari konflik --}}
                                     <tr>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                            {{ $requests->firstItem() + $index }}
+                                        <td data-label="No." class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $requests->firstItem() + $index }}</td>
+                                        <td data-label="Tanggal" class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $requestItem->attendance_date->format('d M Y') }}</td>
+                                        <td data-label="Check-In" class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $requestItem->new_check_in ? $requestItem->new_check_in->format('H:i') : '--.--' }}</td>
+                                        <td data-label="Check-Out" class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $requestItem->new_check_out ? $requestItem->new_check_out->format('H:i') : '--.--' }}</td>
+                                        <td data-label="Alasan Anda" class="px-6 py-4 text-sm text-gray-900">
+                                            <span class="expandable-text" data-original-text="{{ $requestItem->reason ?: '--' }}"></span>
                                         </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                            {{ $requestItem->attendance_date->format('d M Y') }}
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                            {{ $requestItem->new_check_in ? $requestItem->new_check_in->format('H:i') : '--.--' }}
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                            {{ $requestItem->new_check_out ? $requestItem->new_check_out->format('H:i') : '--.--' }}
-                                        </td>
-                                        <td class="px-6 py-4 text-sm text-gray-900 max-w-xs truncate">
-                                            {{ $requestItem->new_activity_title ?: '--' }}
-                                        </td>
-                                        <td class="px-6 py-4 text-sm text-gray-900 max-w-xs truncate">
-                                            {{ $requestItem->new_activity_description ?: '--' }}
-                                        </td>
-                                        <td class="px-6 py-4 text-sm text-gray-900 max-w-xs truncate"> {{-- Tambahkan class truncated untuk Reason --}}
-                                            {{ $requestItem->reason ?: '--' }}
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                        <td data-label="Status" class="px-6 py-4 whitespace-nowrap text-sm">
                                             @if ($requestItem->status === 'pending')
-                                                <span
-                                                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
-                                                    Proses
-                                                </span>
+                                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">Proses</span>
                                             @elseif($requestItem->status === 'approved')
-                                                <span
-                                                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                                                    Diterima
-                                                </span>
+                                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Diterima</span>
                                             @elseif($requestItem->status === 'rejected')
-                                                <span
-                                                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
-                                                    Ditolak
-                                                </span>
+                                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Ditolak</span>
                                             @else
-                                                <span
-                                                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
-                                                    {{ ucfirst($requestItem->status) }}
-                                                </span>
+                                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">{{ ucfirst($requestItem->status) }}</span>
                                             @endif
+                                        </td>
+                                        <td data-label="Catatan Admin" class="px-6 py-4 text-sm text-gray-900">
+                                            <span class="expandable-text" data-original-text="{{ $requestItem->admin_notes ?: '--' }}"></span>
                                         </td>
                                     </tr>
                                 @endforeach
@@ -108,7 +117,6 @@
                         </table>
                     </div>
 
-                    {{-- Pagination Links --}}
                     <div class="mt-4">
                         {{ $requests->links() }}
                     </div>
@@ -117,3 +125,36 @@
         </main>
     </div>
 @endsection
+
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const charLimit = 50; // Batas karakter sebelum dipotong
+
+        document.querySelectorAll('.expandable-text').forEach(span => {
+            const originalText = span.dataset.originalText;
+
+            if (originalText.length > charLimit) {
+                const truncatedText = originalText.substring(0, charLimit) + '...';
+                span.innerHTML = `${truncatedText} <a class="read-more-link">Lihat selengkapnya</a>`;
+
+                const link = span.querySelector('.read-more-link');
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    if (link.textContent === 'Lihat selengkapnya') {
+                        span.innerHTML = `${originalText} <a class="read-more-link">Ringkas</a>`;
+                        // Re-add event listener to the new link
+                        span.querySelector('.read-more-link').addEventListener('click', arguments.callee);
+                    } else {
+                        span.innerHTML = `${truncatedText} <a class="read-more-link">Lihat selengkapnya</a>`;
+                        // Re-add event listener to the new link
+                        span.querySelector('.read-more-link').addEventListener('click', arguments.callee);
+                    }
+                });
+            } else {
+                span.textContent = originalText;
+            }
+        });
+    });
+</script>
+@endpush

@@ -25,11 +25,10 @@ Route::middleware('auth')->group(function () {
     // Logout (bisa diakses semua role)
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-    // --- GRUP RUTE UNTUK USER BIASA (MAHASISWA/SISWA) ---
+    // --- GRUP RUTE UNTUK USER BIASA ---
     Route::middleware('can:access-user-pages')->group(function() {
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
         
-        // Rute terkait Absensi
         Route::controller(AttendanceController::class)->group(function () {
             Route::get('/checkin', 'checkinForm')->name('checkin.form');
             Route::post('/checkin', 'storeCheckin')->name('checkin.store');
@@ -40,9 +39,7 @@ Route::middleware('auth')->group(function () {
             Route::get('/correction-form', 'showCorrectionForm')->name('correction.form');
             Route::post('/correction-request', 'storeCorrectionRequest')->name('correction.store');
         });
-
-        // Rute untuk user biasa melihat status approval mereka
-        // Menggunakan method yang sama tapi karena dilindungi Gate, hanya data mereka yang tampil
+        
         Route::get('/my-approval-requests', [AttendanceController::class, 'showApprovalRequests'])->name('user.approval.requests');
     });
 
@@ -50,21 +47,26 @@ Route::middleware('auth')->group(function () {
     Route::middleware('can:access-admin-pages')->prefix('admin')->name('admin.')->group(function () {
         Route::get('/dashboard', [AdminDashboardController::class, 'adminDashboard'])->name('dashboard');
         
-        // Rute Approval Khusus untuk Admin (menampilkan semua request)
         Route::get('/approval-requests', [AttendanceController::class, 'showApprovalRequests'])->name('approval.requests');
-        // Rute manajemen & monitoring lainnya
+        Route::post('/approval-requests/{correctionRequest}/approve', [AttendanceController::class, 'approveCorrection'])->name('approval.approve');
+        Route::post('/approval-requests/{correctionRequest}/reject', [AttendanceController::class, 'rejectCorrection'])->name('approval.reject');
     });
 
     // --- GRUP RUTE KHUSUS SUPERADMIN ---
     Route::middleware('can:access-superadmin-pages')->prefix('superadmin')->name('superadmin.')->group(function () {
         Route::get('/dashboard', [AdminDashboardController::class, 'superadminDashboard'])->name('dashboard');
-        // Rute khusus superadmin lainnya
     });
 
-    // Rute profil ada di luar grup spesifik agar bisa diakses semua role
+    // --- Rute profil yang sudah dilengkapi ---
     Route::prefix('profile')->name('profile.')->controller(ProfileController::class)->group(function () {
+        // Rute yang sudah ada
         Route::get('/edit', 'edit')->name('edit');
         Route::patch('/update-information', 'updateProfileInformation')->name('update-information');
-        // ... rute profil lainnya
+        
+        // --- RUTE BARU UNTUK PROFIL ---
+        Route::post('/update-photo', 'updateProfilePhoto')->name('update-photo');
+        Route::post('/delete-photo', 'deleteProfilePhoto')->name('delete-photo');
+        Route::get('/change-password', 'showChangePasswordForm')->name('change-password'); // <-- Rute yang hilang
+        Route::patch('/update-password', 'updatePassword')->name('update-password');
     });
 });

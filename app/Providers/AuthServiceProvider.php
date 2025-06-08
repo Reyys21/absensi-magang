@@ -2,9 +2,9 @@
 
 namespace App\Providers;
 
-use App\Models\User;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
+use App\Models\User; // Pastikan model User di-import
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -14,31 +14,37 @@ class AuthServiceProvider extends ServiceProvider
      * @var array<class-string, class-string>
      */
     protected $policies = [
-        //
+        // 'App\Models\Model' => 'App\Policies\ModelPolicy',
     ];
 
     /**
      * Register any authentication / authorization services.
+     *
+     * @return void
      */
-    public function boot(): void
+    public function boot()
     {
-        // Definisikan Gate untuk mengakses halaman Admin
-        // Hanya user dengan role 'admin' ATAU 'superadmin' yang boleh lewat
+        $this->registerPolicies();
+
+        // --- TAMBAHKAN ATAU PASTIKAN KODE GATE INI ADA ---
+
+        // Gate untuk halaman yang hanya bisa diakses oleh user biasa (bukan admin)
+        Gate::define('access-user-pages', function (User $user) {
+            // Asumsi: Anda memiliki kolom 'role' di tabel users
+            // Izinkan jika rolenya BUKAN admin atau superadmin
+            return !$user->hasAnyRole(['admin', 'superadmin']);
+        });
+
+        // Gate untuk halaman yang bisa diakses oleh admin dan superadmin
         Gate::define('access-admin-pages', function (User $user) {
+            // Izinkan jika user memiliki role 'admin' ATAU 'superadmin'
             return $user->hasAnyRole(['admin', 'superadmin']);
         });
 
-        // Definisikan Gate untuk mengakses halaman Superadmin
-        // HANYA user dengan role 'superadmin' yang boleh lewat
+        // Gate untuk halaman yang hanya bisa diakses oleh superadmin
         Gate::define('access-superadmin-pages', function (User $user) {
+            // Izinkan HANYA jika user memiliki role 'superadmin'
             return $user->hasRole('superadmin');
-        });
-
-        // <<< TAMBAHKAN GATE UNTUK USER BIASA DI SINI >>>
-        // Definisikan Gate untuk mengakses halaman khusus mahasiswa/siswa
-        // Hanya user dengan role 'user' yang boleh lewat
-        Gate::define('access-user-pages', function (User $user) {
-            return $user->hasRole('user');
         });
     }
 }

@@ -10,6 +10,7 @@ use App\Models\CorrectionRequest;
 use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Gate;
 
 class AttendanceController extends Controller
 {
@@ -137,7 +138,6 @@ class AttendanceController extends Controller
 
     /**
      * Menampilkan dashboard dengan data absensi hari ini dan total kehadiran.
-     * Asumsi ini adalah method untuk route 'dashboard'.
      *
      * @return \Illuminate\View\View
      */
@@ -149,8 +149,8 @@ class AttendanceController extends Controller
         $today = Carbon::now($appTimezone)->toDateString();
 
         $attendanceToday = Attendance::where('user_id', $userId)
-                                    ->whereDate('date', $today)
-                                    ->first();
+            ->whereDate('date', $today)
+            ->first();
 
         $firstCheckIn = $attendanceToday ? $attendanceToday->check_in : null;
         $lastCheckOut = $attendanceToday ? $attendanceToday->check_out : null;
@@ -168,11 +168,11 @@ class AttendanceController extends Controller
             }
 
             $userAttendances = Attendance::where('user_id', $userId)
-                                        ->whereBetween('date', [$registrationDate, $currentDate])
-                                        ->get()
-                                        ->keyBy(function($item) {
-                                            return $item->date->toDateString();
-                                        });
+                ->whereBetween('date', [$registrationDate, $currentDate])
+                ->get()
+                ->keyBy(function ($item) {
+                    return $item->date->toDateString();
+                });
 
             foreach ($allDatesInRange as $dateString) {
                 $attendanceRecord = $userAttendances->get($dateString);
@@ -228,12 +228,12 @@ class AttendanceController extends Controller
         $currentDay = Carbon::now($appTimezone)->startOfDay();
 
         $existingAttendances = Attendance::where('user_id', $userId)
-                                        ->whereYear('date', $year)
-                                        ->whereMonth('date', $month)
-                                        ->get()
-                                        ->keyBy(function($item) {
-                                            return $item->date->toDateString();
-                                        });
+            ->whereYear('date', $year)
+            ->whereMonth('date', $month)
+            ->get()
+            ->keyBy(function ($item) {
+                return $item->date->toDateString();
+            });
 
         $monthlyAttendances = collect();
 
@@ -256,7 +256,7 @@ class AttendanceController extends Controller
                     $status = 'Tidak Hadir (Belum Lengkap)';
                 }
             }
-            $monthlyAttendances->put($currentLoopDateString, (object)['attendance_status' => $status]);
+            $monthlyAttendances->put($currentLoopDateString, (object) ['attendance_status' => $status]);
         }
 
         $selectedDate = $request->input('selected_date');
@@ -264,11 +264,11 @@ class AttendanceController extends Controller
 
         if ($selectedDate) {
             $dailyAttendances = Attendance::where('user_id', $userId)
-                                        ->whereDate('date', Carbon::parse($selectedDate, $appTimezone)->toDateString())
-                                        ->get();
+                ->whereDate('date', Carbon::parse($selectedDate, $appTimezone)->toDateString())
+                ->get();
 
             if ($dailyAttendances->isEmpty() && Carbon::parse($selectedDate, $appTimezone)->lte(Carbon::now($appTimezone)) && Carbon::parse($selectedDate, $appTimezone)->gte($registrationDate)) {
-                $dummyAttendance = (object)[
+                $dummyAttendance = (object) [
                     'date' => Carbon::parse($selectedDate, $appTimezone),
                     'check_in' => null,
                     'check_out' => null,
@@ -285,9 +285,9 @@ class AttendanceController extends Controller
         } else {
             $sevenDaysAgo = Carbon::now($appTimezone)->subDays(6)->startOfDay();
             $rawDailyAttendances = Attendance::where('user_id', $userId)
-                                            ->whereBetween('date', [$sevenDaysAgo, Carbon::now($appTimezone)->endOfDay()])
-                                            ->orderBy('date', 'desc')
-                                            ->get();
+                ->whereBetween('date', [$sevenDaysAgo, Carbon::now($appTimezone)->endOfDay()])
+                ->orderBy('date', 'desc')
+                ->get();
 
             $currentDailyAttendancesMap = [];
             foreach ($rawDailyAttendances as $att) {
@@ -306,7 +306,7 @@ class AttendanceController extends Controller
                 if ($attendanceRecord) {
                     $processedDailyAttendances->push($attendanceRecord);
                 } else {
-                    $dummyAttendance = (object)[
+                    $dummyAttendance = (object) [
                         'date' => $d,
                         'check_in' => null,
                         'check_out' => null,
@@ -359,7 +359,6 @@ class AttendanceController extends Controller
 
     /**
      * Menampilkan form pop-up untuk koreksi absensi.
-     * Dipanggil via AJAX atau redirect dengan flash data.
      *
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\View\View|\Illuminate\Http\JsonResponse
@@ -380,17 +379,15 @@ class AttendanceController extends Controller
         }
 
         $attendance = Attendance::where('user_id', $userId)
-                                ->whereDate('date', $dateToCorrect->toDateString())
-                                ->first();
+            ->whereDate('date', $dateToCorrect->toDateString())
+            ->first();
 
-        // Ambil data dari permintaan koreksi yang 'pending' atau 'rejected' jika ada, untuk menampilkan data terbaru.
         $pendingOrRejectedCorrection = CorrectionRequest::where('user_id', $userId)
-                                                        ->where('attendance_date', $dateToCorrect->toDateString())
-                                                        ->whereIn('status', ['pending', 'rejected'])
-                                                        ->latest() // Ambil yang terbaru
-                                                        ->first();
+            ->where('attendance_date', $dateToCorrect->toDateString())
+            ->whereIn('status', ['pending', 'rejected'])
+            ->latest()
+            ->first();
 
-        // Gunakan data dari permintaan koreksi jika ada, jika tidak, gunakan data absensi
         $oldCheckIn = ($pendingOrRejectedCorrection && $pendingOrRejectedCorrection->new_check_in) ? $pendingOrRejectedCorrection->new_check_in->format('H:i') : ($attendance && $attendance->check_in ? $attendance->check_in->format('H:i') : '');
         $oldCheckOut = ($pendingOrRejectedCorrection && $pendingOrRejectedCorrection->new_check_out) ? $pendingOrRejectedCorrection->new_check_out->format('H:i') : ($attendance && $attendance->check_out ? $attendance->check_out->format('H:i') : '');
         $oldActivityTitle = ($pendingOrRejectedCorrection && $pendingOrRejectedCorrection->new_activity_title) ? $pendingOrRejectedCorrection->new_activity_title : ($attendance ? $attendance->activity_title : '');
@@ -403,7 +400,7 @@ class AttendanceController extends Controller
             'oldCheckOut',
             'oldActivityTitle',
             'oldActivityDescription',
-            'attendance' // Tetap sertakan attendance untuk referensi data asli jika diperlukan
+            'attendance'
         ));
     }
 
@@ -429,12 +426,10 @@ class AttendanceController extends Controller
 
         $dateToCorrect = Carbon::parse($validated['date_to_correct'], $appTimezone)->startOfDay();
 
-        // Dapatkan data absensi lama untuk perbandingan
         $attendance = Attendance::where('user_id', $userId)
-                                ->whereDate('date', $dateToCorrect->toDateString())
-                                ->first();
+            ->whereDate('date', $dateToCorrect->toDateString())
+            ->first();
 
-        // Siapkan waktu check-in/out baru dengan tanggal lengkap dan timezone yang benar
         $newCheckInTime = null;
         if (!empty($validated['new_check_in'])) {
             $newCheckInTime = Carbon::createFromFormat(
@@ -453,42 +448,31 @@ class AttendanceController extends Controller
             );
         }
 
-        // Validasi waktu check-in/check-out baru
         if ($newCheckInTime && $newCheckOutTime && $newCheckInTime->greaterThanOrEqualTo($newCheckOutTime)) {
             return redirect()->back()->withErrors(['new_check_out' => 'Waktu check-out baru harus setelah waktu check-in baru.'])->withInput();
         }
 
-        // Dapatkan data permintaan koreksi yang sudah ada (pending atau rejected) untuk tanggal ini
-        // Kita perlu mencari yang terbaru jika ada lebih dari satu yang ditolak
         $existingCorrectionRequest = CorrectionRequest::where('user_id', $userId)
             ->where('attendance_date', $dateToCorrect->toDateString())
             ->whereIn('status', ['pending', 'rejected'])
-            ->latest() // Ambil yang terbaru jika ada beberapa yang rejected
+            ->latest()
             ->first();
 
-        // Tentukan nilai "old" yang akan digunakan untuk perbandingan.
-        // Jika ada existingCorrectionRequest, gunakan 'new_check_in'/'new_check_out' dari situ
-        // sebagai nilai "lama" yang sedang dikoreksi ulang.
-        // Jika tidak ada, gunakan data dari attendance asli.
         $currentOldCheckIn = $attendance ? $attendance->check_in : null;
         $currentOldCheckOut = $attendance ? $attendance->check_out : null;
         $currentOldActivityTitle = $attendance ? $attendance->activity_title : null;
         $currentOldActivityDescription = $attendance ? $attendance->activity_description : null;
 
         if ($existingCorrectionRequest) {
-            // Jika ada permintaan koreksi yang sudah ada, ambil nilai 'new' dari permintaan itu sebagai 'old'
-            // untuk perbandingan saat ini. Ini memastikan kita membandingkan dengan permintaan koreksi terakhir.
             $currentOldCheckIn = $existingCorrectionRequest->new_check_in;
             $currentOldCheckOut = $existingCorrectionRequest->new_check_out;
             $currentOldActivityTitle = $existingCorrectionRequest->new_activity_title;
             $currentOldActivityDescription = $existingCorrectionRequest->new_activity_description;
         }
 
-        // Format waktu 'old' saat ini untuk perbandingan dengan input form
         $currentOldCheckInFormatted = $currentOldCheckIn ? $currentOldCheckIn->format('H:i') : null;
         $currentOldCheckOutFormatted = $currentOldCheckOut ? $currentOldCheckOut->format('H:i') : null;
 
-        // Tentukan apakah ada perubahan yang diajukan dengan membandingkan semua field
         $hasChanges = false;
         if (
             ($currentOldCheckInFormatted !== $validated['new_check_in'] && !($currentOldCheckInFormatted === null && empty($validated['new_check_in']))) ||
@@ -503,12 +487,9 @@ class AttendanceController extends Controller
             return redirect()->back()->with('info', 'Tidak ada perubahan yang diajukan untuk koreksi.');
         }
 
-        // Data yang akan disimpan/diperbarui
         $correctionData = [
             'user_id' => $userId,
             'attendance_date' => $dateToCorrect->toDateString(),
-            // Simpan 'old_check_in' dan 'old_check_out' berdasarkan data absensi ASLI.
-            // Ini penting untuk audit trail, selalu bandingkan dengan data kehadiran yang tercatat.
             'old_check_in' => $attendance ? $attendance->check_in : null,
             'old_check_out' => $attendance ? $attendance->check_out : null,
             'new_check_in' => $newCheckInTime,
@@ -520,23 +501,25 @@ class AttendanceController extends Controller
         ];
 
         if ($existingCorrectionRequest) {
-            // Jika ada permintaan koreksi yang sudah ada (pending atau rejected), update saja
             $existingCorrectionRequest->update($correctionData);
             return redirect()->route('dashboard')->with('success', 'Permintaan koreksi Anda telah diperbarui dan dikirim ulang.');
         } else {
-            // Jika tidak ada, buat permintaan koreksi baru
             CorrectionRequest::create($correctionData);
             return redirect()->route('dashboard')->with('success', 'Data koreksi sudah terkirim, silahkan menunggu admin mengkonfirmasinya.');
         }
     }
 
-    // Ini adalah placeholder untuk metode create dan store,
-    // asumsikan ini untuk manajemen absensi oleh admin atau untuk entri manual.
+    /**
+     * Placeholder untuk manajemen absensi oleh admin atau untuk entri manual.
+     */
     public function create()
     {
         return view('attendances.create');
     }
 
+    /**
+     * Placeholder untuk menyimpan absensi manual.
+     */
     public function store(Request $request)
     {
         $appTimezone = config('app.timezone');
@@ -571,17 +554,111 @@ class AttendanceController extends Controller
     }
 
     /**
-     * Menampilkan daftar permintaan koreksi absensi yang diajukan oleh user.
+     * Menampilkan daftar permintaan koreksi.
      *
      * @return \Illuminate\View\View
      */
-    public function showApprovalRequests()
+   public function showApprovalRequests(Request $request)
     {
-        $userId = Auth::id();
-        $requests = CorrectionRequest::where('user_id', $userId)
-                                    ->orderBy('created_at', 'desc')
-                                    ->paginate(10);
+        $user = Auth::user();
 
-        return view('fold_AttendanceApproval.Attendance Approval', compact('requests'));
+        if (Gate::allows('access-admin-pages')) {
+            // Logika untuk Admin
+            $query = CorrectionRequest::with('user')
+                        ->where('status', 'pending')
+                        ->orderBy('created_at', 'desc');
+
+            // Logika Pencarian untuk Admin
+            if ($request->filled('search')) {
+                $search = $request->input('search');
+                $query->where(function($q) use ($search) {
+                    $q->whereHas('user', function ($userQuery) use ($search) {
+                        $userQuery->where('name', 'like', "%{$search}%");
+                    })
+                    ->orWhere('attendance_date', 'like', "%{$search}%");
+                });
+            }
+
+            $requests = $query->paginate(10)->appends($request->only('search'));
+
+            return view('admin.approval', compact('requests'));
+
+        } else {
+            // Logika untuk User Biasa
+            $query = CorrectionRequest::with('user')
+                        ->where('user_id', $user->id)
+                        ->orderBy('created_at', 'desc');
+
+            // Logika Pencarian untuk User
+            if ($request->filled('search')) {
+                $search = $request->input('search');
+                $query->where(function($q) use ($search) {
+                    $q->where('attendance_date', 'like', "%{$search}%")
+                      ->orWhere('status', 'like', "%{$search}%");
+                });
+            }
+            
+            $requests = $query->paginate(10)->appends($request->only('search'));
+            
+            return view('fold_AttendanceApproval.Attendance Approval', compact('requests'));
+        }
+    }
+
+
+    /**
+     * Menyetujui permintaan koreksi absensi.
+     * @param  CorrectionRequest $correctionRequest
+     * @return \Illuminate\Http\RedirectResponse
+     */
+     public function approveCorrection(CorrectionRequest $correctionRequest)
+    {
+        Gate::authorize('access-admin-pages');
+
+        $attendance = Attendance::firstOrNew([
+            'user_id' => $correctionRequest->user_id,
+            'date' => $correctionRequest->attendance_date,
+        ]);
+
+        if ($correctionRequest->new_check_in) {
+            $attendance->check_in = $correctionRequest->new_check_in;
+        }
+        if ($correctionRequest->new_check_out) {
+            $attendance->check_out = $correctionRequest->new_check_out;
+        }
+        if ($correctionRequest->new_activity_title) {
+            $attendance->activity_title = $correctionRequest->new_activity_title;
+        }
+        if ($correctionRequest->new_activity_description) {
+            $attendance->activity_description = $correctionRequest->new_activity_description;
+        }
+        
+        $attendance->save();
+
+        $correctionRequest->update([
+            'status' => 'approved',
+            'approved_by' => Auth::id(),
+            'approved_at' => now(),
+            'admin_notes' => 'Disetujui.'
+        ]);
+
+        return redirect()->route('admin.approval.requests')->with('success', 'Permintaan koreksi berhasil disetujui.');
+    }
+
+    public function rejectCorrection(Request $request, CorrectionRequest $correctionRequest)
+    {
+        Gate::authorize('access-admin-pages');
+
+        $validated = $request->validate([
+            'admin_notes' => 'required|string|max:1000',
+        ]);
+
+        $correctionRequest->update([
+            'status' => 'rejected',
+            'approved_by' => Auth::id(),
+            'approved_at' => now(),
+            'admin_notes' => $validated['admin_notes'],
+        ]);
+
+        return redirect()->route('admin.approval.requests')->with('success', 'Permintaan koreksi berhasil ditolak.');
     }
 }

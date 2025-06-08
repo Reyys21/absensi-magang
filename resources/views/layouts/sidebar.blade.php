@@ -99,7 +99,8 @@
 
                 {{-- Dropdown Manajemen (Termasuk Approval Khusus Admin) --}}
                 <div class="relative">
-                    <button id="btn-manajemen" type="button" class="dropdown-toggle flex items-center justify-between w-full px-4 py-2 rounded-xl transition duration-150 cursor-pointer">
+                    {{-- Tambahkan kelas aktif pada tombol dropdown utama --}}
+                    <button id="btn-manajemen" type="button" class="dropdown-toggle flex items-center justify-between w-full px-4 py-2 rounded-xl transition duration-150 cursor-pointer {{ request()->routeIs('admin.approval.*') ? 'bg-[#FFD100] text-black' : 'hover:bg-[#3C5A6D]' }}">
                         <div class="flex items-center gap-3">
                             <i class="fa-solid fa-list-check"></i> <span class="nav-text">Manajemen</span>
                         </div>
@@ -107,8 +108,8 @@
                     </button>
                     <div id="manajemenDropdown" class="dropdown-menu hidden mt-2 space-y-1 rounded-xl bg-[#34495E]">
                         <a href="#" class="block px-6 py-2 text-sm hover:bg-[#2C3E50] hover:text-[#FFD100] rounded">Account</a>
-                        {{-- Ini adalah link Approval khusus untuk Admin, yang tampilannya akan berbeda --}}
-                        <a href="#" class="block px-6 py-2 text-sm hover:bg-[#2C3E50] hover:text-[#FFD100] rounded">Persetujuan</a>
+                        {{-- Ubah href dan tambahkan kelas aktif pada link Persetujuan --}}
+                        <a href="{{ route('admin.approval.requests') }}" class="block px-6 py-2 text-sm {{ request()->routeIs('admin.approval.*') ? 'bg-[#2C3E50] text-[#FFD100]' : 'hover:bg-[#2C3E50] hover:text-[#FFD100]' }} rounded">Persetujuan</a>
                     </div>
                 </div>
             @endcan
@@ -127,6 +128,7 @@
 </aside>
 
 <script>
+    // Script Javascript tidak ada perubahan
     document.addEventListener('DOMContentLoaded', () => {
         const sidebar = document.getElementById('sidebar');
         const sidebarOverlay = document.getElementById('sidebar-overlay');
@@ -182,6 +184,16 @@
                 const dropdownMenu = button.nextElementSibling;
                 const arrowIcon = button.querySelector('.arrow-icon');
                 if (dropdownMenu && dropdownMenu.classList.contains('dropdown-menu')) {
+                    const isThisMenuOpen = !dropdownMenu.classList.contains('hidden');
+                    // Sembunyikan semua menu lain sebelum menampilkan yang ini
+                    if (!isThisMenuOpen) {
+                        document.querySelectorAll('.dropdown-menu').forEach(menu => {
+                            if (menu !== dropdownMenu) {
+                                menu.classList.add('hidden');
+                                menu.previousElementSibling.querySelector('.arrow-icon')?.classList.remove('rotate-180');
+                            }
+                        });
+                    }
                     dropdownMenu.classList.toggle('hidden');
                 }
                 if (arrowIcon) {
@@ -190,12 +202,23 @@
             });
         });
 
+        // Agar menu dropdown yang aktif terbuka saat halaman dimuat
+        const activeDropdownButton = document.querySelector('.dropdown-toggle.bg-\\[\\#FFD100\\]');
+        if(activeDropdownButton) {
+            const dropdownMenu = activeDropdownButton.nextElementSibling;
+            const arrowIcon = activeDropdownButton.querySelector('.arrow-icon');
+            if(dropdownMenu) dropdownMenu.classList.remove('hidden');
+            if(arrowIcon) arrowIcon.classList.add('rotate-180');
+        }
+
+
         initializeSidebar();
         window.addEventListener('resize', initializeSidebar);
     });
 </script>
 
 <style>
+    /* Style tidak ada perubahan */
     .rotate-180 { transform: rotate(180deg); }
     #sidebar::-webkit-scrollbar { width: 8px; }
     #sidebar::-webkit-scrollbar-track { background: #2C3E50; }

@@ -1,19 +1,21 @@
 @extends('layouts.app')
 
 @section('content')
-<main id="main-content" class="flex-1 p-4 sm:p-6 md:p-8 bg-gray-50">
-    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6">
+    <header class="bg-white flex flex-row justify-between items-center py-2 px-4 sm:px-6 md:px-8 border-b border-gray-200">
         <div>
-            <h1 class="text-2xl sm:text-3xl font-bold text-gray-800">Monitoring User</h1>
-            <p class="text-sm text-gray-500 mt-1">Daftar user mahasiswa atau siswa yang terdaftar di sistem.</p>
+            {{-- Ukuran font disesuaikan untuk mobile, tablet, dan desktop --}}
+            <h1 class="text-lg sm:text-1xl lg:text-2xl font-bold text-gray-800">Monitoring User</h1>
         </div>
         @include('layouts.profile')
-    </div>
+    </header>
 
-    {{-- Container disamakan dengan gaya terbaru --}}
+    {{-- Konten utama dimulai di sini --}}
+    <main id="main-content" class="flex-1 p-4 sm:p-6 md:p-8 bg-gray-50/50">
+
     <div class="bg-white rounded-xl shadow-md border border-gray-200">
         <div class="p-4 border-b border-gray-200">
             <form id="filter-form">
+                {{-- REVISI: Dibuat responsif --}}
                 <div class="flex flex-col sm:flex-row gap-4">
                     <div class="relative flex-grow">
                         <input type="search" id="search-input" name="search" placeholder="Cari nama atau email..."
@@ -30,7 +32,8 @@
             </form>
         </div>
 
-        <div id="table-container">
+        {{-- REVISI: Kontainer tabel dibuat responsif dengan overflow --}}
+        <div id="table-container" class="overflow-x-auto">
             @include('admin._users-table', ['users' => $users])
         </div>
     </div>

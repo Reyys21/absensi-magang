@@ -14,21 +14,50 @@ class UserController extends Controller
     // Method indexMonitoring dan indexManagement tidak berubah, tetap sama seperti sebelumnya.
     public function indexMonitoring(Request $request)
     {
-        $query = User::query()->whereHas('roles', function($q){ $q->where('name', 'user'); });
-        $query->when($request->search, function ($q, $search) { $q->where(function ($subQuery) use ($search) { $subQuery->where('name', 'like', "%{$search}%")->orWhere('email', 'like', "%{$search}%"); }); });
-        $query->when($request->filter_role, function ($q, $role) { $q->where('role', $role); });
-        $users = $query->select('id', 'name', 'email', 'phone', 'role')->latest()->paginate(15)->appends($request->query());
-        if ($request->ajax()) { return view('admin._users-table', compact('users'))->render(); }
+        $query = User::query()->whereHas('roles', function ($q) {
+            $q->where('name', 'user'); });
+
+        // Filter pencarian dan role (yang sudah ada)
+        $query->when($request->search, function ($q, $search) {
+            $q->where(function ($subQuery) use ($search) {
+                $subQuery->where('name', 'like', "%{$search}%")->orWhere('email', 'like', "%{$search}%"); }); });
+        $query->when($request->filter_role, function ($q, $role) {
+            $q->where('role', $role); });
+
+        // REVISI: Menambahkan logika untuk sorting
+        $sortBy = $request->input('sort_by', 'created_at'); // Default sort berdasarkan waktu dibuat
+        $sortDirection = $request->input('sort_direction', 'desc'); // Default sort descending (terbaru)
+
+        // Daftar kolom yang diizinkan untuk di-sort untuk keamanan
+        $sortableColumns = ['name', 'email'];
+        if (in_array($sortBy, $sortableColumns)) {
+            $query->orderBy($sortBy, $sortDirection);
+        } else {
+            $query->latest(); // Fallback ke default
+        }
+
+        $users = $query->select('id', 'name', 'email', 'phone', 'role')->paginate(15)->appends($request->query());
+
+        if ($request->ajax()) {
+            return view('admin._users-table', compact('users'))->render();
+        }
+
         return view('admin.users', compact('users'));
     }
 
     public function indexManagement(Request $request)
     {
-        $query = User::query()->whereHas('roles', function($q){ $q->where('name', 'user'); });
-        $query->when($request->search, function ($q, $search) { $q->where(function ($subQuery) use ($search) { $subQuery->where('name', 'like', "%{$search}%")->orWhere('email', 'like', "%{$search}%"); }); });
-        $query->when($request->filter_role, function ($q, $role) { $q->where('role', $role); });
+        $query = User::query()->whereHas('roles', function ($q) {
+            $q->where('name', 'user'); });
+        $query->when($request->search, function ($q, $search) {
+            $q->where(function ($subQuery) use ($search) {
+                $subQuery->where('name', 'like', "%{$search}%")->orWhere('email', 'like', "%{$search}%"); }); });
+        $query->when($request->filter_role, function ($q, $role) {
+            $q->where('role', $role); });
         $users = $query->select('id', 'profile_photo_path', 'name', 'email', 'phone', 'role', 'nim', 'asal_kampus')->latest()->paginate(15)->appends($request->query());
-        if ($request->ajax()) { return view('admin._account-table', compact('users'))->render(); }
+        if ($request->ajax()) {
+            return view('admin._account-table', compact('users'))->render();
+        }
         return view('admin.account', compact('users'));
     }
 
@@ -66,7 +95,7 @@ class UserController extends Controller
                 $correctionRequestsQuery->orderBy('created_at', 'asc');
                 break;
             case 'tanggal':
-                 $correctionRequestsQuery->when($request->filter_tanggal_koreksi, function ($q, $date) {
+                $correctionRequestsQuery->when($request->filter_tanggal_koreksi, function ($q, $date) {
                     $q->whereDate('attendance_date', $date);
                 });
                 $correctionRequestsQuery->orderBy('created_at', 'desc');

@@ -37,7 +37,7 @@
     @stack('styles') {{-- Tempatkan ini untuk CSS tambahan dari view lain --}}
 </head>
 
-<body class="bg-gray-100 text-gray-900">
+<body class="bg-gray-200 text-[#2A2B2A]">
 
     {{-- INI ADALAH DIV UTAMA YANG MENGATUR TATA LETAK APLIKASI --}}
     <div class="flex h-screen"> {{-- Tambahkan kelas flex dan h-screen untuk layout utama --}}

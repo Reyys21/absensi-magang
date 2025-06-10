@@ -6,12 +6,17 @@
         {{-- sidebar --}}
 
 
-        <main id="main-content" class="flex-1 p-4 md:p-6 bg-gray-100">
-            <div class="flex justify-between items-center mb-6">
-                <h1 class="text-xl sm:text-2xl font-bold">Kehadiran Saya</h1>
-                {{-- Ini dia! Sertakan komponen profil di sini --}}
+ <div class="flex-1 flex flex-col">
+
+            <header class="bg-white flex flex-row justify-between items-center py-2 px-4 sm:px-6 md:px-8 border-b border-gray-200 sticky top-0 z-10">
+                <div>
+                    <h1 class="text-lg sm:text-xl lg:text-2xl font-bold text-gray-800">Kehadiran Saya</h1>
+                </div>
                 @include('layouts.profile')
-            </div>
+            </header>
+
+            {{-- Konten utama dimulai di sini --}}
+            <main id="main-content" class="flex-1 p-4 sm:p-6 md:p-8 bg-gray-50/50">
 
             <div class="flex flex-wrap gap-2 mb-6 items-center">
                 <div class="relative">
@@ -165,6 +170,7 @@
                     </tbody>
                 </table>
             </div>
+  
             <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
             <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
             <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>

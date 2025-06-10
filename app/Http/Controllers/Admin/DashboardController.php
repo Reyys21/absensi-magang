@@ -57,7 +57,7 @@ class DashboardController extends Controller
         };
         $activeTrend = $calculateTrend($activeInRange, $activePreviousRange);
 
-        // === 3. Data untuk Grafik Komposisi Pengguna (Donut Chart) ===
+        // === 3. Data untuk Grafik Komposisi Pengguna (Donut Chart) - Tetap statis ===
         $userComposition = User::whereHas('roles', function($q){ $q->where('name', 'user'); })
             ->select('role', DB::raw('count(*) as total'))->groupBy('role')->pluck('total', 'role');
         $compositionData = [
@@ -66,46 +66,37 @@ class DashboardController extends Controller
         ];
         
         // === 4. Data untuk Grafik Aktivitas (Stacked Bar Chart) ===
-        $attendanceTrend = Attendance::join('users', 'attendances.user_id', '=', 'users.id')
-            ->whereBetween('attendances.date', [$startDate, $endDate])
-            ->select(DB::raw('DATE(attendances.date) as attendance_date'), 'users.role', DB::raw('count(DISTINCT attendances.user_id) as total'))
+        $attendanceQuery = Attendance::join('users', 'attendances.user_id', '=', 'users.id')
+            ->whereBetween('attendances.date', [$startDate, $endDate]);
+
+        // REVISI: Menambahkan logika untuk filter role pada grafik
+        $roleFilter = $request->input('role_filter');
+        $attendanceQuery->when($roleFilter, function ($q, $role) {
+            $q->where('users.role', $role);
+        });
+
+        $attendanceTrend = $attendanceQuery->select(DB::raw('DATE(attendances.date) as attendance_date'), 'users.role', DB::raw('count(DISTINCT attendances.user_id) as total'))
             ->groupBy('attendance_date', 'users.role')
             ->orderBy('attendance_date', 'asc')
             ->get();
 
-        $dateRange = collect(); // Membuat Laravel Collection
-        $trendData = ['labels' => [], 'mahasiswa' => [], 'siswa' => []];
-
+        $dateRange = collect();
         for ($date = $startDate->copy(); $date->lte($endDate); $date->addDay()) {
-            $dateString = $date->toDateString();
-            // Inisialisasi collection dengan data awal
-            $dateRange->put($dateString, ['mahasiswa' => 0, 'siswa' => 0]);
-            $trendData['labels'][] = $date->translatedFormat('d M');
+            $dateRange->put($date->toDateString(), ['mahasiswa' => 0, 'siswa' => 0]);
         }
 
-        // =======================================================
-        // === PERBAIKAN LOGIKA ADA DI SINI ===
-        // =======================================================
         foreach ($attendanceTrend as $trend) {
             $dateKey = $trend->attendance_date;
-
-            // Gunakan method has() untuk memeriksa kunci
             if ($dateRange->has($dateKey)) {
-                // 1. Ambil data array yang ada ke variabel sementara
                 $dailyData = $dateRange->get($dateKey);
-                
-                // 2. Ubah data di variabel sementara tersebut
                 $dailyData[$trend->role] = $trend->total;
-                
-                // 3. Masukkan kembali array yang sudah diubah ke dalam collection
                 $dateRange->put($dateKey, $dailyData);
             }
         }
-        // =======================================================
-        // === AKHIR DARI PERBAIKAN ===
-        // =======================================================
 
-        foreach ($dateRange as $data) {
+        $trendData = ['labels' => [], 'mahasiswa' => [], 'siswa' => []];
+        foreach ($dateRange as $date => $data) {
+            $trendData['labels'][] = Carbon::parse($date)->translatedFormat('d M');
             $trendData['mahasiswa'][] = $data['mahasiswa'];
             $trendData['siswa'][] = $data['siswa'];
         }
@@ -123,9 +114,9 @@ class DashboardController extends Controller
             'trendData' => $trendData,
             'latestCorrections' => $latestCorrections,
             'currentFilter' => $filter,
+            'currentRoleFilter' => $roleFilter, // Mengirim data filter role ke view
         ]);
     }
-
 
     public function superadminDashboard()
     {

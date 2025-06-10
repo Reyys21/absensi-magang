@@ -4,11 +4,17 @@
 @section('content')
     <div class="flex flex-col md:flex-row min-h-screen font-[Inter]">
 
-        <main id="main-content" class="flex-1 p-4 md:p-6 transition-all duration-300 ease-in-out">
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
-                <h1 class="text-xl sm:text-2xl font-bold mb-3 sm:mb-0">Riwayat Absensi Saya</h1>
+       <div class="flex-1 flex flex-col">
+
+            <header class="bg-white flex flex-row justify-between items-center py-2 px-4 sm:px-6 md:px-8 border-b border-gray-200 sticky top-0 z-10">
+                <div>
+                    <h1 class="text-lg sm:text-xl lg:text-2xl font-bold text-gray-800">Riwayat Absensi Saya</h1>
+                </div>
                 @include('layouts.profile')
-            </div>
+            </header>
+
+            {{-- Konten utama dimulai di sini --}}
+            <main id="main-content" class="flex-1 p-4 sm:p-6 md:p-8 bg-gray-50/50">
 
             <div class="bg-white rounded-lg shadow-md p-4 md:p-6 mb-6">
                 <h2 class="text-lg font-semibold mb-4">Riwayat</h2>
@@ -28,7 +34,7 @@
                         <span>Lengkap</span>
                     </div>
                     <div class="flex items-center gap-2">
-                        <div class="w-4 h-4 rounded-full" style="background-color: #f86917;"
+                        <div class="w-4 h-4 rounded-full" style="background-color: #FFD100;"
                             title="Tidak Hadir (Belum Lengkap)"></div>
                         <span>Tidak Hadir (Belum Lengkap)</span>
                     </div>
@@ -97,7 +103,7 @@
                                         $textColor = 'text-white';
                                         break;
                                     case 'Tidak Hadir (Belum Lengkap)':
-                                        $bgColor = '#f86917';
+                                        $bgColor = '#FFD100';
                                         $textColor = 'text-white';
                                         break;
                                     case 'Incomplete':

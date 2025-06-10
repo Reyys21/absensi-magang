@@ -49,11 +49,13 @@
         }
 
         .read-more-link {
-            color: #4f46e5; /* indigo-600 */
+            color: #4f46e5;
+            /* indigo-600 */
             cursor: pointer;
             font-weight: 500;
             margin-left: 5px;
         }
+
         .read-more-link:hover {
             text-decoration: underline;
         }
@@ -61,12 +63,17 @@
 @endpush
 
 @section('content')
-    <div class="flex flex-col md:flex-row min-h-screen font-[Inter]">
-        <main id="main-content" class="flex-1 p-4 md:p-6 transition-all duration-300 ease-in-out">
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
-                <h1 class="text-xl sm:text-2xl font-bold mb-3 sm:mb-0">Permintaan Persetujuan</h1>
+    <div class="flex-1 flex flex-col">
+
+            <header class="bg-white flex flex-row justify-between items-center py-2 px-4 sm:px-6 md:px-8 border-b border-gray-200 sticky top-0 z-10">
+                <div>
+                    <h1 class="text-lg sm:text-xl lg:text-2xl font-bold text-gray-800">Permintaan Koreksi</h1>
+                </div>
                 @include('layouts.profile')
-            </div>
+            </header>
+
+            {{-- Konten utama dimulai di sini --}}
+            <main id="main-content" class="flex-1 p-4 sm:p-6 md:p-8 bg-gray-50/50">
 
             <div class="bg-white rounded-lg shadow-md p-4 md:p-6 mb-6">
                 <h2 class="text-lg font-semibold text-gray-800 mb-4">Daftar Permintaan Koreksi Absensi Anda</h2>
@@ -78,38 +85,65 @@
                         <table class="min-w-full responsive-table">
                             <thead>
                                 <tr>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No.</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tanggal</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Check-In (Req)</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Check-Out (Req)</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Alasan Anda</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Catatan Admin</th>
+                                    <th
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        No.</th>
+                                    <th
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Tanggal</th>
+                                    <th
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Check-In (Req)</th>
+                                    <th
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Check-Out (Req)</th>
+                                    <th
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Alasan Anda</th>
+                                    <th
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Status</th>
+                                    <th
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Catatan Admin</th>
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200 md:divide-y-0">
                                 @foreach ($requests as $index => $requestItem)
                                     <tr>
-                                        <td data-label="No." class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $requests->firstItem() + $index }}</td>
-                                        <td data-label="Tanggal" class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $requestItem->attendance_date->format('d M Y') }}</td>
-                                        <td data-label="Check-In" class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $requestItem->new_check_in ? $requestItem->new_check_in->format('H:i') : '--.--' }}</td>
-                                        <td data-label="Check-Out" class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $requestItem->new_check_out ? $requestItem->new_check_out->format('H:i') : '--.--' }}</td>
+                                        <td data-label="No." class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                            {{ $requests->firstItem() + $index }}</td>
+                                        <td data-label="Tanggal" class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                            {{ $requestItem->attendance_date->format('d M Y') }}</td>
+                                        <td data-label="Check-In" class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                            {{ $requestItem->new_check_in ? $requestItem->new_check_in->format('H:i') : '--.--' }}
+                                        </td>
+                                        <td data-label="Check-Out"
+                                            class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                            {{ $requestItem->new_check_out ? $requestItem->new_check_out->format('H:i') : '--.--' }}
+                                        </td>
                                         <td data-label="Alasan Anda" class="px-6 py-4 text-sm text-gray-900">
-                                            <span class="expandable-text" data-original-text="{{ $requestItem->reason ?: '--' }}"></span>
+                                            <span class="expandable-text"
+                                                data-original-text="{{ $requestItem->reason ?: '--' }}"></span>
                                         </td>
                                         <td data-label="Status" class="px-6 py-4 whitespace-nowrap text-sm">
                                             @if ($requestItem->status === 'pending')
-                                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">Proses</span>
+                                                <span
+                                                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">Proses</span>
                                             @elseif($requestItem->status === 'approved')
-                                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Diterima</span>
+                                                <span
+                                                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Diterima</span>
                                             @elseif($requestItem->status === 'rejected')
-                                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Ditolak</span>
+                                                <span
+                                                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Ditolak</span>
                                             @else
-                                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">{{ ucfirst($requestItem->status) }}</span>
+                                                <span
+                                                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">{{ ucfirst($requestItem->status) }}</span>
                                             @endif
                                         </td>
                                         <td data-label="Catatan Admin" class="px-6 py-4 text-sm text-gray-900">
-                                            <span class="expandable-text" data-original-text="{{ $requestItem->admin_notes ?: '--' }}"></span>
+                                            <span class="expandable-text"
+                                                data-original-text="{{ $requestItem->admin_notes ?: '--' }}"></span>
                                         </td>
                                     </tr>
                                 @endforeach
@@ -127,34 +161,38 @@
 @endsection
 
 @push('scripts')
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const charLimit = 50; // Batas karakter sebelum dipotong
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const charLimit = 50; // Batas karakter sebelum dipotong
 
-        document.querySelectorAll('.expandable-text').forEach(span => {
-            const originalText = span.dataset.originalText;
+            document.querySelectorAll('.expandable-text').forEach(span => {
+                const originalText = span.dataset.originalText;
 
-            if (originalText.length > charLimit) {
-                const truncatedText = originalText.substring(0, charLimit) + '...';
-                span.innerHTML = `${truncatedText} <a class="read-more-link">Lihat selengkapnya</a>`;
+                if (originalText.length > charLimit) {
+                    const truncatedText = originalText.substring(0, charLimit) + '...';
+                    span.innerHTML = `${truncatedText} <a class="read-more-link">Lihat selengkapnya</a>`;
 
-                const link = span.querySelector('.read-more-link');
-                link.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    if (link.textContent === 'Lihat selengkapnya') {
-                        span.innerHTML = `${originalText} <a class="read-more-link">Ringkas</a>`;
-                        // Re-add event listener to the new link
-                        span.querySelector('.read-more-link').addEventListener('click', arguments.callee);
-                    } else {
-                        span.innerHTML = `${truncatedText} <a class="read-more-link">Lihat selengkapnya</a>`;
-                        // Re-add event listener to the new link
-                        span.querySelector('.read-more-link').addEventListener('click', arguments.callee);
-                    }
-                });
-            } else {
-                span.textContent = originalText;
-            }
+                    const link = span.querySelector('.read-more-link');
+                    link.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        if (link.textContent === 'Lihat selengkapnya') {
+                            span.innerHTML =
+                            `${originalText} <a class="read-more-link">Ringkas</a>`;
+                            // Re-add event listener to the new link
+                            span.querySelector('.read-more-link').addEventListener('click',
+                                arguments.callee);
+                        } else {
+                            span.innerHTML =
+                                `${truncatedText} <a class="read-more-link">Lihat selengkapnya</a>`;
+                            // Re-add event listener to the new link
+                            span.querySelector('.read-more-link').addEventListener('click',
+                                arguments.callee);
+                        }
+                    });
+                } else {
+                    span.textContent = originalText;
+                }
+            });
         });
-    });
-</script>
+    </script>
 @endpush

@@ -1,199 +1,217 @@
 @extends('layouts.app')
 
 @push('styles')
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" xintegrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-<style>
-    /* Styling untuk tabel responsif (mode kartu di mobile) */
-    @media (max-width: 1023px) {
-        .responsive-table thead {
-            display: none;
+    {{-- Style untuk tabel responsif dan "lihat selengkapnya" tidak diubah --}}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <style>
+        /* Mode kartu untuk mobile & tablet */
+        @media (max-width: 1023px) {
+            .responsive-table thead {
+                display: none;
+            }
+            .responsive-table,
+            .responsive-table tbody,
+            .responsive-table tr,
+            .responsive-table td {
+                display: block;
+                width: 100%;
+            }
+            .responsive-table tr {
+                margin-bottom: 1.5rem;
+                border: 1px solid #e5e7eb;
+                border-radius: 0.75rem;
+                overflow: hidden;
+                box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+            }
+            .responsive-table td {
+                padding: 1rem;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                text-align: right;
+                border-bottom: 1px solid #f3f4f6;
+            }
+            .responsive-table td:last-child {
+                border-bottom: 0;
+            }
+            .responsive-table td::before {
+                content: attr(data-label);
+                font-weight: 600;
+                text-align: left;
+                margin-right: 1rem;
+                color: #4b5563;
+            }
+            .responsive-table .aksi-buttons {
+                justify-content: flex-end !important;
+            }
         }
-        .responsive-table, .responsive-table tbody, .responsive-table tr, .responsive-table td {
-            display: block;
-            width: 100%;
-        }
-        .responsive-table tr {
-            margin-bottom: 1.5rem;
-            border: 1px solid #e5e7eb;
-            border-radius: 0.75rem;
+        .expandable-content.collapsed {
             overflow: hidden;
-            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            word-break: break-word;
         }
-        .responsive-table td {
-            padding: 1rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            text-align: right;
-            border-bottom: 1px solid #e5e7eb;
+        .toggle-expand {
+            color: #4f46e5;
+            font-weight: 500;
+            cursor: pointer;
+            font-size: 0.875rem;
+            display: none;
+            margin-top: 4px;
         }
-        .responsive-table td:last-child {
-            border-bottom: 0;
+        .toggle-expand:hover {
+            text-decoration: underline;
         }
-        .responsive-table td::before {
-            content: attr(data-label);
-            font-weight: 600;
-            text-align: left;
-            margin-right: 1rem;
-            color: #4b5563;
-        }
-    }
-    
-    /* Styling untuk Lihat Selengkapnya */
-    .expandable-content.collapsed {
-        overflow: hidden;
-        display: -webkit-box;
-        -webkit-line-clamp: 2; /* Batasi hingga 2 baris */
-        -webkit-box-orient: vertical;
-        word-break: break-word;
-    }
-    .toggle-expand {
-        color: #4f46e5;
-        font-weight: 500;
-        cursor: pointer;
-        font-size: 0.875rem;
-        display: none; /* Tampil via JS jika perlu */
-        margin-top: 4px;
-    }
-    .toggle-expand:hover {
-        text-decoration: underline;
-    }
-</style>
+    </style>
 @endpush
 
 @section('content')
-<div class="flex flex-col md:flex-row min-h-screen font-[Inter] bg-gray-50">
-    <main id="main-content" class="flex-1 p-4 sm:p-6 lg:p-8">
-        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
-            <h1 class="text-2xl sm:text-3xl font-bold text-gray-800">Admin: Persetujuan Koreksi</h1>
-            @include('layouts.profile')
-        </div>
+    {{-- Kontainer utama untuk layout flex (sidebar + konten) --}}
+    <div class="flex flex-col md:flex-row min-h-screen font-[Inter]">
 
-        @if (session('success'))
-            <div class="mb-6 p-4 bg-green-100 text-green-800 rounded-lg shadow-sm" role="alert">{{ session('success') }}</div>
-        @endif
-        @if (session('error'))
-            <div class="mb-6 p-4 bg-red-100 text-red-800 rounded-lg shadow-sm" role="alert">{{ session('error') }}</div>
-        @endif
+        {{-- STRUKTUR BARU DIMULAI DI SINI --}}
+        {{-- Kontainer ini membungkus Header dan Main Content sebagai satu kesatuan kolom --}}
+        <div class="flex-1 flex flex-col">
 
-        <div class="bg-white rounded-xl shadow-lg overflow-hidden">
-            <div class="p-4 sm:p-6 border-b border-gray-200">
-                <h2 class="text-xl font-semibold text-gray-800">Permintaan Tertunda</h2>
-                <p class="text-sm text-gray-500 mt-1">Daftar permintaan yang memerlukan tindakan Anda.</p>
-            </div>
+            <header class="bg-white flex flex-row justify-between items-center py-2 px-4 sm:px-6 lg:px-8 border-b border-gray-200 sticky top-0 z-10">
+                <div>
+                    <h1 class="text-l sm:text-1xl lg:text-2xl font-bold text-gray-800">Persetujuan Koreksi</h1>
+                </div>
+                @include('layouts.profile')
+            </header>
 
-            <!-- PERBAIKAN: class="overflow-x-auto" dihapus dari div ini -->
-            <div>
-                @if ($requests->isEmpty())
-                    <div class="text-center py-16 px-6">
-                        <i class="fa-solid fa-check-circle text-5xl text-green-400"></i>
-                        <h3 class="mt-4 text-xl font-semibold text-gray-700">Semua Beres!</h3>
-                        <p class="mt-2 text-gray-500">Tidak ada permintaan koreksi yang menunggu persetujuan.</p>
+            {{-- Latar belakang abu-abu sekarang diterapkan di sini --}}
+            <main id="main-content" class="flex-1 p-4 sm:p-6 lg:p-8 ">
+                
+                {{-- Notifikasi dipindahkan ke dalam main content --}}
+                @if (session('success'))
+                    <div class="mb-6 p-4 bg-green-100 text-green-800 rounded-lg shadow-sm" role="alert">{{ session('success') }}
                     </div>
-                @else
-                    <!-- PERBAIKAN: class="min-w-full" dihapus dari tabel -->
-                    <table class="w-full responsive-table">
-                        <thead class="bg-gray-50 text-xs text-gray-500 uppercase">
-                            <tr class="divide-x divide-gray-200">
-                                <!-- PERBAIKAN: class="min-w-[]" dihapus dari semua th -->
-                                <th class="px-6 py-3 font-medium">No</th>
-                                <th class="px-6 py-3 font-medium">Pemohon</th>
-                                <th class="px-6 py-3 font-medium">Tanggal</th>
-                                <th class="px-6 py-3 font-medium">Check-In</th>
-                                <th class="px-6 py-3 font-medium">Check-Out</th>
-                                <th class="px-6 py-3 font-medium">Judul Aktivitas</th>
-                                <th class="px-6 py-3 font-medium">Deskripsi</th>
-                                <th class="px-6 py-3 font-medium">Alasan</th>
-                                <th class="px-6 py-3 font-medium text-center">Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody class="text-sm divide-y divide-gray-200">
-                            @foreach ($requests as $requestItem)
-                                <tr class="divide-x divide-gray-200 hover:bg-gray-50 transition">
-                                    <td data-label="No" class="px-6 py-4 text-gray-600 font-medium text-center align-top">{{ $requests->firstItem() + $loop->index }}</td>
-                                    <td data-label="Pemohon" class="px-6 py-4 text-gray-900 font-medium align-top">{{ $requestItem->user->name ?? 'N/A' }}</td>
-                                    <td data-label="Tanggal" class="px-6 py-4 text-gray-600 whitespace-nowrap align-top">{{ $requestItem->attendance_date->format('d M Y') }}</td>
-                                    <td data-label="Check-In" class="px-6 py-4 text-gray-600 whitespace-nowrap align-top">{{ $requestItem->new_check_in ? $requestItem->new_check_in->format('H:i') : '--' }}</td>
-                                    <td data-label="Check-Out" class="px-6 py-4 text-gray-600 whitespace-nowrap align-top">{{ $requestItem->new_check_out ? $requestItem->new_check_out->format('H:i') : '--' }}</td>
-                                    <td data-label="Judul" class="px-6 py-4 text-gray-600 align-top">
-                                        <div class="expandable-content collapsed">
-                                            {!! nl2br(e($requestItem->new_activity_title ?: '--')) !!}
-                                        </div>
-                                        <a href="#" class="toggle-expand">Lihat Selengkapnya</a>
-                                    </td>
-                                    <td data-label="Deskripsi" class="px-6 py-4 text-gray-600 align-top">
-                                        <div class="expandable-content collapsed">
-                                           {!! nl2br(e($requestItem->new_activity_description ?: '--')) !!}
-                                        </div>
-                                        <a href="#" class="toggle-expand">Lihat Selengkapnya</a>
-                                    </td>
-                                    <td data-label="Alasan" class="px-6 py-4 text-gray-600 align-top">
-                                        <div class="expandable-content collapsed">
-                                            {!! nl2br(e($requestItem->reason ?: '--')) !!}
-                                        </div>
-                                        <a href="#" class="toggle-expand">Lihat Selengkapnya</a>
-                                    </td>
-                                    <td data-label="Aksi" class="px-6 py-4 align-top">
-                                        <div class="flex items-center justify-end md:justify-center space-x-2">
-                                            <form action="{{ route('admin.approval.approve', $requestItem->id) }}" method="POST" onsubmit="return confirm('Anda yakin ingin MENYETUJUI permintaan ini?');">
-                                                @csrf
-                                                <button type="submit" class="text-white bg-green-600 hover:bg-green-700 font-medium rounded-lg text-xs px-3 py-1.5 text-center">
-                                                    Terima
-                                                </button>
-                                            </form>
-                                            <button onclick="openRejectModal({{ $requestItem->id }}, '{{ $requestItem->user->name ?? 'User' }}', '{{ $requestItem->attendance_date->format('d M Y') }}')" class="text-white bg-red-600 hover:bg-red-700 font-medium rounded-lg text-xs px-3 py-1.5 text-center">
-                                                Tolak
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
                 @endif
-            </div>
+                @if (session('error'))
+                    <div class="mb-6 p-4 bg-red-100 text-red-800 rounded-lg shadow-sm" role="alert">{{ session('error') }}
+                    </div>
+                @endif
 
-            @if($requests->hasPages())
-            <div class="p-4 sm:p-6 border-t border-gray-200">
-                {{ $requests->links() }}
-            </div>
-            @endif
+                {{-- Konten tabel --}}
+                <div class="bg-white rounded-xl shadow-md border border-gray-200">
+                    <div class="p-4 sm:p-6 border-b border-gray-200">
+                        <h2 class="text-xl font-semibold text-gray-800">Permintaan Tertunda</h2>
+                        <p class="text-sm text-gray-500 mt-1">Daftar permintaan yang memerlukan tindakan Anda.</p>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        @if ($requests->isEmpty())
+                            <div class="text-center py-16 px-6">
+                                <i class="fa-solid fa-check-circle text-5xl text-green-400"></i>
+                                <h3 class="mt-4 text-xl font-semibold text-gray-700">Semua Beres!</h3>
+                                <p class="mt-2 text-gray-500">Tidak ada permintaan koreksi yang menunggu persetujuan.</p>
+                            </div>
+                        @else
+                            <table class="w-full responsive-table">
+                                <thead class="bg-gray-50 text-xs text-gray-500 uppercase">
+                                    <tr class="divide-x divide-gray-200">
+                                        <th class="px-6 py-3 font-medium">No</th>
+                                        <th class="px-6 py-3 font-medium">Pemohon</th>
+                                        <th class="px-6 py-3 font-medium">Tanggal</th>
+                                        <th class="px-6 py-3 font-medium">Check-In</th>
+                                        <th class="px-6 py-3 font-medium">Check-Out</th>
+                                        <th class="px-6 py-3 font-medium">Judul Aktivitas</th>
+                                        <th class="px-6 py-3 font-medium">Deskripsi</th>
+                                        <th class="px-6 py-3 font-medium">Alasan</th>
+                                        <th class="px-6 py-3 font-medium text-center">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="text-sm divide-y divide-gray-200">
+                                    @foreach ($requests as $requestItem)
+                                        <tr class="divide-x divide-gray-200 hover:bg-gray-50 transition">
+                                            <td data-label="No"
+                                                class="px-6 py-4 text-gray-600 font-medium text-center align-top">
+                                                {{ $requests->firstItem() + $loop->index }}</td>
+                                            <td data-label="Pemohon" class="px-6 py-4 text-gray-900 font-medium align-top">
+                                                {{ $requestItem->user->name ?? 'N/A' }}</td>
+                                            <td data-label="Tanggal"
+                                                class="px-6 py-4 text-gray-600 whitespace-nowrap align-top">
+                                                {{ $requestItem->attendance_date->format('d M Y') }}</td>
+                                            <td data-label="Check-In"
+                                                class="px-6 py-4 text-gray-600 whitespace-nowrap align-top">
+                                                {{ $requestItem->new_check_in ? $requestItem->new_check_in->format('H:i') : '--' }}
+                                            </td>
+                                            <td data-label="Check-Out"
+                                                class="px-6 py-4 text-gray-600 whitespace-nowrap align-top">
+                                                {{ $requestItem->new_check_out ? $requestItem->new_check_out->format('H:i') : '--' }}
+                                            </td>
+                                            <td data-label="Judul" class="px-6 py-4 text-gray-600 align-top">
+                                                <div class="expandable-content collapsed">{!! nl2br(e($requestItem->new_activity_title ?: '--')) !!}</div><a
+                                                    href="#" class="toggle-expand">Lihat Selengkapnya</a>
+                                            </td>
+                                            <td data-label="Deskripsi" class="px-6 py-4 text-gray-600 align-top">
+                                                <div class="expandable-content collapsed">{!! nl2br(e($requestItem->new_activity_description ?: '--')) !!}</div><a
+                                                    href="#" class="toggle-expand">Lihat Selengkapnya</a>
+                                            </td>
+                                            <td data-label="Alasan" class="px-6 py-4 text-gray-600 align-top">
+                                                <div class="expandable-content collapsed">{!! nl2br(e($requestItem->reason ?: '--')) !!}</div><a
+                                                    href="#" class="toggle-expand">Lihat Selengkapnya</a>
+                                            </td>
+                                            <td data-label="Aksi" class="px-6 py-4 align-top">
+                                                <div
+                                                    class="flex items-center justify-end md:justify-center space-x-2 aksi-buttons">
+                                                    <form action="{{ route('admin.approval.approve', $requestItem->id) }}"
+                                                        method="POST"
+                                                        onsubmit="return confirm('Anda yakin ingin MENYETUJUI permintaan ini?');">
+                                                        @csrf<button type="submit"
+                                                            class="text-white bg-green-600 hover:bg-green-700 font-medium rounded-lg text-xs px-3 py-1.5 text-center">Terima</button>
+                                                    </form>
+                                                    <button
+                                                        onclick="openRejectModal({{ $requestItem->id }}, '{{ $requestItem->user->name ?? 'User' }}', '{{ $requestItem->attendance_date->format('d M Y') }}')"
+                                                        class="text-white bg-red-600 hover:bg-red-700 font-medium rounded-lg text-xs px-3 py-1.5 text-center">Tolak</button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        @endif
+                    </div>
+                    @if ($requests->hasPages())
+                        <div class="p-4 sm:p-6 border-t border-gray-200">{{ $requests->links() }}</div>
+                    @endif
+                </div>
+            </main>
         </div>
-    </main>
-</div>
-
-<!-- Modal Penolakan -->
-<div id="rejectModal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center p-4" style="display: none; z-index: 100;">
-    <div class="relative bg-white rounded-lg shadow-xl w-full max-w-md">
-        <!-- Konten diisi oleh JS -->
     </div>
-</div>
+
+    {{-- Modal tidak diubah --}}
+    <div id="rejectModal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center p-4"
+        style="display: none; z-index: 100;">
+        <div class="relative bg-white rounded-lg shadow-xl w-full max-w-md"></div>
+    </div>
 @endsection
 
 @push('scripts')
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-    // === Script untuk "Lihat Selengkapnya" (FIXED) ===
-    document.querySelectorAll('.expandable-content').forEach(content => {
-        const toggleButton = content.nextElementSibling;
-        
-        // Cek apakah konten perlu dipotong setelah dirender
-        if (content.scrollHeight > content.clientHeight) {
-            toggleButton.style.display = 'inline-block';
-        }
-        
-        toggleButton.addEventListener('click', function(e) {
-            e.preventDefault();
-            content.classList.toggle('collapsed');
-            this.textContent = content.classList.contains('collapsed') ? 'Lihat Selengkapnya' : 'Ringkas';
-        });
-    });
-
-    // === Script untuk Modal Penolakan (Sama seperti sebelumnya) ===
-    window.openRejectModal = function(requestId, userName, date) { 
-        const rejectModal = document.getElementById('rejectModal');
-        const url = `{{ url('admin/approval-requests') }}/${requestId}/reject`;
-        const modalContent = `
+    {{-- Script tidak diubah --}}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // === Script untuk "Lihat Selengkapnya" (FIXED) ===
+            document.querySelectorAll('.expandable-content').forEach(content => {
+                const toggleButton = content.nextElementSibling;
+                // Cek apakah konten perlu dipotong setelah dirender
+                if (content.scrollHeight > content.clientHeight) {
+                    toggleButton.style.display = 'inline-block';
+                }
+                toggleButton.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    content.classList.toggle('collapsed');
+                    this.textContent = content.classList.contains('collapsed') ?
+                        'Lihat Selengkapnya' : 'Ringkas';
+                });
+            });
+            // === Script untuk Modal Penolakan (Sama seperti sebelumnya) ===
+            window.openRejectModal = function(requestId, userName, date) {
+                const rejectModal = document.getElementById('rejectModal');
+                const url = `{{ url('admin/approval-requests') }}/${requestId}/reject`;
+                const modalContent = `
             <div class="p-6">
                 <div class="flex items-start">
                     <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
@@ -223,12 +241,12 @@ document.addEventListener('DOMContentLoaded', function () {
                 </button>
             </div>
         `;
-        rejectModal.querySelector('.relative').innerHTML = modalContent;
-        rejectModal.style.display = 'flex';
-    };
-    window.closeRejectModal = function() { 
-        document.getElementById('rejectModal').style.display = 'none';
-    };
-});
-</script>
+                rejectModal.querySelector('.relative').innerHTML = modalContent;
+                rejectModal.style.display = 'flex';
+            };
+            window.closeRejectModal = function() {
+                document.getElementById('rejectModal').style.display = 'none';
+            };
+        });
+    </script>
 @endpush

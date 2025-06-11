@@ -39,7 +39,7 @@ return [
 
 
 
-    'lifetime' => 30, // 1 artinya 1 menit
+    'lifetime' => 10830, // 1 artinya 1 menit
 
     'expire_on_close' => false,
 

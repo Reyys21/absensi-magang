@@ -9,7 +9,7 @@
     <header class="bg-white flex flex-row justify-between items-center py-2 px-4 sm:px-6 md:px-8 border-b border-gray-200">
         <div>
             {{-- Ukuran font disesuaikan untuk mobile, tablet, dan desktop --}}
-            <h1 class="text-lg sm:text-1xl lg:text-2xl font-bold text-gray-800">Dashboard</h1>
+            <h1 class="text-lg sm:text-1xl lg:text-2xl font-bold text-[#2A2B2A]">Dashboard</h1>
         </div>
         @include('layouts.profile')
     </header>
@@ -24,19 +24,19 @@
 
             <div class="flex flex-col gap-6">
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                    <div class="bg-[#F0386B] p-5 rounded-2xl shadow-sm border border-gray-100">
+                    <div class="bg-[#14BDEB] p-5 rounded-2xl shadow-sm border border-gray-100">
                         <div
                             class="flex items-center justify-center bg-indigo-100 text-indigo-500 w-10 h-10 rounded-lg mb-4">
                             <i class="fa-solid fa-users"></i>
                         </div>
-                        <p class="text-3xl font-bold text-gray-800">{{ $totalUsers }}</p>
+                        <p class="text-3xl font-bold text-[#2A2B2A]">{{ $totalUsers }}</p>
                         <p class="text-sm font-medium text-[#2A2B2A]">Total Pengguna</p>
                     </div>
                     <div class="bg-[#FFD100] p-5 rounded-2xl shadow-sm border border-gray-100">
                         <div class="flex items-center justify-center bg-green-100 text-green-500 w-10 h-10 rounded-lg mb-4">
                             <i class="fa-solid fa-user-clock"></i>
                         </div>
-                        <p class="text-3xl font-bold text-gray-800">{{ $activeInRange }}</p>
+                        <p class="text-3xl font-bold text-[#2A2B2A]">{{ $activeInRange }}</p>
                         <div class="flex items-center text-sm font-medium text-[#2A2B2A]">
                             <span>Pengguna Aktif</span>
                             <span
@@ -48,15 +48,15 @@
                     <div class="bg-[#F7FFF7] p-5 rounded-2xl shadow-sm border border-gray-100">
                         <div class="flex items-center justify-center bg-sky-100 text-sky-500 w-10 h-10 rounded-lg mb-4"><i
                                 class="fa-solid fa-user-check"></i></div>
-                        <p class="text-3xl font-bold text-gray-800">{{ $completedInRange }}</p>
+                        <p class="text-3xl font-bold text-[#2A2B2A]">{{ $completedInRange }}</p>
                         <p class="text-sm font-medium text-[#2A2B2A]">Absensi Lengkap</p>
                     </div>
-                    <div class="bg-[#14BDEB] p-5 rounded-2xl shadow-sm border border-gray-100">
+                    <div class="bg-[#F0386B] p-5 rounded-2xl shadow-sm border border-gray-100">
                         <div
                             class="flex items-center justify-center bg-orange-100 text-orange-500 w-10 h-10 rounded-lg mb-4">
                             <i class="fa-solid fa-circle-exclamation"></i>
                         </div>
-                        <p class="text-3xl font-bold text-gray-800">{{ $pendingCorrections }}</p>
+                        <p class="text-3xl font-bold text-[#2A2B2A]">{{ $pendingCorrections }}</p>
                         <p class="text-sm font-medium text-[#2A2B2A]">Koreksi Pending</p>
                     </div>
                 </div>
@@ -65,11 +65,11 @@
                     <div class="flex justify-between items-center mb-4">
                         <h3 class="text-lg font-bold text-[#2A2B2A]">Permintaan Koreksi Menunggu</h3>
                         <a href="{{ route('admin.approval.requests') }}"
-                            class="text-sm font-medium text-[#2A2B2A] hover:text-[#C1C4C1]">Lihat Semua &rarr;</a>
+                            class="text-sm font-medium text-[#2A2B2A] hover:text-[#C1C4C1] ">Lihat Semua &rarr;</a>
                     </div>
                     <div class="overflow-x-auto">
                         <table class="w-full text-sm">
-                            <thead class="bg-[#F7FFF7] text-[#2A2B2A] uppercase text-xs">
+                            <thead class="bg-[##14BDEB] text-[#2A2B2A] uppercase text-xs">
                                 <tr>
                                     <th class="p-3 text-left">Pengguna</th>
                                     <th class="p-3 text-left">Tanggal Koreksi</th>
@@ -78,7 +78,7 @@
                             </thead>
                             <tbody class="divide-y divide-gray-100">
                                 @forelse ($latestCorrections as $correction)
-                                    <tr class="hover:bg-[#C1C4C1] ">
+                                    <tr class="hover:bg-[#FFD100] ">
                                         <td class="p-3">
                                             <div class="flex items-center gap-3">
                                                 @php
@@ -93,23 +93,23 @@
                                                 <img src="{{ $finalPhotoUrl }}" alt="Foto"
                                                     class="h-9 w-9 rounded-full object-cover">
                                                 <div>
-                                                    <p class="font-semibold text-gray-800">{{ $correction->user->name }}</p>
-                                                    <p class="text-xs text-gray-500">{{ $correction->user->email }}</p>
+                                                    <p class="font-semibold text-[#2A2B2A]">{{ $correction->user->name }}</p>
+                                                    <p class="text-xs text-[#2A2B2A]">{{ $correction->user->email }}</p>
                                                 </div>
                                             </div>
                                         </td>
-                                        <td class="p-3 text-gray-600">{{ $correction->attendance_date->format('d M Y') }}
+                                        <td class="p-3 text-[#2A2B2A]">{{ $correction->attendance_date->format('d M Y') }}
                                         </td>
                                         <td class="p-3">
                                             <span
-                                                class="px-3 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                                                class="px-3 py-1 text-xs font-semibold rounded-full bg-[#F7FFF7] text-[#2A2B2A] border-2 border-[#ffd100]">
                                                 {{ Str::ucfirst($correction->status) }}
                                             </span>
                                         </td>
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="3" class="text-center p-8 text-gray-400"><i
+                                        <td colspan="3" class="text-center p-8 text-[#2A2B2A]"><i
                                                 class="fa-solid fa-check-double fa-3x mb-2"></i>
                                             <p class="font-medium">Tidak ada permintaan koreksi.</p>
                                         </td>

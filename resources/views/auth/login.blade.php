@@ -236,17 +236,31 @@
             <div class="form-container">
                 <h4 class="text-center fw-bold mb-2">SELAMAT DATANG</h4>
                 <p class="text-center text-muted mb-4">Di Website Absensi Magang. Silakan Masuk Dulu</p>
+                
+                {{-- ▼▼▼ BLOK UNTUK MENAMPILKAN PESAN ▼▼▼ --}}
 
-                @if ($errors->any())
-                <div class="alert alert-danger">{{ $errors->first() }}</div>
+                {{-- Pesan jika session berakhir --}}
+                @if (session('session_expired'))
+                    <div class="alert alert-warning d-flex align-items-center" role="alert">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <div>
+                           {{ session('session_expired') }}
+                        </div>
+                    </div>
                 @endif
+                
+                {{-- Pesan jika ada error validasi login --}}
+                @if ($errors->any())
+                    <div class="alert alert-danger">{{ $errors->first() }}</div>
+                @endif
+
+                {{-- ▲▲▲ AKHIR BLOK PESAN ▲▲▲ --}}
 
                 <form method="POST" action="/login" class="login-form">
                     @csrf
                     <div class="mb-3">
-                        {{-- Perubahan di sini: Ubah type dari "email" menjadi "text" dan sesuaikan placeholder --}}
                         <input type="text" name="email" class="form-control" placeholder="Masukkan Email atau Nama Anda" required
-                            autofocus value="{{ old('email') }}"> {{-- Menambahkan value="{{ old('email') }}" untuk mempertahankan input --}}
+                            autofocus value="{{ old('email') }}">
                     </div>
                     <div class="mb-4">
                         <input type="password" name="password" class="form-control" placeholder="Masukkan Kata Sandi Anda"

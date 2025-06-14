@@ -25,9 +25,7 @@ class AuthServiceProvider extends ServiceProvider
     public function boot()
     {
         $this->registerPolicies();
-
-        // --- TAMBAHKAN ATAU PASTIKAN KODE GATE INI ADA ---
-
+        
         // Gate untuk halaman yang hanya bisa diakses oleh user biasa (bukan admin)
         Gate::define('access-user-pages', function (User $user) {
             // Asumsi: Anda memiliki kolom 'role' di tabel users

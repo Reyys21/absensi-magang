@@ -97,6 +97,16 @@
                                     <th
                                         class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                         Check-Out (Req)</th>
+                                    
+                                    {{-- ▼▼▼ KOLOM BARU DITAMBAHKAN DI SINI ▼▼▼ --}}
+                                    <th
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Judul Aktivitas</th>
+                                    <th
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Deskripsi</th>
+                                    {{-- ▲▲▲ AKHIR KOLOM BARU ▲▲▲ --}}
+
                                     <th
                                         class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                         Alasan Anda</th>
@@ -122,6 +132,18 @@
                                             class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                             {{ $requestItem->new_check_out ? $requestItem->new_check_out->format('H:i') : '--.--' }}
                                         </td>
+                                        
+                                        {{-- ▼▼▼ DATA BARU DITAMBAHKAN DI SINI ▼▼▼ --}}
+                                        <td data-label="Judul Aktivitas" class="px-6 py-4 text-sm text-gray-900">
+                                            <span class="expandable-text"
+                                                data-original-text="{{ $requestItem->new_activity_title ?: '--' }}"></span>
+                                        </td>
+                                        <td data-label="Deskripsi" class="px-6 py-4 text-sm text-gray-900">
+                                            <span class="expandable-text"
+                                                data-original-text="{{ $requestItem->new_activity_description ?: '--' }}"></span>
+                                        </td>
+                                        {{-- ▲▲▲ AKHIR DATA BARU ▲▲▲ --}}
+                                        
                                         <td data-label="Alasan Anda" class="px-6 py-4 text-sm text-gray-900">
                                             <span class="expandable-text"
                                                 data-original-text="{{ $requestItem->reason ?: '--' }}"></span>

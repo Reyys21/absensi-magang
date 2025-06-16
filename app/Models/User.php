@@ -5,11 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Spatie\Permission\Traits\HasRoles; // <<< TAMBAHKAN IMPORT INI
+use Spatie\Permission\Traits\HasRoles;
+use Illuminate\Database\Eloquent\Relations\BelongsTo; // <-- Tambahkan import ini
 
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable, HasRoles; // <<< TAMBAHKAN HasRoles DI SINI
+    use HasFactory, Notifiable, HasRoles;
 
     /**
      * The attributes that are mass assignable.
@@ -20,10 +21,11 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'role', // Kita biarkan dulu untuk sementara agar registrasi lama tidak error
+        'role',
         'asal_kampus',
         'nim',
         'phone',
+        'bidang_id', // <-- Tambahkan 'bidang_id' di sini
     ];
 
     /**
@@ -51,7 +53,17 @@ class User extends Authenticatable
         ];
     }
 
-    // Relasi ke Attendance (ini dari kode Anda sebelumnya, tetap dipertahankan)
+    /**
+     * Get the bidang that owns the User
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function bidang(): BelongsTo
+    {
+        return $this->belongsTo(Bidang::class);
+    }
+
+    // Relasi ke Attendance
     public function attendances()
     {
         return $this->hasMany(Attendance::class);

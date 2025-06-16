@@ -29,7 +29,7 @@ class AuthController extends Controller
 
             $user = Auth::user();
 
-            // <<< AWAL PERUBAHAN LOGIKA REDIRECT MENGGUNAKAN SPATIE >>>
+            // <<< LOGIKA REDIRECT MENGGUNAKAN SPATIE >>>
             if ($user->hasRole('superadmin')) {
                 // Arahkan superadmin ke dashboardnya
                 return redirect()->intended(route('superadmin.dashboard'));
@@ -40,7 +40,7 @@ class AuthController extends Controller
                 // User biasa ke dashboard mereka
                 return redirect()->intended(route('dashboard'));
             }
-            // <<< AKHIR PERUBAHAN >>>
+
         }
 
         return back()->withErrors([

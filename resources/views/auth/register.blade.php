@@ -48,7 +48,7 @@
             width: 100%;
         }
 
-        .login-form input {
+        .login-form input, .login-form select {
             border-radius: 8px;
         }
 
@@ -126,12 +126,10 @@
                 right: 15px;
                 font-size: 13px;
                 color: white;
-                /* <-- Tambahan: ini membuat teks span putih */
             }
 
             .top-signup span {
                 color: white;
-                /* <-- Ini yang membuat tulisan 'Don't have an account yet?' menjadi putih */
             }
 
             .top-signup a {
@@ -167,49 +165,6 @@
                 max-width: 600px;
             }
         }
-
-        @media only screen and (max-width: 768px) {
-            .bg-left {
-                background-color: #0B849F;
-                background-image: none;
-                text-align: center;
-                padding: 2rem 1rem;
-            }
-
-            .pln-brand {
-                justify-content: center;
-                align-items: center;
-                display: flex;
-                flex-direction: column;
-            }
-
-            .custom-travel-img {
-                max-width: 200px;
-                margin-top: 1rem;
-            }
-
-            .form-container h4 {
-                font-size: 22px;
-            }
-
-            .top-signup {
-                top: 15px;
-                right: 15px;
-                font-size: 13px;
-            }
-
-            .top-signup a {
-                padding: 4px 10px;
-                font-size: 13px;
-                color: white;
-                border-color: white;
-            }
-
-            .top-signup a:hover {
-                background-color: white;
-                color: #0B849F;
-            }
-        }
     </style>
 </head>
 
@@ -238,7 +193,13 @@
                 <p class="text-center text-muted mb-4">Silakan buat akun Anda untuk melanjutkan</p>
 
                 @if ($errors->any())
-                    <div class="alert alert-danger">{{ $errors->first() }}</div>
+                    <div class="alert alert-danger">
+                        <ul class="mb-0 ps-3">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                        </ul>
+                    </div>
                 @endif
 
                 <form method="POST" action="{{ route('register') }}" class="login-form">
@@ -246,30 +207,38 @@
 
                     <div class="mb-3">
                         <select name="role" class="form-control" required>
-                            <option value="">Daftar sebagai</option>
-                            <option value="mahasiswa">Mahasiswa</option>
-                            <option value="siswa">Siswa</option>
-                            <option value="admin">Admin</option>
+                            <option value="" disabled {{ old('role') ? '' : 'selected' }}>Daftar sebagai</option>
+                            <option value="mahasiswa" {{ old('role') == 'mahasiswa' ? 'selected' : '' }}>Mahasiswa</option>
+                            <option value="siswa" {{ old('role') == 'siswa' ? 'selected' : '' }}>Siswa</option>
                         </select>
                     </div>
 
                     <div class="mb-3 d-flex gap-2">
-                        <input type="text" name="name" class="form-control" placeholder="Nama" required>
-                        <input type="email" name="email" class="form-control" placeholder="Email" required>
+                        <input type="text" name="name" class="form-control" placeholder="Nama" value="{{ old('name') }}" required>
+                        <input type="email" name="email" class="form-control" placeholder="Email" value="{{ old('email') }}" required>
                     </div>
 
                     <div class="mb-3">
-                        <input type="text" name="asal_kampus" class="form-control" placeholder="Asal Kampus"
-                            required>
-
+                        <input type="text" name="asal_kampus" class="form-control" placeholder="Asal Kampus" value="{{ old('asal_kampus') }}" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <select name="bidang_id" id="bidang_id" class="form-control" required>
+                            <option value="" disabled selected>Pilih Bidang/Departemen</option>
+                            @foreach ($bidangs as $bidang)
+                                <option value="{{ $bidang->id }}" {{ old('bidang_id') == $bidang->id ? 'selected' : '' }}>
+                                    {{ $bidang->name }}
+                                </option>
+                            @endforeach
+                        </select>
                     </div>
 
                     <div class="mb-3">
-                        <input type="text" name="phone" class="form-control" placeholder="Nomor Telepon">
+                        <input type="text" name="phone" class="form-control" placeholder="Nomor Telepon" value="{{ old('phone') }}">
                     </div>
 
                     <div class="mb-3">
-                        <input type="text" name="nim" class="form-control" placeholder="NIM (Opsional)">
+                        <input type="text" name="nim" class="form-control" placeholder="NIM (Opsional)" value="{{ old('nim') }}">
                     </div>
 
                     <div class="mb-3">

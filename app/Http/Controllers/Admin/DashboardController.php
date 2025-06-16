@@ -9,12 +9,16 @@ use App\Models\Attendance;
 use App\Models\CorrectionRequest;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
 {
     public function adminDashboard(Request $request)
     {
-        // === 1. Logika Filter Rentang Tanggal (Date Range) ===
+        // ▼▼▼ BARIS YANG HILANG DITAMBAHKAN DI SINI ▼▼▼
+        $adminBidangId = Auth::user()->bidang_id;
+
+        // === 1. Logika Filter Rentang Tanggal (Tidak berubah) ===
         $filter = $request->input('filter', 'last_7_days');
         $startDate = Carbon::today()->startOfDay();
         $endDate = Carbon::today()->endOfDay();
@@ -44,32 +48,47 @@ class DashboardController extends Controller
                 }
                 break;
         }
+        
+        // === 2. Data untuk KPI Cards dengan Tren (DIBERI SCOPE) ===
+        $totalUsers = User::whereHas('roles', function($q){ $q->where('name', 'user'); })
+                          ->where('bidang_id', $adminBidangId) // <-- SCOPE
+                          ->count();
+                          
+        $pendingCorrections = CorrectionRequest::where('status', 'pending')
+                                                ->whereHas('user', function ($q) use ($adminBidangId) {
+                                                    $q->where('bidang_id', $adminBidangId); // <-- SCOPE
+                                                })
+                                                ->count();
 
-        // === 2. Data untuk KPI Cards dengan Tren ===
-        $totalUsers = User::whereHas('roles', function($q){ $q->where('name', 'user'); })->count();
-        $pendingCorrections = CorrectionRequest::where('status', 'pending')->count();
-        $activeInRange = Attendance::whereBetween('date', [$startDate, $endDate])->distinct('user_id')->count();
-        $completedInRange = Attendance::whereBetween('date', [$startDate, $endDate])->whereNotNull('check_in')->whereNotNull('check_out')->count();
-        $activePreviousRange = Attendance::whereBetween('date', [$comparisonStartDate, $comparisonEndDate])->distinct('user_id')->count();
+        $baseAttendanceQuery = Attendance::whereHas('user', function($q) use ($adminBidangId) {
+            $q->where('bidang_id', $adminBidangId); // <-- SCOPE
+        });
+
+        $activeInRange = (clone $baseAttendanceQuery)->whereBetween('date', [$startDate, $endDate])->distinct('user_id')->count();
+        $completedInRange = (clone $baseAttendanceQuery)->whereBetween('date', [$startDate, $endDate])->whereNotNull('check_in')->whereNotNull('check_out')->count();
+        $activePreviousRange = (clone $baseAttendanceQuery)->whereBetween('date', [$comparisonStartDate, $comparisonEndDate])->distinct('user_id')->count();
+        
         $calculateTrend = function($current, $previous) {
             if ($previous == 0) return $current > 0 ? 100 : 0;
             return (($current - $previous) / $previous) * 100;
         };
         $activeTrend = $calculateTrend($activeInRange, $activePreviousRange);
 
-        // === 3. Data untuk Grafik Komposisi Pengguna (Donut Chart) - Tetap statis ===
+        // === 3. Data untuk Grafik Komposisi Pengguna (DIBERI SCOPE) ===
         $userComposition = User::whereHas('roles', function($q){ $q->where('name', 'user'); })
+            ->where('bidang_id', $adminBidangId) // <-- SCOPE
             ->select('role', DB::raw('count(*) as total'))->groupBy('role')->pluck('total', 'role');
+        
         $compositionData = [
             'labels' => $userComposition->keys()->map(fn($role) => ucfirst($role))->toArray(),
             'series' => $userComposition->values()->toArray(),
         ];
         
-        // === 4. Data untuk Grafik Aktivitas (Stacked Bar Chart) ===
+        // === 4. Data untuk Grafik Aktivitas (DIBERI SCOPE) ===
         $attendanceQuery = Attendance::join('users', 'attendances.user_id', '=', 'users.id')
-            ->whereBetween('attendances.date', [$startDate, $endDate]);
+            ->whereBetween('attendances.date', [$startDate, $endDate])
+            ->where('users.bidang_id', $adminBidangId); // <-- SCOPE
 
-        // REVISI: Menambahkan logika untuk filter role pada grafik
         $roleFilter = $request->input('role_filter');
         $attendanceQuery->when($roleFilter, function ($q, $role) {
             $q->where('users.role', $role);
@@ -79,7 +98,7 @@ class DashboardController extends Controller
             ->groupBy('attendance_date', 'users.role')
             ->orderBy('attendance_date', 'asc')
             ->get();
-
+            
         $dateRange = collect();
         for ($date = $startDate->copy(); $date->lte($endDate); $date->addDay()) {
             $dateRange->put($date->toDateString(), ['mahasiswa' => 0, 'siswa' => 0]);
@@ -101,8 +120,12 @@ class DashboardController extends Controller
             $trendData['siswa'][] = $data['siswa'];
         }
 
-        // === 5. Data untuk Tabel Permintaan Koreksi Terbaru ===
-        $latestCorrections = CorrectionRequest::with('user')->where('status', 'pending')->latest()->take(5)->get();
+        // === 5. Data untuk Tabel Permintaan Koreksi Terbaru (DIBERI SCOPE) ===
+        $latestCorrections = CorrectionRequest::with('user')->where('status', 'pending')
+            ->whereHas('user', function($q) use ($adminBidangId) {
+                $q->where('bidang_id', $adminBidangId); // <-- SCOPE
+            })
+            ->latest()->take(5)->get();
 
         return view('admin.dashboard', [
             'totalUsers' => $totalUsers,
@@ -114,7 +137,7 @@ class DashboardController extends Controller
             'trendData' => $trendData,
             'latestCorrections' => $latestCorrections,
             'currentFilter' => $filter,
-            'currentRoleFilter' => $roleFilter, // Mengirim data filter role ke view
+            'currentRoleFilter' => $roleFilter,
         ]);
     }
 

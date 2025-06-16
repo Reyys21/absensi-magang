@@ -8,32 +8,37 @@ use App\Models\User;
 use App\Models\Attendance;
 use App\Models\CorrectionRequest;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Auth; // Pastikan Auth di-import
 
 class UserController extends Controller
 {
-    // Method indexMonitoring dan indexManagement tidak berubah, tetap sama seperti sebelumnya.
     public function indexMonitoring(Request $request)
     {
-        $query = User::query()->whereHas('roles', function ($q) {
-            $q->where('name', 'user'); });
+        $adminBidangId = Auth::user()->bidang_id;
 
-        // Filter pencarian dan role (yang sudah ada)
+        $query = User::query()->whereHas('roles', function ($q) {
+            $q->where('name', 'user');
+        });
+        
+        // ▼▼▼ FILTER UTAMA: Hanya tampilkan user dari bidang admin yang login ▼▼▼
+        $query->where('bidang_id', $adminBidangId);
+
         $query->when($request->search, function ($q, $search) {
             $q->where(function ($subQuery) use ($search) {
-                $subQuery->where('name', 'like', "%{$search}%")->orWhere('email', 'like', "%{$search}%"); }); });
+                $subQuery->where('name', 'like', "%{$search}%")->orWhere('email', 'like', "%{$search}%");
+            });
+        });
         $query->when($request->filter_role, function ($q, $role) {
-            $q->where('role', $role); });
+            $q->where('role', $role);
+        });
 
-        // REVISI: Menambahkan logika untuk sorting
-        $sortBy = $request->input('sort_by', 'created_at'); // Default sort berdasarkan waktu dibuat
-        $sortDirection = $request->input('sort_direction', 'desc'); // Default sort descending (terbaru)
-
-        // Daftar kolom yang diizinkan untuk di-sort untuk keamanan
+        $sortBy = $request->input('sort_by', 'created_at');
+        $sortDirection = $request->input('sort_direction', 'desc');
         $sortableColumns = ['name', 'email'];
         if (in_array($sortBy, $sortableColumns)) {
             $query->orderBy($sortBy, $sortDirection);
         } else {
-            $query->latest(); // Fallback ke default
+            $query->latest();
         }
 
         $users = $query->select('id', 'name', 'email', 'phone', 'role')->paginate(15)->appends($request->query());
@@ -47,16 +52,28 @@ class UserController extends Controller
 
     public function indexManagement(Request $request)
     {
+        $adminBidangId = Auth::user()->bidang_id;
+
         $query = User::query()->whereHas('roles', function ($q) {
-            $q->where('name', 'user'); });
+            $q->where('name', 'user');
+        });
+        
+        // ▼▼▼ FILTER UTAMA: Hanya tampilkan user dari bidang admin yang login ▼▼▼
+        $query->where('bidang_id', $adminBidangId);
+        
         $query->when($request->search, function ($q, $search) {
             $q->where(function ($subQuery) use ($search) {
-                $subQuery->where('name', 'like', "%{$search}%")->orWhere('email', 'like', "%{$search}%"); }); });
+                $subQuery->where('name', 'like', "%{$search}%")->orWhere('email', 'like', "%{$search}%");
+            });
+        });
         $query->when($request->filter_role, function ($q, $role) {
-            $q->where('role', $role); });
+            $q->where('role', $role);
+        });
+        
         $users = $query->select('id', 'profile_photo_path', 'name', 'email', 'phone', 'role', 'nim', 'asal_kampus')->latest()->paginate(15)->appends($request->query());
+        
         if ($request->ajax()) {
-            return view('admin._account-table', compact('users'))->render();
+            return view('admin._account-table', compact('users'));
         }
         return view('admin.account', compact('users'));
     }
@@ -64,10 +81,14 @@ class UserController extends Controller
 
     public function showMonitoring(User $user, Request $request)
     {
-        // === Query untuk Riwayat Absensi ===
-        $attendancesQuery = Attendance::where('user_id', $user->id);
+        // ▼▼▼ OTORISASI: Pastikan admin tidak bisa melihat detail user dari bidang lain ▼▼▼
+        if (Auth::user()->bidang_id != $user->bidang_id) {
+            abort(403, 'AKSES DITOLAK. Anda tidak berwenang melihat data user dari bidang lain.');
+        }
 
-        // Logika filter baru untuk Absensi
+        // Sisa method tidak berubah
+        $attendancesQuery = Attendance::where('user_id', $user->id);
+        
         switch ($request->input('filter_type_absensi')) {
             case 'terlama':
                 $attendancesQuery->orderBy('date', 'asc');
@@ -76,20 +97,17 @@ class UserController extends Controller
                 $attendancesQuery->when($request->filter_tanggal_absensi, function ($q, $date) {
                     $q->whereDate('date', $date);
                 });
-                // Default sort untuk tanggal yang dipilih adalah terbaru
                 $attendancesQuery->orderBy('date', 'desc');
                 break;
-            default: // Termasuk 'terbaru' dan kasus awal
+            default:
                 $attendancesQuery->orderBy('date', 'desc');
                 break;
         }
 
         $attendances = $attendancesQuery->paginate(10, ['*'], 'attendances_page')->appends($request->query());
 
-        // === Query untuk Riwayat Pengajuan Koreksi ===
         $correctionRequestsQuery = CorrectionRequest::where('user_id', $user->id);
 
-        // Logika filter baru untuk Koreksi
         switch ($request->input('filter_type_koreksi')) {
             case 'terlama':
                 $correctionRequestsQuery->orderBy('created_at', 'asc');
@@ -100,7 +118,7 @@ class UserController extends Controller
                 });
                 $correctionRequestsQuery->orderBy('created_at', 'desc');
                 break;
-            default: // Termasuk 'terbaru' dan kasus awal
+            default:
                 $correctionRequestsQuery->orderBy('created_at', 'desc');
                 break;
         }

@@ -8,8 +8,8 @@
 
     <header class="bg-white flex flex-row justify-between items-center py-2 px-4 sm:px-6 md:px-8 border-b border-gray-200">
         <div>
-            {{-- Ukuran font disesuaikan untuk mobile, tablet, dan desktop --}}
-            <h1 class="text-lg sm:text-1xl lg:text-2xl font-bold text-[#2A2B2A]">Superadmin Dashboard</h1>
+            {{-- Ukuran font diubah dari text-lg/2xl menjadi text-base/xl --}}
+            <h1 class="text-base sm:text-lg lg:text-xl font-bold text-[#2A2B2A]">Superadmin Dashboard</h1>
         </div>
         @include('layouts.profile')
     </header>
@@ -17,9 +17,6 @@
     {{-- Konten utama dimulai di sini --}}
     <main id="main-content" class="flex-1 p-4 sm:p-6 md:p-8 bg-gray-50/50">
 
-        {{-- Header Halaman --}}
-
-        {{-- REVISI: Tata Letak Utama Menggunakan Grid 2 Kolom Besar --}}
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
             <div class="flex flex-col gap-6">
@@ -29,14 +26,15 @@
                             class="flex items-center justify-center bg-indigo-100 text-indigo-500 w-10 h-10 rounded-lg mb-4">
                             <i class="fa-solid fa-users"></i>
                         </div>
-                        <p class="text-3xl font-bold text-[#2A2B2A]">{{ $totalUsers }}</p>
+                        {{-- Ukuran font diubah dari text-3xl menjadi text-2xl --}}
+                        <p class="text-2xl font-bold text-[#2A2B2A]">{{ $totalUsers }}</p>
                         <p class="text-sm font-medium text-[#2A2B2A]">Total Pengguna</p>
                     </div>
                     <div class="bg-[#FFD100] p-5 rounded-2xl shadow-sm border border-gray-100">
                         <div class="flex items-center justify-center bg-green-100 text-green-500 w-10 h-10 rounded-lg mb-4">
                             <i class="fa-solid fa-user-clock"></i>
                         </div>
-                        <p class="text-3xl font-bold text-[#2A2B2A]">{{ $activeInRange }}</p>
+                        <p class="text-2xl font-bold text-[#2A2B2A]">{{ $activeInRange }}</p>
                         <div class="flex items-center text-sm font-medium text-[#2A2B2A]">
                             <span>Pengguna Aktif</span>
                             <span
@@ -48,7 +46,7 @@
                     <div class="bg-[#F7FFF7] p-5 rounded-2xl shadow-sm border border-gray-100">
                         <div class="flex items-center justify-center bg-sky-100 text-sky-500 w-10 h-10 rounded-lg mb-4"><i
                                 class="fa-solid fa-user-check"></i></div>
-                        <p class="text-3xl font-bold text-[#2A2B2A]">{{ $completedInRange }}</p>
+                        <p class="text-2xl font-bold text-[#2A2B2A]">{{ $completedInRange }}</p>
                         <p class="text-sm font-medium text-[#2A2B2A]">Absensi Lengkap</p>
                     </div>
                     <div class="bg-[#F0386B] p-5 rounded-2xl shadow-sm border border-gray-100">
@@ -56,14 +54,15 @@
                             class="flex items-center justify-center bg-orange-100 text-orange-500 w-10 h-10 rounded-lg mb-4">
                             <i class="fa-solid fa-circle-exclamation"></i>
                         </div>
-                        <p class="text-3xl font-bold text-[#2A2B2A]">{{ $pendingCorrections }}</p>
+                        <p class="text-2xl font-bold text-[#2A2B2A]">{{ $pendingCorrections }}</p>
                         <p class="text-sm font-medium text-[#2A2B2A]">Koreksi Pending</p>
                     </div>
                 </div>
 
                 <div class="bg-[#F7FFF7] p-6 rounded-2xl shadow-sm border border-gray-100">
                     <div class="flex justify-between items-center mb-4">
-                        <h3 class="text-lg font-bold text-[#2A2B2A]">Permintaan Koreksi Menunggu</h3>
+                        {{-- Ukuran font diubah dari text-lg menjadi text-base --}}
+                        <h3 class="text-base font-bold text-[#2A2B2A]">Permintaan Koreksi Menunggu</h3>
                         <a href="{{ route('admin.approval.requests') }}"
                             class="text-sm font-medium text-[#2A2B2A] hover:text-[#C1C4C1] ">Lihat Semua &rarr;</a>
                     </div>
@@ -94,13 +93,13 @@
                                                 <img src="{{ $finalPhotoUrl }}" alt="Foto"
                                                     class="h-9 w-9 rounded-full object-cover">
                                                 <div>
-                                                    <p class="font-semibold text-[#2A2B2A]">{{ $correction->user->name }}</p>
+                                                    <p class="font-semibold text-sm text-[#2A2B2A]">{{ $correction->user->name }}</p>
                                                     <p class="text-xs text-[#2A2B2A]">{{ $correction->user->email }}</p>
                                                 </div>
                                             </div>
                                         </td>
-                                        <td class="p-3 text-[#2A2B2A]">{{ $correction->user->bidang->name ?? 'N/A' }}</td> {{-- Tampilkan nama bidang --}}
-                                        <td class="p-3 text-[#2A2B2A]">{{ $correction->attendance_date->format('d M Y') }}
+                                        <td class="p-3 text-sm text-[#2A2B2A]">{{ $correction->user->bidang->name ?? 'N/A' }}</td> {{-- Tampilkan nama bidang --}}
+                                        <td class="p-3 text-sm text-[#2A2B2A]">{{ $correction->attendance_date->format('d M Y') }}
                                         </td>
                                         <td class="p-3">
                                             <span
@@ -111,9 +110,9 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="4" class="text-center p-8 text-[#2A2B2A]"><i {{-- Colspan 4 karena ada kolom bidang --}}
-                                                class="fa-solid fa-check-double fa-3x mb-2"></i>
-                                            <p class="font-medium">Tidak ada permintaan koreksi.</p>
+                                        <td colspan="4" class="text-center p-8 text-[#2A2B2A]">
+                                            <i class="fa-solid fa-check-double fa-2x mb-2"></i>
+                                            <p class="font-medium text-sm">Tidak ada permintaan koreksi.</p>
                                         </td>
                                     </tr>
                                 @endforelse
@@ -127,11 +126,11 @@
 
                 <div class="bg-[#F7FFF7] p-6 rounded-2xl shadow-sm border border-gray-100">
                     <div class="flex justify-between items-center mb-4">
-                        {{-- REVISI: Judul diubah menjadi Performa Magang --}}
-                        <h3 class="text-lg font-bold text-[#2A2B2A]">Performa Magang</h3>
+                        {{-- Ukuran font diubah dari text-lg menjadi text-base --}}
+                        <h3 class="text-base font-bold text-[#2A2B2A]">Performa Magang</h3>
                         <form id="filter-form" method="GET">
                             <select name="filter" id="date-filter"
-                                class="bg-[#F7FFF7] border-gray-200  rounded-sm text-xs focus:ring-indigo-500 focus:border-indigo-500">
+                                class="bg-[#F7FFF7] border-gray-200 rounded-sm text-xs focus:ring-indigo-500 focus:border-indigo-500">
                                 <option value="last_7_days" {{ $currentFilter == 'last_7_days' ? 'selected' : '' }}>7 Hari
                                     Terakhir</option>
                                 <option value="this_month" {{ $currentFilter == 'this_month' ? 'selected' : '' }}>Bulan Ini
@@ -156,7 +155,8 @@
                 </div>
 
                 <div class="bg-[#F7FFF7] p-6 rounded-2xl shadow-sm border border-gray-100">
-                    <h3 class="text-lg font-bold text-[#2A2B2A] mb-4">Komposisi Pengguna</h3>
+                    {{-- Ukuran font diubah dari text-lg menjadi text-base --}}
+                    <h3 class="text-base font-bold text-[#2A2B2A] mb-4">Komposisi Pengguna</h3>
                     <div id="composition-chart" class="flex justify-center"></div>
                 </div>
 
@@ -184,7 +184,7 @@
                 chart: {
                     type: 'bar',
                     height: 250,
-                    stacked: false, // UBAH INI DARI TRUE MENJADI FALSE
+                    stacked: false, 
                     toolbar: {
                         show: false
                     }
@@ -192,7 +192,7 @@
                 plotOptions: {
                     bar: {
                         horizontal: false,
-                        columnWidth: '40%', // Sesuaikan lebar kolom jika diperlukan
+                        columnWidth: '40%',
                         borderRadius: 4
                     }
                 },
@@ -203,7 +203,8 @@
                     categories: trendData.labels,
                     labels: {
                         style: {
-                            colors: '#2A2B2A'
+                            colors: '#2A2B2A',
+                            fontSize: '12px' // Ukuran font sumbu X
                         }
                     },
                     axisBorder: {
@@ -216,8 +217,8 @@
                 yaxis: {
                     labels: {
                         style: {
-                            colors: ['#2A2B2A', '#14BDEB'],
-                            colors: '#'
+                            colors: '#2A2B2A',
+                            fontSize: '12px' // Ukuran font sumbu Y
                         },
                         offsetX: -10
                     }
@@ -226,6 +227,7 @@
                     position: 'top',
                     horizontalAlign: 'left',
                     offsetY: -5,
+                    fontSize: '13px', // Ukuran font legenda
                     markers: {
                         radius: 12
                     }
@@ -269,14 +271,14 @@
                                 },
                                 value: {
                                     offsetY: 8,
-                                    fontSize: '28px',
+                                    fontSize: '22px', // Diubah dari 28px
                                     fontWeight: 'bold'
                                 },
                                 total: {
                                     show: true,
                                     label: 'Total Pengguna',
                                     color: '#6B7280',
-                                    fontSize: '14px',
+                                    fontSize: '12px', // Diubah dari 14px
                                     formatter: () => totalUsers
                                 }
                             }
@@ -286,11 +288,12 @@
                 dataLabels: {
                     enabled: false
                 },
-                colors: ['  #FFD100', '#F0386B'],
+                colors: ['#FFD100', '#F0386B'],
                 legend: {
                     show: true,
                     position: 'bottom',
                     horizontalAlign: 'center',
+                    fontSize: '13px', // Ukuran font legenda
                     itemMargin: {
                         horizontal: 10
                     },
@@ -305,11 +308,11 @@
                 compositionChartOptions);
             compositionChart.render();
 
-            // Logika untuk Filter Tanggal dan Bidang
-            const filterForm = document.getElementById('filter-form'); // Menggunakan form ID yang sama
+            // Logika untuk Filter Tanggal dan Bidang (tidak berubah)
+            const filterForm = document.getElementById('filter-form');
             const dateFilterSelect = document.getElementById('date-filter');
             const customRangeInput = document.getElementById('custom-range-input');
-            const bidangFilterSelect = document.getElementById('bidang-filter'); // Ambil elemen filter bidang
+            const bidangFilterSelect = document.getElementById('bidang-filter');
 
             const fp = flatpickr("#custom-range-input", {
                 mode: "range",
@@ -343,7 +346,6 @@
                 }
             });
 
-            // Tambahkan event listener untuk filter bidang
             bidangFilterSelect.addEventListener('change', function() {
                 filterForm.submit();
             });

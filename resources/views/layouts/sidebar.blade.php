@@ -16,7 +16,7 @@
            fixed inset-y-0 left-0
            transform -translate-x-full
            md:relative md:translate-x-0
-           w-64 md:w-60 {{-- Lebar ramping sesuai permintaan terakhir --}}
+           w-64 md:w-60
            transition-all duration-300 ease-in-out z-40">
 
     {{-- Bagian Atas: Logo, Menu Navigasi --}}
@@ -25,7 +25,8 @@
             <div id="pln-logo-text" class="flex items-center space-x-3 transition-opacity duration-200">
                 <img src="{{ asset('assets/images/Logo_PLN.png') }}" alt="Logo PLN" class="w-12 h-12 object-contain" />
                 <div id="pln-text" class="transition-opacity duration-200">
-                    <p class="text-base font-bold leading-5">PLN</p>
+                    {{-- Ukuran font diubah --}}
+                    <p class="text-sm font-bold leading-5">PLN</p>
                     <p class="text-xs text-gray-300">UID KALSELTENG</p>
                 </div>
             </div>
@@ -41,47 +42,39 @@
                 {{-- MENU USER BIASA --}}
                 @can('access-user-pages')
                     <div class="flex items-center px-1 pt-3 pb-2 space-x-2 heading-container">
-                        <span
-                            class="text-xs uppercase text-gray-400 font-semibold tracking-wider nav-text whitespace-nowrap transition-opacity duration-200">Menu
-                            Utama</span>
+                        <span class="text-xs uppercase text-gray-400 font-semibold tracking-wider nav-text whitespace-nowrap transition-opacity duration-200">Menu Utama</span>
                         <span class="flex-grow border-t border-gray-700 heading-line transition-all duration-300"></span>
                     </div>
+                    {{-- Ukuran font diubah ke text-sm --}}
                     <a href="{{ route('dashboard') }}"
-                        class="flex items-center gap-4 px-4 py-2.5 rounded-lg transition duration-150 {{ request()->routeIs('dashboard') ? 'bg-[#3C5A6D] text-[#FFD100]' : 'hover:bg-[#3C5A6D]' }}">
-                        <i class="fa-solid fa-house w-5 text-center"></i><span
-                            class="nav-text transition-opacity duration-200">Dasboard</span>
+                        class="flex items-center gap-4 px-4 py-2.5 rounded-lg transition duration-150 text-sm {{ request()->routeIs('dashboard') ? 'bg-[#3C5A6D] text-[#FFD100]' : 'hover:bg-[#3C5A6D]' }}">
+                        <i class="fa-solid fa-house w-5 text-center"></i><span class="nav-text transition-opacity duration-200">Dasboard</span>
                     </a>
 
                     <div class="flex items-center px-1 pt-4 pb-2 space-x-2 heading-container">
-                        <span
-                            class="text-xs uppercase text-gray-400 font-semibold tracking-wider nav-text whitespace-nowrap transition-opacity duration-200">Manajemen
-                            Absensi</span>
+                        <span class="text-xs uppercase text-gray-400 font-semibold tracking-wider nav-text whitespace-nowrap transition-opacity duration-200">Manajemen Absensi</span>
                         <span class="flex-grow border-t border-gray-700 heading-line transition-all duration-300"></span>
                     </div>
                     <a href="{{ route('attendance.history') }}"
-                        class="flex items-center gap-4 pl-4 pr-4 py-2.5 rounded-lg transition duration-150 {{ request()->routeIs('attendance.history') ? 'bg-[#3C5A6D] text-[#FFD100]' : 'hover:bg-[#3C5A6D]' }}">
-                        <i class="fa-solid fa-clock-rotate-left w-5 text-center"></i> <span
-                            class="nav-text transition-opacity duration-200">Riwayat</span>
+                        class="flex items-center gap-4 pl-4 pr-4 py-2.5 rounded-lg transition duration-150 text-sm {{ request()->routeIs('attendance.history') ? 'bg-[#3C5A6D] text-[#FFD100]' : 'hover:bg-[#3C5A6D]' }}">
+                        <i class="fa-solid fa-clock-rotate-left w-5 text-center"></i> <span class="nav-text transition-opacity duration-200">Riwayat</span>
                     </a>
                     <a href="{{ route('attendance.my') }}"
-                        class="flex items-center gap-4 pl-4 pr-4 py-2.5 rounded-lg transition duration-150 {{ request()->routeIs('attendance.my') ? 'bg-[#3C5A6D] text-[#FFD100]' : 'hover:bg-[#3C5A6D]' }}">
-                        <i class="fa-solid fa-user-check w-5 text-center"></i> <span
-                            class="nav-text transition-opacity duration-200">Absensi Saya</span>
+                        class="flex items-center gap-4 pl-4 pr-4 py-2.5 rounded-lg transition duration-150 text-sm {{ request()->routeIs('attendance.my') ? 'bg-[#3C5A6D] text-[#FFD100]' : 'hover:bg-[#3C5A6D]' }}">
+                        <i class="fa-solid fa-user-check w-5 text-center"></i> <span class="nav-text transition-opacity duration-200">Absensi Saya</span>
                     </a>
                     <a href="{{ route('user.approval.requests') }}"
-                        class="flex items-center gap-4 pl-4 pr-4 py-2.5 rounded-lg transition duration-150 {{ request()->routeIs('user.approval.requests') ? 'bg-[#3C5A6D] text-[#FFD100]' : 'hover:bg-[#3C5A6D]' }}">
-                        <i class="fa-solid fa-thumbs-up w-5 text-center"></i> <span
-                            class="nav-text transition-opacity duration-200">Permintaan Koreksi</span>
+                        class="flex items-center gap-4 pl-4 pr-4 py-2.5 rounded-lg transition duration-150 text-sm {{ request()->routeIs('user.approval.requests') ? 'bg-[#3C5A6D] text-[#FFD100]' : 'hover:bg-[#3C5A6D]' }}">
+                        <i class="fa-solid fa-thumbs-up w-5 text-center"></i> <span class="nav-text transition-opacity duration-200">Permintaan Koreksi</span>
                     </a>
                 @endcan
 
                 {{-- MENU ADMIN --}}
                 @can('access-admin-pages')
                     <div class="flex items-center px-1 pt-3 pb-2 space-x-2 heading-container">
-                        <span
-                            class="text-xs uppercase text-gray-400 font-semibold tracking-wider nav-text whitespace-nowrap transition-opacity duration-200">
-                            @if(Auth::user()->hasRole('superadmin')) {{-- --}}
-                                Superadmin {{-- --}}
+                        <span class="text-xs uppercase text-gray-400 font-semibold tracking-wider nav-text whitespace-nowrap transition-opacity duration-200">
+                            @if(Auth::user()->hasRole('superadmin'))
+                                Superadmin
                             @else
                                 Admin
                             @endif
@@ -90,61 +83,49 @@
                         <span class="flex-grow border-t border-gray-700 heading-line transition-all duration-300"></span>
                     </div>
 
-                    {{-- Admin Dashboard link untuk Admin, Superadmin Dashboard link untuk Superadmin --}}
                     @if (!Auth::user()->hasRole('superadmin'))
                         <a href="{{ route('admin.dashboard') }}"
-                            class="flex items-center gap-4 px-4 py-2.5 rounded-lg transition duration-150 {{ request()->routeIs('admin.dashboard') ? 'bg-[#3C5A6D] text-[#FFD100]' : 'hover:bg-[#3C5A6D]' }}">
-                            <i class="fa-solid fa-user-gear w-5 text-center"></i> <span
-                                class="nav-text transition-opacity duration-200">Admin Dashboard</span>
+                            class="flex items-center gap-4 px-4 py-2.5 rounded-lg transition duration-150 text-sm {{ request()->routeIs('admin.dashboard') ? 'bg-[#3C5A6D] text-[#FFD100]' : 'hover:bg-[#3C5A6D]' }}">
+                            <i class="fa-solid fa-user-gear w-5 text-center"></i> <span class="nav-text transition-opacity duration-200">Admin Dashboard</span>
                         </a>
                     @else
                         <a href="{{ route('superadmin.dashboard') }}"
-                            class="flex items-center gap-4 px-4 py-2.5 rounded-lg transition duration-150 {{ request()->routeIs('superadmin.dashboard') ? 'bg-[#3C5A6D] text-[#FFD100]' : 'hover:bg-[#3C5A6D]' }}">
-                            <i class="fa-solid fa-user-shield w-5 text-center"></i> <span
-                                class="nav-text transition-opacity duration-200">Superadmin Dashboard</span>
+                            class="flex items-center gap-4 px-4 py-2.5 rounded-lg transition duration-150 text-sm {{ request()->routeIs('superadmin.dashboard') ? 'bg-[#3C5A6D] text-[#FFD100]' : 'hover:bg-[#3C5A6D]' }}">
+                            <i class="fa-solid fa-user-shield w-5 text-center"></i> <span class="nav-text transition-opacity duration-200">Superadmin Dashboard</span>
                         </a>
                     @endif
 
                     <div class="flex items-center px-1 pt-4 pb-2 space-x-2 heading-container">
-                        <span
-                            class="text-xs uppercase text-gray-400 font-semibold tracking-wider nav-text whitespace-nowrap transition-opacity duration-200">Manajemen
-                            User</span>
+                        <span class="text-xs uppercase text-gray-400 font-semibold tracking-wider nav-text whitespace-nowrap transition-opacity duration-200">Manajemen User</span>
                         <span class="flex-grow border-t border-gray-700 heading-line transition-all duration-300"></span>
                     </div>
                     <a href="{{ route('admin.monitoring.users.index') }}"
-                        class="flex items-center gap-4 pl-4 pr-4 py-2.5 rounded-lg transition duration-150 {{ request()->routeIs('admin.monitoring.*') ? 'bg-[#3C5A6D] text-[#FFD100]' : 'hover:bg-[#3C5A6D]' }}">
-                        <i class="fa-solid fa-users w-5 text-center"></i> <span
-                            class="nav-text transition-opacity duration-200">Monitoring User</span>
+                        class="flex items-center gap-4 pl-4 pr-4 py-2.5 rounded-lg transition duration-150 text-sm {{ request()->routeIs('admin.monitoring.*') ? 'bg-[#3C5A6D] text-[#FFD100]' : 'hover:bg-[#3C5A6D]' }}">
+                        <i class="fa-solid fa-users w-5 text-center"></i> <span class="nav-text transition-opacity duration-200">Monitoring User</span>
                     </a>
                     <a href="{{ route('admin.approval.requests') }}"
-                        class="flex items-center gap-4 pl-4 pr-4 py-2.5 rounded-lg transition duration-150 {{ request()->routeIs('admin.approval.*') ? 'bg-[#3C5A6D] text-[#FFD100]' : 'hover:bg-[#3C5A6D]' }}">
-                        <i class="fa-solid fa-clipboard-check w-5 text-center"></i> <span
-                            class="nav-text transition-opacity duration-200">Permintaan Koreksi</span>
+                        class="flex items-center gap-4 pl-4 pr-4 py-2.5 rounded-lg transition duration-150 text-sm {{ request()->routeIs('admin.approval.*') ? 'bg-[#3C5A6D] text-[#FFD100]' : 'hover:bg-[#3C5A6D]' }}">
+                        <i class="fa-solid fa-clipboard-check w-5 text-center"></i> <span class="nav-text transition-opacity duration-200">Permintaan Koreksi</span>
                     </a>
                     <a href="{{ route('admin.management.accounts.index') }}"
-                        class="flex items-center gap-4 pl-4 pr-4 py-2.5 rounded-lg transition duration-150 {{ request()->routeIs('admin.management.*') ? 'bg-[#3C5A6D] text-[#FFD100]' : 'hover:bg-[#3C5A6D]' }}">
-                        <i class="fa-solid fa-address-card w-5 text-center"></i> <span
-                            class="nav-text transition-opacity duration-200"> Info User</span>
+                        class="flex items-center gap-4 pl-4 pr-4 py-2.5 rounded-lg transition duration-150 text-sm {{ request()->routeIs('admin.management.*') ? 'bg-[#3C5A6D] text-[#FFD100]' : 'hover:bg-[#3C5A6D]' }}">
+                        <i class="fa-solid fa-address-card w-5 text-center"></i> <span class="nav-text transition-opacity duration-200"> Info User</span>
                     </a>
                 @endcan
 
-                {{-- ▼▼▼ MENU KHUSUS SUPERADMIN (Hanya untuk Manajemen Bidang dan Manajemen Admin) ▼▼▼ --}}
+                {{-- MENU KHUSUS SUPERADMIN --}}
                 @can('access-superadmin-pages')
                     <div class="flex items-center px-1 pt-4 pb-2 space-x-2 heading-container">
-                        <span
-                            class="text-xs uppercase text-gray-400 font-semibold tracking-wider nav-text whitespace-nowrap transition-opacity duration-200">Pengaturan
-                            Superadmin</span> {{-- Ubah teks heading --}}
+                        <span class="text-xs uppercase text-gray-400 font-semibold tracking-wider nav-text whitespace-nowrap transition-opacity duration-200">Pengaturan Superadmin</span>
                         <span class="flex-grow border-t border-gray-700 heading-line transition-all duration-300"></span>
                     </div>
                     <a href="{{ route('superadmin.bidang.index') }}"
-                        class="flex items-center gap-4 pl-4 pr-4 py-2.5 rounded-lg transition duration-150 {{ request()->routeIs('superadmin.bidang.*') ? 'bg-[#3C5A6D] text-[#FFD100]' : 'hover:bg-[#3C5A6D]' }}">
-                        <i class="fa-solid fa-sitemap w-5 text-center"></i> <span
-                            class="nav-text transition-opacity duration-200">Manajemen Bidang</span>
+                        class="flex items-center gap-4 pl-4 pr-4 py-2.5 rounded-lg transition duration-150 text-sm {{ request()->routeIs('superadmin.bidang.*') ? 'bg-[#3C5A6D] text-[#FFD100]' : 'hover:bg-[#3C5A6D]' }}">
+                        <i class="fa-solid fa-sitemap w-5 text-center"></i> <span class="nav-text transition-opacity duration-200">Manajemen Bidang</span>
                     </a>
                     <a href="{{ route('superadmin.admins.index') }}"
-                        class="flex items-center gap-4 pl-4 pr-4 py-2.5 rounded-lg transition duration-150 {{ request()->routeIs('superadmin.admins.*') ? 'bg-[#3C5A6D] text-[#FFD100]' : 'hover:bg-[#3C5A6D]' }}">
-                        <i class="fa-solid fa-user-shield w-5 text-center"></i> <span
-                            class="nav-text transition-opacity duration-200">Manajemen Admin</span>
+                        class="flex items-center gap-4 pl-4 pr-4 py-2.5 rounded-lg transition duration-150 text-sm {{ request()->routeIs('superadmin.admins.*') ? 'bg-[#3C5A6D] text-[#FFD100]' : 'hover:bg-[#3C5A6D]' }}">
+                        <i class="fa-solid fa-user-shield w-5 text-center"></i> <span class="nav-text transition-opacity duration-200">Manajemen Admin</span>
                     </a>
                 @endcan
 
@@ -171,8 +152,7 @@
             @csrf
             <button type="submit"
                 class="w-full flex items-center gap-4 px-4 py-2.5 rounded-lg text-sm transition duration-150 hover:bg-[#3C5A6D]">
-                <i class="fa-solid fa-right-from-bracket w-5 text-center"></i> <span
-                    class="nav-text transition-opacity duration-200">Keluar</span>
+                <i class="fa-solid fa-right-from-bracket w-5 text-center"></i> <span class="nav-text transition-opacity duration-200">Keluar</span>
             </button>
         </form>
     </div>

@@ -5,7 +5,6 @@
         class="flex items-center space-x-2 focus:outline-none p-1 rounded-full transition duration-200 hover:bg-gray-100"
         aria-haspopup="true" aria-expanded="false">
         
-        {{-- FOTO PROFIL DENGAN EFEK RING --}}
         <img class="h-10 w-10 rounded-full object-cover ring-2 ring-offset-2 ring-[#14BDEB]"
             src="{{ optional(Auth::user())->profile_photo_path
                 ? (Str::startsWith(optional(Auth::user())->profile_photo_path, 'profile_photos/')
@@ -14,21 +13,19 @@
                 : asset('profile_photos/avatar_1 (1).jpg') }}"
             alt="{{ optional(Auth::user())->name ?: 'Pengguna' }}">
         
-        {{-- IKON PANAH DROPDOWN DITAMBAHKAN KEMBALI --}}
         <svg class="h-5 w-5 text-gray-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
         </svg>
 
     </button>
 
-    {{-- KONTEN DROPDOWN (Tidak ada perubahan di sini) --}}
+    {{-- KONTEN DROPDOWN --}}
     <div id="profileDropdown"
         class="hidden origin-top-right absolute mt-2 bg-gray-900 rounded-lg shadow-xl z-50 p-6 text-gray-200
                ring-1 ring-black ring-opacity-5 focus:outline-none transition transform scale-95 opacity-0
                w-auto min-w-[14rem] max-w-[calc(100vw-2rem)] right-0
                sm:w-72 sm:max-w-none
-               md:w-80
-               lg:w-96"
+               md:w-80"
         role="menu" aria-orientation="vertical" aria-labelledby="profileToggle">
         <div class="flex items-start space-x-4">
             <img class="h-16 w-16 rounded-full object-cover flex-shrink-0"
@@ -39,12 +36,14 @@
                     : asset('profile_photos/avatar_1 (1).jpg') }}"
                 alt="{{ optional(Auth::user())->name ?: 'Pengguna' }}">
             <div>
-                <h2 class="text-xl font-semibold text-white leading-tight">
+                {{-- Ukuran font diubah dari text-xl ke text-lg --}}
+                <h2 class="text-lg font-semibold text-white leading-tight">
                     {{ optional(Auth::user())->name ?: 'Guest User' }}</h2>
                 <span class="inline-block mt-1 px-2 py-0.5 rounded-sm text-xs font-medium bg-red-600 text-white">
                     {{ optional(Auth::user())->role ?: 'N/A' }}
                 </span>
-                <div class="mt-2 text-sm text-gray-400 break-words">
+                {{-- Ukuran font diubah dari text-sm ke text-xs --}}
+                <div class="mt-2 text-xs text-gray-400 break-words">
                     <div>{{ optional(Auth::user())->email ?: 'N/A' }}</div>
                     <div>{{ optional(Auth::user())->nim ?: 'N/A' }}</div>
                 </div>
@@ -66,7 +65,7 @@
     </div>
 </div>
 
-{{-- SCRIPT DROPDOWN (Tidak ada perubahan di sini) --}}
+
 <script>
     const toggleBtn = document.getElementById('profileToggle');
     const dropdown = document.getElementById('profileDropdown');

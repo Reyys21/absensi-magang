@@ -5,7 +5,8 @@
 
         {{-- Header Halaman --}}
         <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-10">
-            <h1 class="text-4xl sm:text-5xl font-extrabold text-slate-800 dark:text-white leading-tight mb-4 sm:mb-0">
+            {{-- Ukuran font diubah dari 4xl/5xl menjadi 2xl/3xl --}}
+            <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-800 dark:text-white leading-tight mb-4 sm:mb-0">
                 Ubah Password
             </h1>
             <a href="{{ url()->previous() }}"
@@ -23,35 +24,27 @@
             </a>
         </div>
 
-        {{-- Status / Error Messages --}}
+        {{-- Status / Error Messages (ukuran font disesuaikan) --}}
         @if (session('status'))
             <div class="bg-green-50 dark:bg-green-900/40 border border-green-200 dark:border-green-700 border-l-4 border-green-500 dark:border-green-600 text-green-700 dark:text-green-300 p-4 mb-6 rounded-lg shadow-sm"
                 role="alert">
                 <div class="flex items-center">
-                    <div class="py-1"><svg class="fill-current h-6 w-6 text-green-500 dark:text-green-400 mr-3"
-                            xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                            <path
-                                d="M2.93 17.07A10 10 0 1 1 17.07 2.93 10 10 0 0 1 2.93 17.07zm12.73-1.41A8 8 0 1 0 4.34 4.34a8 8 0 0 0 11.32 11.32zM6.7 9.29L9 11.6l4.3-4.3 1.4 1.42L9 14.4l-3.7-3.7 1.4-1.42z" />
-                        </svg></div>
+                    <div class="py-1"><svg class="fill-current h-6 w-6 text-green-500 dark:text-green-400 mr-3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M2.93 17.07A10 10 0 1 1 17.07 2.93 10 10 0 0 1 2.93 17.07zm12.73-1.41A8 8 0 1 0 4.34 4.34a8 8 0 0 0 11.32 11.32zM6.7 9.29L9 11.6l4.3-4.3 1.4 1.42L9 14.4l-3.7-3.7 1.4-1.42z" /></svg></div>
                     <div>
-                        <p class="font-semibold text-lg">Berhasil!</p>
+                        {{-- Ukuran font diubah dari text-lg menjadi text-base --}}
+                        <p class="font-semibold text-base">Berhasil!</p>
                         <p class="text-sm">{{ session('status') }}</p>
                     </div>
                 </div>
             </div>
         @endif
-
         @if ($errors->any())
             <div class="bg-red-50 dark:bg-red-900/40 border border-red-200 dark:border-red-700 border-l-4 border-red-500 dark:border-red-600 text-red-700 dark:text-red-300 p-4 mb-6 rounded-lg shadow-sm"
                 role="alert">
                 <div class="flex items-center">
-                    <div class="py-1"><svg class="fill-current h-6 w-6 text-red-500 dark:text-red-400 mr-3"
-                            xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                            <path
-                                d="M2.93 17.07A10 10 0 1 1 17.07 2.93 10 10 0 0 1 2.93 17.07zm1.41-1.41A8 8 0 1 0 15.66 4.34 8 8 0 0 0 4.34 15.66zm9.9-8.49L11.41 10l2.83 2.83-1.41 1.41L10 11.41l-2.83 2.83-1.41-1.41L8.59 10 5.76 7.17l1.41-1.41L10 8.59l2.83-2.83 1.41 1.41z" />
-                        </svg></div>
+                    <div class="py-1"><svg class="fill-current h-6 w-6 text-red-500 dark:text-red-400 mr-3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M2.93 17.07A10 10 0 1 1 17.07 2.93 10 10 0 0 1 2.93 17.07zm1.41-1.41A8 8 0 1 0 15.66 4.34 8 8 0 0 0 4.34 15.66zm9.9-8.49L11.41 10l2.83 2.83-1.41 1.41L10 11.41l-2.83 2.83-1.41-1.41L8.59 10 5.76 7.17l1.41-1.41L10 8.59l2.83-2.83 1.41 1.41z" /></svg></div>
                     <div>
-                        <p class="font-semibold text-lg">Ada Kesalahan!</p>
+                        <p class="font-semibold text-base">Ada Kesalahan!</p>
                         <ul class="mt-1 list-disc list-inside text-sm">
                             @foreach ($errors->all() as $error)
                                 <li>{{ $error }}</li>
@@ -70,14 +63,10 @@
                 <div id="profile-image-wrapper"
                     class="relative h-48 w-48 rounded-full overflow-hidden ring-4 ring-offset-4 ring-indigo-500 dark:ring-offset-slate-800 cursor-pointer shadow-lg group">
                     <img id="main-profile-image" class="w-full h-full object-cover"
-                        src="{{ optional($user)->profile_photo_path
-                            ? (Str::startsWith(optional($user)->profile_photo_path, 'profile_photos/')
-                                ? asset(optional($user)->profile_photo_path)
-                                : asset('storage/' . optional($user)->profile_photo_path))
-                            : asset('profile_photos/avatar_1 (1).jpg') }}"
+                        src="{{ optional($user)->profile_photo_path ? (Str::startsWith(optional($user)->profile_photo_path, 'profile_photos/') ? asset(optional($user)->profile_photo_path) : asset('storage/' . optional($user)->profile_photo_path)) : asset('profile_photos/avatar_1 (1).jpg') }}"
                         alt="{{ optional($user)->name ?: 'Pengguna' }}">
                     <div
-                        class="absolute inset-0 bg-black bg-opacity-50 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-white text-base font-medium">
+                        class="absolute inset-0 bg-black bg-opacity-50 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-white text-sm font-medium">
                         <svg class="w-9 h-9 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                             xmlns="http://www.w3.org/2000/svg">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -89,17 +78,18 @@
                         Ganti Foto
                     </div>
                 </div>
-                <p class="text-2xl font-bold text-slate-800 dark:text-slate-100 text-center md:text-left">
+                {{-- Ukuran font diubah dari 2xl menjadi xl --}}
+                <p class="text-xl font-bold text-slate-800 dark:text-slate-100 text-center md:text-left">
                     {{ optional($user)->name }}</p>
                 <span
                     class="inline-block px-4 py-1.5 rounded-full text-sm font-semibold bg-rose-100 dark:bg-rose-700 text-rose-700 dark:text-rose-100">
                     {{ optional($user)->role ? Str::ucfirst(optional($user)->role) : 'N/A' }}
                 </span>
 
-                {{-- NAVIGASI LINK --}}
+                {{-- NAVIGASI LINK (ukuran font ditambahkan) --}}
                 <div class="w-full flex flex-col space-y-3 mt-6">
                     <a href="{{ route('profile.edit') }}"
-                        class="w-full text-left py-3 px-5 rounded-xl font-semibold transition-colors duration-200 ease-in-out
+                        class="w-full text-left py-3 px-5 rounded-xl font-semibold transition-colors duration-200 ease-in-out text-sm
                         bg-slate-100 text-slate-700 hover:bg-slate-200 shadow-sm
                         dark:bg-slate-700 dark:text-slate-200 dark:hover:bg-slate-600
                         flex items-center">
@@ -111,7 +101,7 @@
                         Informasi Umum
                     </a>
                     <a href="{{ route('profile.change-password') }}"
-                        class="w-full text-left py-3 px-5 rounded-xl font-semibold transition-colors duration-200 ease-in-out
+                        class="w-full text-left py-3 px-5 rounded-xl font-semibold transition-colors duration-200 ease-in-out text-sm
                         bg-indigo-600 text-white shadow-md
                         hover:bg-indigo-700 dark:bg-indigo-700 dark:hover:bg-indigo-600 dark:text-white
                         flex items-center">
@@ -130,8 +120,9 @@
             <div class="md:col-span-2 space-y-8">
                 <div
                     class="bg-slate-50 dark:bg-slate-700/50 p-7 rounded-xl shadow-md border border-slate-200 dark:border-slate-700">
+                    {{-- Ukuran font diubah dari 2xl menjadi lg --}}
                     <h2
-                        class="text-2xl font-bold mb-6 text-slate-700 dark:text-slate-200 border-b border-slate-300 dark:border-slate-600 pb-4">
+                        class="text-lg font-bold mb-6 text-slate-700 dark:text-slate-200 border-b border-slate-300 dark:border-slate-600 pb-4">
                         Perbarui Password
                     </h2>
                     <form method="POST" action="{{ route('profile.update-password') }}" class="space-y-6">
@@ -142,14 +133,15 @@
                             <label for="current_password"
                                 class="block text-slate-700 dark:text-slate-300 text-sm font-medium mb-2">Password Saat
                                 Ini:</label>
+                            {{-- Ukuran font diubah dari text-base menjadi text-sm --}}
                             <input type="password" name="current_password" id="current_password"
                                 class="w-full px-4 py-2.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-200
                                        placeholder-slate-400 dark:placeholder-slate-500
                                        focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500
-                                       transition duration-150 ease-in-out text-base"
+                                       transition duration-150 ease-in-out text-sm"
                                 required>
                             @error('current_password')
-                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                                <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                             @enderror
                         </div>
 
@@ -161,10 +153,10 @@
                                 class="w-full px-4 py-2.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-200
                                        placeholder-slate-400 dark:placeholder-slate-500
                                        focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500
-                                       transition duration-150 ease-in-out text-base"
+                                       transition duration-150 ease-in-out text-sm"
                                 required>
-                            @error('password')
-                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                             @error('password')
+                                <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                             @enderror
                         </div>
 
@@ -176,22 +168,23 @@
                                 class="w-full px-4 py-2.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-200
                                        placeholder-slate-400 dark:placeholder-slate-500
                                        focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500
-                                       transition duration-150 ease-in-out text-base"
+                                       transition duration-150 ease-in-out text-sm"
                                 required>
                             @error('password_confirmation')
-                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                                <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                             @enderror
                         </div>
                         <div class="pt-4">
+                            {{-- Ukuran font diubah dari text-base menjadi text-sm --}}
                             <button type="submit"
-                                class="inline-flex items-center px-6 py-3 border border-transparent text-base font-semibold rounded-lg shadow-md
+                                class="inline-flex items-center px-6 py-3 border border-transparent text-sm font-semibold rounded-lg shadow-md
                                    bg-indigo-600 text-white hover:bg-indigo-700
                                    focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-slate-800
                                    transition-colors duration-200 ease-in-out">
                                 <svg class="w-5 h-5 mr-2 -ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                                     xmlns="http://www.w3.org/2000/svg">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M8 11V7a4 4 0 118 0v4m-4 2v5m-4-5h8m-4-5h8m-4-5h8m-4-5h8m-4-5h8"></path>
+                                        d="M8 11V7a4 4 0 118 0v4m-4 2v5m-4-5h8m-4-5h8m-4-5h8m-4-5h8"></path>
                                 </svg>
                                 Perbarui Password
                             </button>
@@ -203,7 +196,7 @@
     </div>
 
     {{-- MODAL UBAH FOTO PROFIL (Tetap sama, karena ini modal global) --}}
-    <div id="photoModal" class="fixed inset-0 bg-gray-900 bg-opacity-80 flex items-center justify-center z-50 hidden p-4">
+   <div id="photoModal" class="fixed inset-0 bg-gray-900 bg-opacity-80 flex items-center justify-center z-50 hidden p-4">
         <div class="bg-white dark:bg-slate-800 rounded-xl shadow-2xl p-7 sm:p-9 max-w-2xl w-full transform transition-all duration-300 ease-out scale-95 opacity-0"
             id="modal-content-wrapper">
             <div class="flex justify-between items-center mb-6 pb-4 border-b border-slate-200 dark:border-slate-700">

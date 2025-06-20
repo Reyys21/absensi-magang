@@ -3,7 +3,8 @@
 @section('content')
 <div class="container mx-auto py-8 px-4 sm:px-6 lg:px-8">
     <div class="flex justify-between items-center mb-6">
-        <h1 class="text-3xl font-bold text-gray-800">Manajemen Admin</h1>
+        {{-- Ukuran font diubah dari text-3xl menjadi text-xl --}}
+        <h1 class="text-xl font-bold text-gray-800">Manajemen Admin</h1>
         <a href="{{ route('superadmin.admins.create') }}" class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white font-semibold text-sm rounded-lg shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
             <i class="fa-solid fa-plus mr-2"></i>
             Tambah Admin Baru
@@ -11,10 +12,10 @@
     </div>
 
     @if (session('success'))
-        <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-4 rounded-r-lg" role="alert"><p>{{ session('success') }}</p></div>
+        <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-4 rounded-r-lg" role="alert"><p class="text-sm">{{ session('success') }}</p></div>
     @endif
     @if (session('error'))
-        <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4 rounded-r-lg" role="alert"><p>{{ session('error') }}</p></div>
+        <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4 rounded-r-lg" role="alert"><p class="text-sm">{{ session('error') }}</p></div>
     @endif
 
     <div class="bg-white shadow-md rounded-lg overflow-hidden">
@@ -47,7 +48,7 @@
                     </td>
                 </tr>
                 @empty
-                <tr><td colspan="4" class="px-6 py-4 text-center text-gray-500">Belum ada akun admin yang dibuat.</td></tr>
+                <tr><td colspan="4" class="px-6 py-4 text-center text-sm text-gray-500">Belum ada akun admin yang dibuat.</td></tr>
                 @endforelse
             </tbody>
         </table>

@@ -5,7 +5,8 @@
 
         {{-- Header Halaman --}}
         <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-10">
-            <h1 class="text-4xl sm:text-5xl font-extrabold text-slate-800 dark:text-white leading-tight mb-4 sm:mb-0">
+            {{-- Ukuran font diubah dari 4xl/5xl menjadi 2xl/3xl --}}
+            <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-800 dark:text-white leading-tight mb-4 sm:mb-0">
                 Edit Profil
             </h1>
             <a href="{{ url()->previous() }}"
@@ -34,7 +35,8 @@
                                 d="M2.93 17.07A10 10 0 1 1 17.07 2.93 10 10 0 0 1 2.93 17.07zm12.73-1.41A8 8 0 1 0 4.34 4.34a8 8 0 0 0 11.32 11.32zM6.7 9.29L9 11.6l4.3-4.3 1.4 1.42L9 14.4l-3.7-3.7 1.4-1.42z" />
                         </svg></div>
                     <div>
-                        <p class="font-semibold text-lg">Berhasil!</p>
+                        {{-- Ukuran font diubah dari text-lg ke text-base --}}
+                        <p class="font-semibold text-base">Berhasil!</p>
                         <p class="text-sm">{{ session('status') }}</p>
                     </div>
                 </div>
@@ -51,7 +53,7 @@
                                 d="M2.93 17.07A10 10 0 1 1 17.07 2.93 10 10 0 0 1 2.93 17.07zm1.41-1.41A8 8 0 1 0 15.66 4.34 8 8 0 0 0 4.34 15.66zm9.9-8.49L11.41 10l2.83 2.83-1.41 1.41L10 11.41l-2.83 2.83-1.41-1.41L8.59 10 5.76 7.17l1.41-1.41L10 8.59l2.83-2.83 1.41 1.41z" />
                         </svg></div>
                     <div>
-                        <p class="font-semibold text-lg">Ada Kesalahan!</p>
+                        <p class="font-semibold text-base">Ada Kesalahan!</p>
                         <ul class="mt-1 list-disc list-inside text-sm">
                             @foreach ($errors->all() as $error)
                                 <li>{{ $error }}</li>
@@ -66,19 +68,15 @@
         <div
             class="bg-white dark:bg-slate-800 p-8 rounded-2xl shadow-xl border border-slate-100 dark:border-slate-700 grid grid-cols-1 md:grid-cols-3 gap-10 min-w-0">
             {{-- KOLOM KIRI (FOTO PROFIL & NAVIGASI LINK) --}}
-            <div class="md:col-span-1 flex flex-col items-center md:items-center space-y-6"> {{-- Changed md:items-start to md:items-center --}}
+            <div class="md:col-span-1 flex flex-col items-center md:items-center space-y-6">
                 <div id="profile-image-wrapper"
                     class="relative h-48 w-48 rounded-full overflow-hidden ring-4 ring-offset-4 ring-indigo-500 dark:ring-offset-slate-800 cursor-pointer shadow-lg group">
                     <img id="main-profile-image" class="w-full h-full object-cover"
-                        src="{{ optional($user)->profile_photo_path
-                            ? (Str::startsWith(optional($user)->profile_photo_path, 'profile_photos/')
-                                ? asset(optional($user)->profile_photo_path)
-                                : asset('storage/' . optional($user)->profile_photo_path))
-                            : asset('profile_photos/avatar_1 (1).jpg') }}"
+                        src="{{ optional($user)->profile_photo_path ? (Str::startsWith(optional($user)->profile_photo_path, 'profile_photos/') ? asset(optional($user)->profile_photo_path) : asset('storage/' . optional($user)->profile_photo_path)) : asset('profile_photos/avatar_1 (1).jpg') }}"
                         alt="{{ optional($user)->name ?: 'Pengguna' }}">
                     <div
-                        class="absolute inset-0 bg-black bg-opacity-50 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-white text-base font-medium">
-                        <svg class="w-9 h-9 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                        class="absolute inset-0 bg-black bg-opacity-50 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-white text-sm font-medium">
+                        <svg class="w-8 h-8 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                             xmlns="http://www.w3.org/2000/svg">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z">
@@ -89,7 +87,8 @@
                         Ganti Foto
                     </div>
                 </div>
-                <p class="text-2xl font-bold text-slate-800 dark:text-slate-100 text-center"> {{-- Removed md:text-left --}}
+                {{-- Ukuran font diubah dari 2xl menjadi xl --}}
+                <p class="text-xl font-bold text-slate-800 dark:text-slate-100 text-center">
                     {{ optional($user)->name }}</p>
                 <span
                     class="inline-block px-4 py-1.5 rounded-full text-sm font-semibold bg-rose-100 dark:bg-rose-700 text-rose-700 dark:text-rose-100">
@@ -98,8 +97,9 @@
 
                 {{-- NAVIGASI LINK --}}
                 <div class="w-full flex flex-col space-y-3 mt-6">
+                     {{-- Ukuran font ditambahkan (text-sm) --}}
                     <a href="{{ route('profile.edit') }}"
-                        class="w-full text-left py-3 px-5 rounded-xl font-semibold transition-colors duration-200 ease-in-out
+                        class="w-full text-left py-3 px-5 rounded-xl font-semibold transition-colors duration-200 ease-in-out text-sm
                         bg-indigo-600 text-white shadow-md
                         hover:bg-indigo-700 dark:bg-indigo-700 dark:hover:bg-indigo-600 dark:text-white
                         flex items-center">
@@ -111,7 +111,7 @@
                         Informasi Umum
                     </a>
                     <a href="{{ route('profile.change-password') }}"
-                        class="w-full text-left py-3 px-5 rounded-xl font-semibold transition-colors duration-200 ease-in-out
+                        class="w-full text-left py-3 px-5 rounded-xl font-semibold transition-colors duration-200 ease-in-out text-sm
                         bg-slate-100 text-slate-700 hover:bg-slate-200 shadow-sm
                         dark:bg-slate-700 dark:text-slate-200 dark:hover:bg-slate-600
                         flex items-center">
@@ -128,11 +128,11 @@
 
             {{-- KOLOM KANAN (FORM INFORMASI DASAR) --}}
             <div class="md:col-span-2 space-y-8">
-                {{-- Bagian: Informasi Dasar Profil --}}
                 <div id="general-info-content"
                     class="bg-slate-50 dark:bg-slate-700/50 p-7 rounded-xl shadow-md border border-slate-200 dark:border-slate-700">
+                    {{-- Ukuran font diubah dari 2xl menjadi lg --}}
                     <h2
-                        class="text-2xl font-bold mb-6 text-slate-700 dark:text-slate-200 border-b border-slate-300 dark:border-slate-600 pb-4">
+                        class="text-lg font-bold mb-6 text-slate-700 dark:text-slate-200 border-b border-slate-300 dark:border-slate-600 pb-4">
                         Informasi Umum
                     </h2>
                     <form method="POST" action="{{ route('profile.update-information') }}" class="space-y-6">
@@ -143,18 +143,16 @@
                             <label for="name"
                                 class="block text-slate-700 dark:text-slate-300 text-sm font-medium mb-2">Nama
                                 Lengkap:</label>
+                            {{-- Ukuran font diubah dari text-base menjadi text-sm --}}
                             <input type="text" name="name" id="name"
                                 value="{{ old('name', optional($user)->name) }}"
                                 class="w-full px-4 py-2.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-200
                                     placeholder-slate-400 dark:placeholder-slate-500
                                     focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500
-                                    transition duration-150 ease-in-out text-base"
+                                    transition duration-150 ease-in-out text-sm"
                                 required>
-                            @error('name')
-                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                            @enderror
                         </div>
-
+                        {{-- Semua input di bawah ini diubah menjadi text-sm --}}
                         <div>
                             <label for="email"
                                 class="block text-slate-700 dark:text-slate-300 text-sm font-medium mb-2">Alamat
@@ -164,11 +162,8 @@
                                 class="w-full px-4 py-2.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-200
                                     placeholder-slate-400 dark:placeholder-slate-500
                                     focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500
-                                    transition duration-150 ease-in-out text-base"
+                                    transition duration-150 ease-in-out text-sm"
                                 required>
-                            @error('email')
-                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                            @enderror
                         </div>
 
                         <div>
@@ -178,7 +173,7 @@
                             <select name="role" id="role"
                                 class="w-full px-4 py-2.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-200
                                     focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500
-                                    transition duration-150 ease-in-out text-base"
+                                    transition duration-150 ease-in-out text-sm"
                                 required>
                                 <option value="">Pilih Role</option>
                                 <option value="mahasiswa" {{ optional($user)->role == 'mahasiswa' ? 'selected' : '' }}>
@@ -186,9 +181,6 @@
                                 <option value="siswa" {{ optional($user)->role == 'siswa' ? 'selected' : '' }}>Siswa
                                 </option>
                             </select>
-                            @error('role')
-                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                            @enderror
                         </div>
 
                         <div>
@@ -200,10 +192,7 @@
                                 class="w-full px-4 py-2.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-200
                                     placeholder-slate-400 dark:placeholder-slate-500
                                     focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500
-                                    transition duration-150 ease-in-out text-base">
-                            @error('asal_kampus')
-                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                            @enderror
+                                    transition duration-150 ease-in-out text-sm">
                         </div>
 
                         <div>
@@ -215,10 +204,7 @@
                                 class="w-full px-4 py-2.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-200
                                     placeholder-slate-400 dark:placeholder-slate-500
                                     focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500
-                                    transition duration-150 ease-in-out text-base">
-                            @error('phone')
-                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                            @enderror
+                                    transition duration-150 ease-in-out text-sm">
                         </div>
 
                         <div>
@@ -230,15 +216,13 @@
                                 class="w-full px-4 py-2.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-200
                                     placeholder-slate-400 dark:placeholder-slate-500
                                     focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500
-                                    transition duration-150 ease-in-out text-base">
-                            @error('nim')
-                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                            @enderror
+                                    transition duration-150 ease-in-out text-sm">
                         </div>
 
                         <div class="pt-4">
+                            {{-- Ukuran font diubah dari text-base menjadi text-sm --}}
                             <button type="submit"
-                                class="inline-flex items-center px-6 py-3 border border-transparent text-base font-semibold rounded-lg shadow-md
+                                class="inline-flex items-center px-6 py-3 border border-transparent text-sm font-semibold rounded-lg shadow-md
                                     bg-green-600 text-white hover:bg-green-700
                                     focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 dark:focus:ring-offset-slate-800
                                     transition-colors duration-200 ease-in-out">
@@ -262,7 +246,8 @@
         <div class="bg-white dark:bg-slate-800 rounded-xl shadow-2xl p-7 sm:p-9 max-w-2xl w-full transform transition-all duration-300 ease-out scale-95 opacity-0"
             id="modal-content-wrapper">
             <div class="flex justify-between items-center mb-6 pb-4 border-b border-slate-200 dark:border-slate-700">
-                <h2 class="text-2xl font-bold text-slate-800 dark:text-slate-100">Ubah Foto Profil</h2>
+                {{-- Ukuran font diubah dari 2xl menjadi lg --}}
+                <h2 class="text-lg font-bold text-slate-800 dark:text-slate-100">Ubah Foto Profil</h2>
                 <button id="closeModalBtn"
                     class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors duration-200 ease-in-out">
                     <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"
@@ -274,9 +259,9 @@
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                {{-- Bagian: Unggah Foto Baru --}}
                 <div>
-                    <h3 class="text-xl font-semibold mb-5 text-slate-700 dark:text-slate-200">Unggah Foto Baru</h3>
+                    {{-- Ukuran font diubah dari xl menjadi base --}}
+                    <h3 class="text-base font-semibold mb-5 text-slate-700 dark:text-slate-200">Unggah Foto Baru</h3>
                     <form action="{{ route('profile.update-photo') }}" method="POST" enctype="multipart/form-data"
                         id="uploadPhotoForm" class="space-y-5">
                         @csrf
@@ -295,8 +280,9 @@
                             <p class="text-xs text-slate-500 dark:text-slate-400 mt-2">Maksimal 2MB, format JPG, PNG, GIF.
                             </p>
                         </div>
+                        {{-- Ukuran font diubah dari text-base menjadi text-sm --}}
                         <button type="submit"
-                            class="w-full inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-semibold rounded-lg shadow-sm
+                            class="w-full inline-flex items-center justify-center px-6 py-3 border border-transparent text-sm font-semibold rounded-lg shadow-sm
                                     bg-indigo-600 text-white hover:bg-indigo-700
                                     focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-slate-800
                                     transition-colors duration-200 ease-in-out">
@@ -310,9 +296,8 @@
                     </form>
                 </div>
 
-                {{-- Bagian: Pilih Avatar Default --}}
                 <div>
-                    <h3 class="text-xl font-semibold mb-5 text-slate-700 dark:text-slate-200">Pilih Avatar Default</h3>
+                    <h3 class="text-base font-semibold mb-5 text-slate-700 dark:text-slate-200">Pilih Avatar Default</h3>
                     <form action="{{ route('profile.update-photo') }}" method="POST" id="defaultAvatarForm">
                         @csrf
                         <div class="grid grid-cols-3 gap-4 max-h-64 overflow-y-auto pr-3 custom-scrollbar">
@@ -339,8 +324,9 @@
                     onsubmit="return confirm('Apakah Anda yakin ingin menghapus foto profil? Ini akan mengembalikan ke avatar default pertama.');"
                     class="w-full sm:w-auto">
                     @csrf
+                    {{-- Ukuran font diubah dari text-base menjadi text-sm --}}
                     <button type="submit"
-                        class="w-full sm:w-auto inline-flex items-center justify-center px-5 py-2.5 border border-transparent text-base font-semibold rounded-lg shadow-sm
+                        class="w-full sm:w-auto inline-flex items-center justify-center px-5 py-2.5 border border-transparent text-sm font-semibold rounded-lg shadow-sm
                             bg-red-600 text-white hover:bg-red-700
                             focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 dark:focus:ring-offset-slate-800
                             transition-colors duration-200 ease-in-out">

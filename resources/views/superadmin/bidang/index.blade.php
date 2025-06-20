@@ -22,19 +22,38 @@
     @endif
 
     <div class="bg-white shadow-md rounded-lg overflow-hidden">
+        {{-- Tambah Form Pencarian --}}
+        <div class="p-4 border-b border-gray-200">
+            <div class="relative">
+                <input type="search" id="search-input" name="search" placeholder="Cari nama bidang..."
+                       value="{{ request('search') }}"
+                       class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow">
+                <i class="fa-solid fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+            </div>
+        </div>
+
         <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
                 <tr>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama Bidang</th>
-                    <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
+                    {{-- Tambah kolom No. --}}
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">No.</th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">ID</th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">Nama Bidang</th>
+                    <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">Aksi</th>
                 </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
-                @forelse ($bidangs as $bidang)
+                @forelse ($bidangs as $index => $bidang)
                 <tr>
+                    {{-- Tampilkan nomor urut --}}
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $bidangs->firstItem() + $index }}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $bidang->id }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ $bidang->name }}</td>
+                    {{-- Ubah Nama Bidang menjadi link ke halaman show --}}
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                        <a href="{{ route('superadmin.bidang.show', $bidang) }}" class="text-blue-600 hover:text-blue-900">
+                            {{ $bidang->name }}
+                        </a>
+                    </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-right">
                         <a href="{{ route('superadmin.bidang.edit', $bidang) }}" class="text-indigo-600 hover:text-indigo-900 mr-4">Edit</a>
                         <form action="{{ route('superadmin.bidang.destroy', $bidang) }}" method="POST" class="inline" onsubmit="return confirm('Apakah Anda yakin ingin menghapus bidang ini?');">
@@ -46,7 +65,8 @@
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="3" class="px-6 py-4 text-center text-gray-500">
+                    {{-- Ubah colspan menjadi 4 --}}
+                    <td colspan="4" class="px-6 py-4 text-center text-gray-500">
                         Belum ada bidang yang dibuat.
                     </td>
                 </tr>
@@ -58,4 +78,21 @@
         {{ $bidangs->links() }}
     </div>
 </div>
-@endsection
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const searchInput = document.getElementById('search-input');
+    let debounceTimer;
+
+    searchInput.addEventListener('keyup', () => {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => {
+            const url = new URL(window.location.href);
+            url.searchParams.set('search', searchInput.value);
+            url.searchParams.set('page', 1); // Reset halaman ke 1 setiap kali filter berubah
+            window.location.href = url.toString();
+        }, 300); // Debounce untuk 300ms
+    });
+});
+</script>
+@endpush

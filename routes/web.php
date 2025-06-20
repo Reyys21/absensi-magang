@@ -9,6 +9,8 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\HomepageController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\UserController; // <-- PASTIKAN USE STATEMENT INI ADA DI ATAS
+use App\Http\Controllers\Superadmin\BidangController; // Import BidangController
+
 
 // Rute Homepage publik
 Route::get('/', [HomepageController::class, 'index'])->name('home');
@@ -63,6 +65,12 @@ Route::middleware('auth')->group(function () {
     // --- GRUP RUTE KHUSUS SUPERADMIN ---
     Route::middleware('can:access-superadmin-pages')->prefix('superadmin')->name('superadmin.')->group(function () {
         Route::get('/dashboard', [AdminDashboardController::class, 'superadminDashboard'])->name('dashboard');
+      
+        Route::resource('bidang', \App\Http\Controllers\Superadmin\BidangController::class);
+        // Tambahkan route show untuk bidang
+        Route::get('bidang/{bidang}/detail', [BidangController::class, 'show'])->name('bidang.show'); //
+
+        Route::resource('admins', \App\Http\Controllers\Superadmin\AdminController::class)->parameters(['admins' => 'admin']);
     });
 
     // --- Rute profil yang sudah dilengkapi ---
@@ -78,12 +86,12 @@ Route::middleware('auth')->group(function () {
         Route::patch('/update-password', 'updatePassword')->name('update-password');
     });
 
-    // --- GRUP RUTE KHUSUS SUPERADMIN ---
-    Route::middleware('can:access-superadmin-pages')->prefix('superadmin')->name('superadmin.')->group(function () {
-        Route::get('/dashboard', [AdminDashboardController::class, 'superadminDashboard'])->name('dashboard');
+    // --- GRUP RUTE KHUSUS SUPERADMIN (ini duplikat dari atas, pastikan hanya ada satu) ---
+    // Route::middleware('can:access-superadmin-pages')->prefix('superadmin')->name('superadmin.')->group(function () {
+    //     Route::get('/dashboard', [AdminDashboardController::class, 'superadminDashboard'])->name('dashboard');
       
-        Route::resource('bidang', \App\Http\Controllers\Superadmin\BidangController::class);
+    //     Route::resource('bidang', \App\Http\Controllers\Superadmin\BidangController::class);
 
-        Route::resource('admins', \App\Http\Controllers\Superadmin\AdminController::class)->parameters(['admins' => 'admin']);
-    });
+    //     Route::resource('admins', \App\Http\Controllers\Superadmin\AdminController::class)->parameters(['admins' => 'admin']);
+    // });
 });

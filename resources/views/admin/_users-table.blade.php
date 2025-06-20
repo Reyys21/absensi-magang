@@ -32,6 +32,7 @@
                 </th>
                 {{-- REVISI: Kolom "Nomor HP" dihapus --}}
                 <th class="p-4 text-left font-semibold">Status</th>
+                <th class="p-4 text-left font-semibold">Bidang</th> {{-- Tambah kolom Bidang --}}
                 <th class="p-4 text-left font-semibold">Aksi</th>
             </tr>
         </thead>
@@ -44,6 +45,7 @@
                     <td class="p-4 whitespace-nowrap">{{ $user->email }}</td>
                     {{-- REVISI: Kolom data "Nomor HP" dihapus --}}
                     <td class="p-4 whitespace-nowrap"><span class="px-2 py-1 text-xs font-medium rounded-full {{ $user->role == 'mahasiswa' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800' }}">{{ Str::ucfirst($user->role) }}</span></td>
+                    <td class="p-4 whitespace-nowrap">{{ $user->bidang->name ?? 'N/A' }}</td> {{-- Tampilkan nama bidang --}}
                     <td class="p-4 whitespace-nowrap">
                         <a href="{{ route('admin.monitoring.users.show', $user->id) }}" class="font-medium text-blue-600 hover:text-blue-800">
                             Lihat Detail
@@ -53,7 +55,7 @@
             @empty
                 <tr>
                     {{-- REVISI: Colspan tetap 5 --}}
-                    <td colspan="5" class="text-center p-10 text-gray-500">
+                    <td colspan="6" class="text-center p-10 text-gray-500"> {{-- Ubah colspan menjadi 6 --}}
                         <i class="fa-solid fa-folder-open fa-3x mb-3"></i>
                         <p class="font-medium">Data tidak ditemukan.</p>
                     </td>

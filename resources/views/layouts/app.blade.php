@@ -43,8 +43,8 @@
     <div class="flex h-screen"> {{-- Tambahkan kelas flex dan h-screen untuk layout utama --}}
 
         {{-- Sidebar (akan di-include di sini) --}}
-        @include('layouts.sidebar')
-
+        @include('layouts.sidebar') {{-- --}}
+        
         {{-- Main Content Area --}}
         <main id="main-content" class="flex-1 overflow-y-auto transition-all duration-300 ease-in-out">
             {{-- Konten utama dari view turunan akan di-yield di sini --}}

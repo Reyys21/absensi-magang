@@ -8,6 +8,7 @@
                 <th class="p-4 text-left font-semibold">Nama</th>
                 <th class="p-4 text-left font-semibold">Email</th>
                 <th class="p-4 text-left font-semibold">Status</th>
+                <th class="p-4 text-left font-semibold">Bidang</th> {{-- Tambahkan kolom Bidang --}}
                 <th class="p-4 text-left font-semibold">Aksi</th>
             </tr>
         </thead>
@@ -43,11 +44,15 @@
                             {{ Str::ucfirst($user->role) }}
                         </span>
                     </td>
+                    <td class="p-4 whitespace-nowrap text-gray-600"> {{-- Tampilkan nama bidang --}}
+                        {{ $user->bidang->name ?? 'N/A' }} {{-- --}}
+                    </td> {{-- --}}
                     <td class="p-4 whitespace-nowrap">
                         <button type="button" class="see-more-btn font-medium text-blue-600 hover:text-blue-800"
                             data-name="{{ $user->name }}" data-email="{{ $user->email }}" data-phone="{{ $user->phone ?? 'N/A' }}"
                             data-role="{{ Str::ucfirst($user->role) }}" data-nim="{{ $user->nim ?? 'N/A' }}" data-kampus="{{ $user->asal_kampus }}"
-                            data-photo="{{ $finalPhotoUrl }}">
+                            data-photo="{{ $finalPhotoUrl }}"
+                            data-bidang="{{ $user->bidang->name ?? 'N/A' }}"> {{-- Tambahkan data-bidang --}}
                             Lihat Detail
                         </button>
                     </td>
@@ -55,7 +60,7 @@
             @empty
                 <tr>
                      {{-- REVISI: Colspan disesuaikan menjadi 6 --}}
-                     <td colspan="6" class="text-center p-10 text-gray-500">
+                     <td colspan="7" class="text-center p-10 text-gray-500"> {{-- Ubah colspan menjadi 7 --}}
                         <i class="fa-solid fa-folder-open fa-3x mb-3"></i>
                         <p class="font-medium">Data tidak ditemukan.</p>
                         <p class="text-xs mt-1">Coba ubah kata kunci pencarian atau filter Anda.</p>

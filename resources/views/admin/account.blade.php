@@ -30,6 +30,18 @@
                                 Mahasiswa</option>
                             <option value="siswa" {{ request('filter_role') == 'siswa' ? 'selected' : '' }}>Siswa</option>
                         </select>
+                         {{-- Filter Bidang untuk Superadmin --}}
+                        @if(Auth::user()->hasRole('superadmin'))
+                        <select id="filter-bidang" name="bidang_filter"
+                            class="w-full sm:w-auto border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow">
+                            <option value="">Semua Bidang</option>
+                            @foreach($bidangs as $bidang)
+                                <option value="{{ $bidang->id }}" {{ request('bidang_filter') == $bidang->id ? 'selected' : '' }}>
+                                    {{ $bidang->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                        @endif
                     </div>
                 </form>
             </div>
@@ -73,6 +85,10 @@
                                 <td class="font-semibold text-gray-500 py-2 pr-2 align-top">NIM</td>
                                 <td id="modal-nim" class="py-2 text-gray-800 font-medium"></td>
                             </tr>
+                            <tr class="border-b"> {{-- Tambahkan border-b --}}
+                                <td class="font-semibold py-2 pr-2 align-top">Bidang</td> {{-- Tambahkan bidang --}}
+                                <td id="modal-bidang" class="py-2 text-gray-800 font-medium"></td> {{-- Tambahkan bidang --}}
+                            </tr>
                             <tr>
                                 <td class="font-semibold pt-2 pr-2 align-top">Asal Kampus</td>
                                 <td id="modal-kampus" class="pt-2 text-gray-800 font-medium"></td>
@@ -92,6 +108,7 @@
             const searchInput = document.getElementById('search-input');
             const filterRole = document.getElementById('filter-role');
             const tableContainer = document.getElementById('table-container');
+            const filterBidang = document.getElementById('filter-bidang'); // Ambil elemen filter bidang
             let debounceTimer;
 
             function fetchData() {
@@ -121,6 +138,9 @@
             });
 
             filterRole.addEventListener('change', fetchData);
+            if (filterBidang) { // Tambahkan event listener untuk filter bidang jika ada
+                filterBidang.addEventListener('change', fetchData); //
+            }
 
             // Script untuk modal (sudah benar, tidak ada perubahan)
             const modal = document.getElementById('custom-modal');
@@ -135,6 +155,7 @@
                 document.getElementById('modal-role').textContent = ': ' + button.dataset.role;
                 document.getElementById('modal-nim').textContent = ': ' + button.dataset.nim;
                 document.getElementById('modal-kampus').textContent = ': ' + button.dataset.kampus;
+                document.getElementById('modal-bidang').textContent = ': ' + button.dataset.bidang; // Tambah bidang ke modal
 
                 modal.classList.remove('hidden');
                 setTimeout(() => {

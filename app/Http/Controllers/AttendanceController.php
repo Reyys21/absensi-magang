@@ -7,6 +7,7 @@ use Illuminate\Support\Carbon;
 use App\Models\Attendance;
 use App\Models\User;
 use App\Models\CorrectionRequest;
+use App\Models\Bidang; // Import Bidang model
 use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Log;
@@ -378,34 +379,44 @@ class AttendanceController extends Controller
     public function showApprovalRequests(Request $request)
     {
         $user = Auth::user();
+        $query = CorrectionRequest::with(['user', 'user.bidang'])->where('status', 'pending'); // Eager load user dan bidang user
+
+        // Tambahkan search
+        if ($request->filled('search')) { //
+            $search = $request->input('search'); //
+            $query->where(function ($q) use ($search) { //
+                $q->whereHas('user', function ($userQuery) use ($search) { //
+                    $userQuery->where('name', 'like', "%{$search}%")
+                              ->orWhere('email', 'like', "%{$search}%");
+                })->orWhere('attendance_date', 'like', "%{$search}%"); //
+            });
+        }
+
         if (Gate::allows('access-admin-pages')) {
-            // ▼▼▼ LOGIKA UNTUK ADMIN DIBERI SCOPE ▼▼▼
-            $adminBidangId = $user->bidang_id;
-            $query = CorrectionRequest::with('user')
-                ->whereHas('user', function ($userQuery) use ($adminBidangId) {
+            if ($user->hasRole('superadmin')) { //
+                // Superadmin melihat semua permintaan
+                // Tambahkan filter bidang untuk superadmin
+                if ($request->filled('bidang_filter')) { //
+                    $bidangId = $request->input('bidang_filter'); //
+                    $query->whereHas('user', function ($userQuery) use ($bidangId) { //
+                        $userQuery->where('bidang_id', $bidangId); //
+                    });
+                }
+            } else {
+                // Admin hanya melihat permintaan dari bidangnya
+                $adminBidangId = $user->bidang_id;
+                $query->whereHas('user', function ($userQuery) use ($adminBidangId) {
                     $userQuery->where('bidang_id', $adminBidangId);
-                })
-                ->where('status', 'pending')->orderBy('created_at', 'desc');
-            if ($request->filled('search')) {
-                $search = $request->input('search');
-                $query->where(function ($q) use ($search) {
-                    $q->whereHas('user', function ($userQuery) use ($search) {
-                        $userQuery->where('name', 'like', "%{$search}%");
-                    })->orWhere('attendance_date', 'like', "%{$search}%");
                 });
             }
-            $requests = $query->paginate(10)->appends($request->only('search'));
-            return view('admin.approval', compact('requests'));
+            $requests = $query->orderBy('created_at', 'desc')->paginate(10)->appends($request->query());
+            $bidangs = Bidang::orderBy('name')->get(); // Ambil semua bidang untuk filter
+            return view('admin.approval', compact('requests', 'bidangs')); // Kirim bidangs ke view
         } else {
-            // Logika untuk User Biasa
-            $query = CorrectionRequest::with('user')->where('user_id', $user->id)->orderBy('created_at', 'desc');
-            if ($request->filled('search')) {
-                $search = $request->input('search');
-                $query->where(function ($q) use ($search) {
-                    $q->where('attendance_date', 'like', "%{$search}%")->orWhere('status', 'like', "%{$search}%");
-                });
-            }
-            $requests = $query->paginate(10)->appends($request->only('search'));
+            // Logika untuk User Biasa (tidak berubah banyak, hanya penambahan search)
+            $query->where('user_id', $user->id); //
+            // Search sudah ditambahkan di awal query.
+            $requests = $query->orderBy('created_at', 'desc')->paginate(10)->appends($request->query());
             return view('fold_AttendanceApproval.Attendance Approval', compact('requests'));
         }
     }
@@ -417,8 +428,9 @@ class AttendanceController extends Controller
     {
         Gate::authorize('access-admin-pages');
         // ▼▼▼ OTORISASI TAMBAHAN ▼▼▼
-        if (auth()->user()->bidang_id != $correctionRequest->user->bidang_id) {
-            abort(403, 'Anda tidak berwenang menyetujui permintaan dari bidang ini.');
+        // Superadmin dapat menyetujui permintaan dari bidang manapun, admin hanya dari bidangnya sendiri.
+        if (Auth::user()->hasRole('admin') && Auth::user()->bidang_id != $correctionRequest->user->bidang_id) { //
+            abort(403, 'Anda tidak berwenang menyetujui permintaan dari bidang ini.'); //
         }
         $attendance = Attendance::firstOrNew(['user_id' => $correctionRequest->user_id, 'date' => $correctionRequest->attendance_date]);
         if ($correctionRequest->new_check_in) $attendance->check_in = $correctionRequest->new_check_in;
@@ -437,8 +449,9 @@ class AttendanceController extends Controller
     {
         Gate::authorize('access-admin-pages');
         // ▼▼▼ OTORISASI TAMBAHAN ▼▼▼
-        if (auth()->user()->bidang_id != $correctionRequest->user->bidang_id) {
-            abort(403, 'Anda tidak berwenang menolak permintaan dari bidang ini.');
+        // Superadmin dapat menolak permintaan dari bidang manapun, admin hanya dari bidangnya sendiri.
+        if (Auth::user()->hasRole('admin') && Auth::user()->bidang_id != $correctionRequest->user->bidang_id) { //
+            abort(403, 'Anda tidak berwenang menolak permintaan dari bidang ini.'); //
         }
         $validated = $request->validate(['admin_notes' => 'required|string|max:1000']);
         $correctionRequest->update(['status' => 'rejected', 'approved_by' => Auth::id(), 'approved_at' => now(), 'admin_notes' => $validated['admin_notes']]);

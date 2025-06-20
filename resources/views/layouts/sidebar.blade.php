@@ -1,3 +1,4 @@
+{{-- resources/views/layouts/sidebar.blade.php --}}
 {{-- Tombol 'hamburger' untuk membuka sidebar di mobile --}}
 <button id="mobile-menu-toggle"
     class="md:hidden fixed bottom-4 right-4 w-14 h-14 flex items-center justify-center z-50 bg-[#2C3E50] text-white rounded-full shadow-lg hover:bg-[#3C5A6D] focus:outline-none transition-transform transform active:scale-90">
@@ -78,14 +79,31 @@
                 @can('access-admin-pages')
                     <div class="flex items-center px-1 pt-3 pb-2 space-x-2 heading-container">
                         <span
-                            class="text-xs uppercase text-gray-400 font-semibold tracking-wider nav-text whitespace-nowrap transition-opacity duration-200">Admin</span>
+                            class="text-xs uppercase text-gray-400 font-semibold tracking-wider nav-text whitespace-nowrap transition-opacity duration-200">
+                            @if(Auth::user()->hasRole('superadmin')) {{-- --}}
+                                Superadmin {{-- --}}
+                            @else
+                                Admin
+                            @endif
+                            Dashboard
+                        </span>
                         <span class="flex-grow border-t border-gray-700 heading-line transition-all duration-300"></span>
                     </div>
-                    <a href="{{ route('admin.dashboard') }}"
-                        class="flex items-center gap-4 px-4 py-2.5 rounded-lg transition duration-150 {{ request()->routeIs('admin.dashboard') ? 'bg-[#3C5A6D] text-[#FFD100]' : 'hover:bg-[#3C5A6D]' }}">
-                        <i class="fa-solid fa-user-gear w-5 text-center"></i> <span
-                            class="nav-text transition-opacity duration-200">Admin Dashboard</span>
-                    </a>
+
+                    {{-- Admin Dashboard link untuk Admin, Superadmin Dashboard link untuk Superadmin --}}
+                    @if (!Auth::user()->hasRole('superadmin'))
+                        <a href="{{ route('admin.dashboard') }}"
+                            class="flex items-center gap-4 px-4 py-2.5 rounded-lg transition duration-150 {{ request()->routeIs('admin.dashboard') ? 'bg-[#3C5A6D] text-[#FFD100]' : 'hover:bg-[#3C5A6D]' }}">
+                            <i class="fa-solid fa-user-gear w-5 text-center"></i> <span
+                                class="nav-text transition-opacity duration-200">Admin Dashboard</span>
+                        </a>
+                    @else
+                        <a href="{{ route('superadmin.dashboard') }}"
+                            class="flex items-center gap-4 px-4 py-2.5 rounded-lg transition duration-150 {{ request()->routeIs('superadmin.dashboard') ? 'bg-[#3C5A6D] text-[#FFD100]' : 'hover:bg-[#3C5A6D]' }}">
+                            <i class="fa-solid fa-user-shield w-5 text-center"></i> <span
+                                class="nav-text transition-opacity duration-200">Superadmin Dashboard</span>
+                        </a>
+                    @endif
 
                     <div class="flex items-center px-1 pt-4 pb-2 space-x-2 heading-container">
                         <span
@@ -110,11 +128,12 @@
                     </a>
                 @endcan
 
-                {{-- ▼▼▼ MENU BARU KHUSUS SUPERADMIN ▼▼▼ --}}
+                {{-- ▼▼▼ MENU KHUSUS SUPERADMIN (Hanya untuk Manajemen Bidang dan Manajemen Admin) ▼▼▼ --}}
                 @can('access-superadmin-pages')
                     <div class="flex items-center px-1 pt-4 pb-2 space-x-2 heading-container">
                         <span
-                            class="text-xs uppercase text-gray-400 font-semibold tracking-wider nav-text whitespace-nowrap transition-opacity duration-200">Superadmin</span>
+                            class="text-xs uppercase text-gray-400 font-semibold tracking-wider nav-text whitespace-nowrap transition-opacity duration-200">Pengaturan
+                            Superadmin</span> {{-- Ubah teks heading --}}
                         <span class="flex-grow border-t border-gray-700 heading-line transition-all duration-300"></span>
                     </div>
                     <a href="{{ route('superadmin.bidang.index') }}"

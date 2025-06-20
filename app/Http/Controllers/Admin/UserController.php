@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Attendance;
 use App\Models\CorrectionRequest;
+use App\Models\Bidang; // Import model Bidang
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth; // Pastikan Auth di-import
 
@@ -14,14 +15,18 @@ class UserController extends Controller
 {
     public function indexMonitoring(Request $request)
     {
-        $adminBidangId = Auth::user()->bidang_id;
-
         $query = User::query()->whereHas('roles', function ($q) {
             $q->where('name', 'user');
         });
         
-        // ▼▼▼ FILTER UTAMA: Hanya tampilkan user dari bidang admin yang login ▼▼▼
-        $query->where('bidang_id', $adminBidangId);
+        // Cek apakah user yang login adalah superadmin
+        if (Auth::user()->hasRole('superadmin')) { //
+            // Superadmin melihat semua user
+        } else {
+            // Admin hanya melihat user dari bidangnya
+            $adminBidangId = Auth::user()->bidang_id;
+            $query->where('bidang_id', $adminBidangId); //
+        }
 
         $query->when($request->search, function ($q, $search) {
             $q->where(function ($subQuery) use ($search) {
@@ -41,25 +46,33 @@ class UserController extends Controller
             $query->latest();
         }
 
-        $users = $query->select('id', 'name', 'email', 'phone', 'role')->paginate(15)->appends($request->query());
+        // Eager load relasi bidang untuk ditampilkan di tabel
+        $users = $query->with('bidang')->select('id', 'name', 'email', 'phone', 'role', 'bidang_id')->paginate(15)->appends($request->query()); //
 
         if ($request->ajax()) {
             return view('admin._users-table', compact('users'))->render();
         }
 
-        return view('admin.users', compact('users'));
+        // Ambil semua bidang untuk filter di UI, hanya jika superadmin yang melihat
+        $bidangs = Auth::user()->hasRole('superadmin') ? Bidang::orderBy('name')->get() : collect(); //
+
+        return view('admin.users', compact('users', 'bidangs')); // Kirim bidangs ke view
     }
 
     public function indexManagement(Request $request)
     {
-        $adminBidangId = Auth::user()->bidang_id;
-
         $query = User::query()->whereHas('roles', function ($q) {
             $q->where('name', 'user');
         });
         
-        // ▼▼▼ FILTER UTAMA: Hanya tampilkan user dari bidang admin yang login ▼▼▼
-        $query->where('bidang_id', $adminBidangId);
+        // Cek apakah user yang login adalah superadmin
+        if (Auth::user()->hasRole('superadmin')) { //
+            // Superadmin melihat semua user
+        } else {
+            // Admin hanya melihat user dari bidangnya
+            $adminBidangId = Auth::user()->bidang_id;
+            $query->where('bidang_id', $adminBidangId); //
+        }
         
         $query->when($request->search, function ($q, $search) {
             $q->where(function ($subQuery) use ($search) {
@@ -70,20 +83,24 @@ class UserController extends Controller
             $q->where('role', $role);
         });
         
-        $users = $query->select('id', 'profile_photo_path', 'name', 'email', 'phone', 'role', 'nim', 'asal_kampus')->latest()->paginate(15)->appends($request->query());
+        // Eager load relasi bidang untuk ditampilkan di tabel
+        $users = $query->with('bidang')->select('id', 'profile_photo_path', 'name', 'email', 'phone', 'role', 'nim', 'asal_kampus', 'bidang_id')->latest()->paginate(15)->appends($request->query()); //
         
         if ($request->ajax()) {
             return view('admin._account-table', compact('users'));
         }
-        return view('admin.account', compact('users'));
+        // Ambil semua bidang untuk filter di UI, hanya jika superadmin yang melihat
+        $bidangs = Auth::user()->hasRole('superadmin') ? Bidang::orderBy('name')->get() : collect(); //
+
+        return view('admin.account', compact('users', 'bidangs')); // Kirim bidangs ke view
     }
 
 
     public function showMonitoring(User $user, Request $request)
     {
         // ▼▼▼ OTORISASI: Pastikan admin tidak bisa melihat detail user dari bidang lain ▼▼▼
-        if (Auth::user()->bidang_id != $user->bidang_id) {
-            abort(403, 'AKSES DITOLAK. Anda tidak berwenang melihat data user dari bidang lain.');
+        if (Auth::user()->hasRole('admin') && Auth::user()->bidang_id != $user->bidang_id) { //
+            abort(403, 'AKSES DITOLAK. Anda tidak berwenang melihat data user dari bidang lain.'); //
         }
 
         // Sisa method tidak berubah

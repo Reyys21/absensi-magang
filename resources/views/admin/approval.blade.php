@@ -54,8 +54,9 @@
         }
         .toggle-expand {
             color: #4f46e5;
-            font-weight: 500;
+            /* indigo-600 */
             cursor: pointer;
+            font-weight: 500;
             font-size: 0.875rem;
             display: none;
             margin-top: 4px;
@@ -99,6 +100,27 @@
                     <div class="p-4 sm:p-6 border-b border-gray-200">
                         <h2 class="text-xl font-semibold text-gray-800">Permintaan Tertunda</h2>
                         <p class="text-sm text-gray-500 mt-1">Daftar permintaan yang memerlukan tindakan Anda.</p>
+
+                        {{-- Search and Filter --}}
+                        <div class="mt-4 flex flex-col sm:flex-row gap-4">
+                            <div class="relative flex-grow">
+                                <input type="search" id="search-input" name="search" placeholder="Cari nama, email, atau tanggal..."
+                                       value="{{ request('search') }}"
+                                       class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow">
+                                <i class="fa-solid fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                            </div>
+
+                            @if (Auth::user()->hasRole('superadmin')) {{-- Tampilkan filter bidang hanya untuk superadmin --}}
+                            <select id="filter-bidang" name="bidang_filter" class="w-full sm:w-auto border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow">
+                                <option value="">Semua Bidang</option>
+                                @foreach ($bidangs as $bidang)
+                                    <option value="{{ $bidang->id }}" {{ request('bidang_filter') == $bidang->id ? 'selected' : '' }}>
+                                        {{ $bidang->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            @endif
+                        </div>
                     </div>
 
                     <div class="overflow-x-auto">
@@ -114,6 +136,7 @@
                                     <tr class="divide-x divide-gray-200">
                                         <th class="px-6 py-3 font-medium">No</th>
                                         <th class="px-6 py-3 font-medium">Pemohon</th>
+                                        <th class="px-6 py-3 font-medium">Bidang</th> {{-- Tambahkan kolom bidang --}}
                                         <th class="px-6 py-3 font-medium">Tanggal</th>
                                         <th class="px-6 py-3 font-medium">Check-In</th>
                                         <th class="px-6 py-3 font-medium">Check-Out</th>
@@ -131,6 +154,8 @@
                                                 {{ $requests->firstItem() + $loop->index }}</td>
                                             <td data-label="Pemohon" class="px-6 py-4 text-gray-900 font-medium align-top">
                                                 {{ $requestItem->user->name ?? 'N/A' }}</td>
+                                            <td data-label="Bidang" class="px-6 py-4 text-gray-600 align-top">
+                                                {{ $requestItem->user->bidang->name ?? 'N/A' }}</td> {{-- Tampilkan nama bidang --}}
                                             <td data-label="Tanggal"
                                                 class="px-6 py-4 text-gray-600 whitespace-nowrap align-top">
                                                 {{ $requestItem->attendance_date->format('d M Y') }}</td>
@@ -207,6 +232,31 @@
                         'Lihat Selengkapnya' : 'Ringkas';
                 });
             });
+
+            // === Script untuk Search dan Filter Bidang ===
+            const searchInput = document.getElementById('search-input');
+            const filterBidang = document.getElementById('filter-bidang'); // Ambil elemen filter bidang
+
+            let debounceTimer;
+
+            function applyFilters() {
+                clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(() => {
+                    const url = new URL(window.location.href);
+                    url.searchParams.set('search', searchInput.value);
+                    if (filterBidang) { // Pastikan filterBidang ada sebelum menggunakannya
+                        url.searchParams.set('bidang_filter', filterBidang.value); //
+                    }
+                    url.searchParams.set('page', 1); // Reset halaman ke 1 setiap kali filter berubah
+                    window.location.href = url.toString();
+                }, 300); // Debounce untuk 300ms
+            }
+
+            searchInput.addEventListener('keyup', applyFilters);
+            if (filterBidang) { // Tambahkan event listener hanya jika elemen ada
+                filterBidang.addEventListener('change', applyFilters); //
+            }
+
             // === Script untuk Modal Penolakan (Sama seperti sebelumnya) ===
             window.openRejectModal = function(requestId, userName, date) {
                 const rejectModal = document.getElementById('rejectModal');

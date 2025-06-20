@@ -15,7 +15,6 @@
     <div class="bg-white rounded-xl shadow-md border border-gray-200">
         <div class="p-4 border-b border-gray-200">
             <form id="filter-form">
-                {{-- REVISI: Dibuat responsif --}}
                 <div class="flex flex-col sm:flex-row gap-4">
                     <div class="relative flex-grow">
                         <input type="search" id="search-input" name="search" placeholder="Cari nama atau email..."
@@ -28,11 +27,22 @@
                         <option value="mahasiswa" {{ request('filter_role') == 'mahasiswa' ? 'selected' : '' }}>Mahasiswa</option>
                         <option value="siswa" {{ request('filter_role') == 'siswa' ? 'selected' : '' }}>Siswa</option>
                     </select>
+
+                    {{-- ELEMEN BARU: Filter Bidang hanya untuk Super Admin --}}
+                    @if(Auth::user()->hasRole('superadmin'))
+                        <select id="filter-bidang" name="bidang_filter" class="w-full sm:w-auto border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow">
+                            <option value="">Semua Bidang</option>
+                            @foreach($bidangs as $bidang)
+                                <option value="{{ $bidang->id }}" {{ request('bidang_filter') == $bidang->id ? 'selected' : '' }}>
+                                    {{ $bidang->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    @endif
                 </div>
             </form>
         </div>
 
-        {{-- REVISI: Kontainer tabel dibuat responsif dengan overflow --}}
         <div id="table-container" class="overflow-x-auto">
             @include('admin._users-table', ['users' => $users])
         </div>
@@ -40,7 +50,6 @@
 </main>
 @endsection
 
-{{-- Script untuk live search/filter tidak berubah --}}
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function () {
@@ -48,6 +57,9 @@ document.addEventListener('DOMContentLoaded', function () {
     const searchInput = document.getElementById('search-input');
     const filterRole = document.getElementById('filter-role');
     const tableContainer = document.getElementById('table-container');
+    
+    // SCRIPT BARU: Ambil elemen filter bidang
+    const filterBidang = document.getElementById('filter-bidang');
     let debounceTimer;
 
     function fetchData() {
@@ -63,8 +75,14 @@ document.addEventListener('DOMContentLoaded', function () {
         })
         .catch(error => console.error('Error:', error));
     }
+
     searchInput.addEventListener('keyup', () => { clearTimeout(debounceTimer); debounceTimer = setTimeout(fetchData, 200); });
     filterRole.addEventListener('change', fetchData);
+
+    // SCRIPT BARU: Tambahkan event listener untuk filter bidang jika elemennya ada
+    if (filterBidang) {
+        filterBidang.addEventListener('change', fetchData);
+    }
 });
 </script>
 @endpush

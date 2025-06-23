@@ -16,7 +16,9 @@ class DashboardController extends Controller
 {
     public function adminDashboard(Request $request)
     {
-        $adminBidangId = Auth::user()->bidang_id;
+        // ▼▼▼ PERUBAHAN LOGIKA DIMULAI DI SINI ▼▼▼
+        $admin = Auth::user();
+        $adminHasGlobalScope = $admin->can('view global dashboard');
 
         $filter = $request->input('filter', 'last_7_days');
         $startDate = Carbon::today()->startOfDay();
@@ -48,45 +50,63 @@ class DashboardController extends Controller
                 break;
         }
 
-        // Data untuk KPI Cards dengan Tren (DIBERI SCOPE)
-        $totalUsers = User::whereHas('roles', function($q){ $q->where('name', 'user'); })
-                          ->where('bidang_id', $adminBidangId) // SCOPE
-                          ->count();
-                          
-        $pendingCorrections = CorrectionRequest::where('status', 'pending')
-                                                ->whereHas('user', function ($q) use ($adminBidangId) {
-                                                    $q->where('bidang_id', $adminBidangId); // SCOPE
-                                                })
-                                                ->count();
+        // Membuat query dasar untuk user
+        $userQuery = User::whereHas('roles', function ($q) {
+            $q->where('name', 'user'); });
+        if (!$adminHasGlobalScope) {
+            $userQuery->where('bidang_id', $admin->bidang_id); // Terapkan scope jika bukan global admin
+        }
 
-        $baseAttendanceQuery = Attendance::whereHas('user', function($q) use ($adminBidangId) {
-            $q->where('bidang_id', $adminBidangId); // SCOPE
-        });
+        // Membuat query dasar untuk correction request
+        $correctionQuery = CorrectionRequest::where('status', 'pending');
+        if (!$adminHasGlobalScope) {
+            $correctionQuery->whereHas('user', function ($q) use ($admin) {
+                $q->where('bidang_id', $admin->bidang_id); // Terapkan scope jika bukan global admin
+            });
+        }
 
+        // Membuat query dasar untuk attendance
+        $baseAttendanceQuery = Attendance::query();
+        if (!$adminHasGlobalScope) {
+            $baseAttendanceQuery->whereHas('user', function ($q) use ($admin) {
+                $q->where('bidang_id', $admin->bidang_id); // Terapkan scope jika bukan global admin
+            });
+        }
+
+        // Kalkulasi KPI Cards
+        $totalUsers = (clone $userQuery)->count();
+        $pendingCorrections = (clone $correctionQuery)->count();
         $activeInRange = (clone $baseAttendanceQuery)->whereBetween('date', [$startDate, $endDate])->distinct('user_id')->count();
         $completedInRange = (clone $baseAttendanceQuery)->whereBetween('date', [$startDate, $endDate])->whereNotNull('check_in')->whereNotNull('check_out')->count();
         $activePreviousRange = (clone $baseAttendanceQuery)->whereBetween('date', [$comparisonStartDate, $comparisonEndDate])->distinct('user_id')->count();
-        
-        $calculateTrend = function($current, $previous) {
-            if ($previous == 0) return $current > 0 ? 100 : 0;
+
+        $calculateTrend = function ($current, $previous) {
+            if ($previous == 0)
+                return $current > 0 ? 100 : 0;
             return (($current - $previous) / $previous) * 100;
         };
         $activeTrend = $calculateTrend($activeInRange, $activePreviousRange);
 
-        // Data untuk Grafik Komposisi Pengguna (DIBERI SCOPE)
-        $userComposition = User::whereHas('roles', function($q){ $q->where('name', 'user'); })
-            ->where('bidang_id', $adminBidangId) // SCOPE
-            ->select('role', DB::raw('count(*) as total'))->groupBy('role')->pluck('total', 'role');
-        
+        // Grafik Komposisi
+        $userCompositionQuery = User::whereHas('roles', function ($q) {
+            $q->where('name', 'user'); });
+        if (!$adminHasGlobalScope) {
+            $userCompositionQuery->where('bidang_id', $admin->bidang_id); // Terapkan scope
+        }
+        $userComposition = $userCompositionQuery->select('role', DB::raw('count(*) as total'))->groupBy('role')->pluck('total', 'role');
+
         $compositionData = [
             'labels' => $userComposition->keys()->map(fn($role) => ucfirst($role))->toArray(),
             'series' => $userComposition->values()->toArray(),
         ];
-        
-        // Data untuk Grafik Aktivitas (DIBERI SCOPE)
+
+        // Grafik Aktivitas
         $attendanceQuery = Attendance::join('users', 'attendances.user_id', '=', 'users.id')
-            ->whereBetween('attendances.date', [$startDate, $endDate])
-            ->where('users.bidang_id', $adminBidangId); // SCOPE
+            ->whereBetween('attendances.date', [$startDate, $endDate]);
+
+        if (!$adminHasGlobalScope) {
+            $attendanceQuery->where('users.bidang_id', $admin->bidang_id); // Terapkan scope
+        }
 
         $roleFilter = $request->input('role_filter');
         $attendanceQuery->when($roleFilter, function ($q, $role) {
@@ -97,7 +117,7 @@ class DashboardController extends Controller
             ->groupBy('attendance_date', 'users.role')
             ->orderBy('attendance_date', 'asc')
             ->get();
-            
+
         $dateRange = collect();
         for ($date = $startDate->copy(); $date->lte($endDate); $date->addDay()) {
             $dateRange->put($date->toDateString(), ['mahasiswa' => 0, 'siswa' => 0]);
@@ -119,14 +139,16 @@ class DashboardController extends Controller
             $trendData['siswa'][] = $data['siswa'];
         }
 
-        // Data untuk Tabel Permintaan Koreksi Terbaru (DIBERI SCOPE)
-        $latestCorrections = CorrectionRequest::with('user')->where('status', 'pending')
-            ->whereHas('user', function($q) use ($adminBidangId) {
-                $q->where('bidang_id', $adminBidangId); // SCOPE
-            })
-            ->latest()->take(5)->get();
+        // Tabel Koreksi Terbaru
+        $latestCorrectionsQuery = CorrectionRequest::with('user')->where('status', 'pending');
+        if (!$adminHasGlobalScope) {
+            $latestCorrectionsQuery->whereHas('user', function ($q) use ($admin) {
+                $q->where('bidang_id', $admin->bidang_id); // Terapkan scope
+            });
+        }
+        $latestCorrections = $latestCorrectionsQuery->latest()->take(5)->get();
+        // ▲▲▲ AKHIR PERUBAHAN LOGIKA ▲▲▲
 
-        // Tidak mengirim 'hideSidebar' untuk Admin Dashboard
         return view('admin.dashboard', [
             'totalUsers' => $totalUsers,
             'activeInRange' => $activeInRange,
@@ -140,7 +162,6 @@ class DashboardController extends Controller
             'currentRoleFilter' => $roleFilter,
         ]);
     }
-
     public function superadminDashboard(Request $request) // Tambahkan Request $request
     {
         // Variabel untuk menyembunyikan sidebar di tampilan superadmin dashboard
@@ -177,9 +198,10 @@ class DashboardController extends Controller
         }
 
         // Data untuk KPI Cards dengan Tren (Tanpa Scope Bidang)
-        $totalUsers = User::whereHas('roles', function($q){ $q->where('name', 'user'); })
-                          ->count(); // Tanpa scope bidang
-                          
+        $totalUsers = User::whereHas('roles', function ($q) {
+            $q->where('name', 'user'); })
+            ->count(); // Tanpa scope bidang
+
         $pendingCorrections = CorrectionRequest::where('status', 'pending')->count(); // Tanpa scope bidang
 
         $baseAttendanceQuery = Attendance::query(); // Query dasar tanpa scope bidang
@@ -187,22 +209,24 @@ class DashboardController extends Controller
         $activeInRange = (clone $baseAttendanceQuery)->whereBetween('date', [$startDate, $endDate])->distinct('user_id')->count();
         $completedInRange = (clone $baseAttendanceQuery)->whereBetween('date', [$startDate, $endDate])->whereNotNull('check_in')->whereNotNull('check_out')->count();
         $activePreviousRange = (clone $baseAttendanceQuery)->whereBetween('date', [$comparisonStartDate, $comparisonEndDate])->distinct('user_id')->count();
-        
-        $calculateTrend = function($current, $previous) {
-            if ($previous == 0) return $current > 0 ? 100 : 0;
+
+        $calculateTrend = function ($current, $previous) {
+            if ($previous == 0)
+                return $current > 0 ? 100 : 0;
             return (($current - $previous) / $previous) * 100;
         };
         $activeTrend = $calculateTrend($activeInRange, $activePreviousRange);
 
         // Data untuk Grafik Komposisi Pengguna (Tanpa Scope Bidang)
-        $userComposition = User::whereHas('roles', function($q){ $q->where('name', 'user'); })
+        $userComposition = User::whereHas('roles', function ($q) {
+            $q->where('name', 'user'); })
             ->select('role', DB::raw('count(*) as total'))->groupBy('role')->pluck('total', 'role');
-        
+
         $compositionData = [
             'labels' => $userComposition->keys()->map(fn($role) => ucfirst($role))->toArray(),
             'series' => $userComposition->values()->toArray(),
         ];
-        
+
         // Data untuk Grafik Aktivitas (dengan filter bidang opsional untuk superadmin)
         $attendanceQuery = Attendance::join('users', 'attendances.user_id', '=', 'users.id')
             ->whereBetween('attendances.date', [$startDate, $endDate]);
@@ -222,7 +246,7 @@ class DashboardController extends Controller
             ->groupBy('attendance_date', 'users.role')
             ->orderBy('attendance_date', 'asc')
             ->get();
-            
+
         $dateRange = collect();
         for ($date = $startDate->copy(); $date->lte($endDate); $date->addDay()) {
             $dateRange->put($date->toDateString(), ['mahasiswa' => 0, 'siswa' => 0]);

@@ -379,43 +379,43 @@ class AttendanceController extends Controller
     public function showApprovalRequests(Request $request)
     {
         $user = Auth::user();
-        $query = CorrectionRequest::with(['user', 'user.bidang'])->where('status', 'pending'); // Eager load user dan bidang user
+        $query = CorrectionRequest::with(['user', 'user.bidang'])->where('status', 'pending');
 
-        // Tambahkan search
-        if ($request->filled('search')) { //
-            $search = $request->input('search'); //
-            $query->where(function ($q) use ($search) { //
-                $q->whereHas('user', function ($userQuery) use ($search) { //
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $query->where(function ($q) use ($search) {
+                $q->whereHas('user', function ($userQuery) use ($search) {
                     $userQuery->where('name', 'like', "%{$search}%")
                               ->orWhere('email', 'like', "%{$search}%");
-                })->orWhere('attendance_date', 'like', "%{$search}%"); //
+                })->orWhere('attendance_date', 'like', "%{$search}%");
             });
         }
 
         if (Gate::allows('access-admin-pages')) {
-            if ($user->hasRole('superadmin')) { //
-                // Superadmin melihat semua permintaan
-                // Tambahkan filter bidang untuk superadmin
-                if ($request->filled('bidang_filter')) { //
-                    $bidangId = $request->input('bidang_filter'); //
-                    $query->whereHas('user', function ($userQuery) use ($bidangId) { //
-                        $userQuery->where('bidang_id', $bidangId); //
+            // ▼▼▼ PERUBAHAN LOGIKA DIMULAI DI SINI ▼▼▼
+            // Superadmin atau Admin dengan izin global bisa filter berdasarkan bidang
+            if ($user->hasRole('superadmin') || $user->can('approve all requests')) {
+                if ($request->filled('bidang_filter')) {
+                    $bidangId = $request->input('bidang_filter');
+                    $query->whereHas('user', function ($userQuery) use ($bidangId) {
+                        $userQuery->where('bidang_id', $bidangId);
                     });
                 }
             } else {
-                // Admin hanya melihat permintaan dari bidangnya
+                // Admin biasa hanya melihat permintaan dari bidangnya
                 $adminBidangId = $user->bidang_id;
                 $query->whereHas('user', function ($userQuery) use ($adminBidangId) {
                     $userQuery->where('bidang_id', $adminBidangId);
                 });
             }
+            // ▲▲▲ AKHIR PERUBAHAN LOGIKA ▲▲▲
+
             $requests = $query->orderBy('created_at', 'desc')->paginate(10)->appends($request->query());
-            $bidangs = Bidang::orderBy('name')->get(); // Ambil semua bidang untuk filter
-            return view('admin.approval', compact('requests', 'bidangs')); // Kirim bidangs ke view
+            $bidangs = Bidang::orderBy('name')->get();
+            return view('admin.approval', compact('requests', 'bidangs'));
         } else {
-            // Logika untuk User Biasa (tidak berubah banyak, hanya penambahan search)
-            $query->where('user_id', $user->id); //
-            // Search sudah ditambahkan di awal query.
+            // Logika untuk User Biasa
+            $query->where('user_id', $user->id);
             $requests = $query->orderBy('created_at', 'desc')->paginate(10)->appends($request->query());
             return view('fold_AttendanceApproval.Attendance Approval', compact('requests'));
         }
@@ -427,11 +427,15 @@ class AttendanceController extends Controller
     public function approveCorrection(CorrectionRequest $correctionRequest)
     {
         Gate::authorize('access-admin-pages');
-        // ▼▼▼ OTORISASI TAMBAHAN ▼▼▼
-        // Superadmin dapat menyetujui permintaan dari bidang manapun, admin hanya dari bidangnya sendiri.
-        if (Auth::user()->hasRole('admin') && Auth::user()->bidang_id != $correctionRequest->user->bidang_id) { //
-            abort(403, 'Anda tidak berwenang menyetujui permintaan dari bidang ini.'); //
+        
+        // ▼▼▼ PERUBAHAN LOGIKA OTORISASI ▼▼▼
+        $admin = Auth::user();
+        // Tolak jika dia admin biasa (tanpa izin global) DAN mencoba mengakses data dari bidang lain
+        if ($admin->hasRole('admin') && !$admin->can('approve all requests') && $admin->bidang_id != $correctionRequest->user->bidang_id) {
+            abort(403, 'Anda tidak berwenang menyetujui permintaan dari bidang ini.');
         }
+        // ▲▲▲ AKHIR PERUBAHAN LOGIKA ▲▲▲
+
         $attendance = Attendance::firstOrNew(['user_id' => $correctionRequest->user_id, 'date' => $correctionRequest->attendance_date]);
         if ($correctionRequest->new_check_in) $attendance->check_in = $correctionRequest->new_check_in;
         if ($correctionRequest->new_check_out) $attendance->check_out = $correctionRequest->new_check_out;
@@ -448,11 +452,15 @@ class AttendanceController extends Controller
     public function rejectCorrection(Request $request, CorrectionRequest $correctionRequest)
     {
         Gate::authorize('access-admin-pages');
-        // ▼▼▼ OTORISASI TAMBAHAN ▼▼▼
-        // Superadmin dapat menolak permintaan dari bidang manapun, admin hanya dari bidangnya sendiri.
-        if (Auth::user()->hasRole('admin') && Auth::user()->bidang_id != $correctionRequest->user->bidang_id) { //
-            abort(403, 'Anda tidak berwenang menolak permintaan dari bidang ini.'); //
+
+        // ▼▼▼ PERUBAHAN LOGIKA OTORISASI ▼▼▼
+        $admin = Auth::user();
+        // Tolak jika dia admin biasa (tanpa izin global) DAN mencoba mengakses data dari bidang lain
+        if ($admin->hasRole('admin') && !$admin->can('approve all requests') && $admin->bidang_id != $correctionRequest->user->bidang_id) {
+            abort(403, 'Anda tidak berwenang menolak permintaan dari bidang ini.');
         }
+        // ▲▲▲ AKHIR PERUBAHAN LOGIKA ▲▲▲
+
         $validated = $request->validate(['admin_notes' => 'required|string|max:1000']);
         $correctionRequest->update(['status' => 'rejected', 'approved_by' => Auth::id(), 'approved_at' => now(), 'admin_notes' => $validated['admin_notes']]);
         return redirect()->route('admin.approval.requests')->with('success', 'Permintaan koreksi berhasil ditolak.');

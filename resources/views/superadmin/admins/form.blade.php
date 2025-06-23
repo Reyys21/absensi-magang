@@ -77,7 +77,6 @@
                                 </option>
                             @endforeach
                         </select>
-                        {{-- Jika select dinonaktifkan, kita butuh input tersembunyi untuk mengirim nilainya --}}
                         @if(Auth::user()->hasRole('admin') && !Auth::user()->hasRole('superadmin'))
                             <input type="hidden" name="bidang_id" value="{{ Auth::user()->bidang_id }}">
                         @endif
@@ -103,6 +102,36 @@
                         @enderror
                     </div>
                 </div>
+
+                {{-- ▼▼▼ KODE BARU DITAMBAHKAN DI SINI ▼▼▼ --}}
+                @if(Auth::user()->hasRole('superadmin') && $admin->exists)
+                <div class="mt-6 pt-6 border-t">
+                    <h3 class="text-base font-semibold text-gray-900">Izin Tambahan (Global Scope)</h3>
+                    <p class="text-sm text-gray-500 mb-4">Berikan hak akses tambahan untuk admin ini agar bisa melihat data di luar bidangnya.</p>
+                    <div class="space-y-3">
+                        @foreach ($permissions as $permission)
+                            <div class="flex items-start">
+                                <div class="flex items-center h-5">
+                                    <input id="permission-{{ $permission->id }}" name="permissions[]" type="checkbox" value="{{ $permission->name }}"
+                                        class="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded"
+                                        {{ $admin->hasPermissionTo($permission->name) ? 'checked' : '' }}>
+                                </div>
+                                <div class="ml-3 text-sm">
+                                    <label for="permission-{{ $permission->id }}" class="font-medium text-gray-700">{{ ucwords($permission->name) }}</label>
+                                    @if ($permission->name === 'view global dashboard')
+                                        <p class="text-gray-500">Izinkan admin melihat data dashboard dari semua bidang.</p>
+                                    @elseif ($permission->name === 'view all users')
+                                        <p class="text-gray-500">Izinkan admin memonitor dan melihat detail semua user dari semua bidang.</p>
+                                    @elseif ($permission->name === 'approve all requests')
+                                        <p class="text-gray-500">Izinkan admin menyetujui/menolak permintaan koreksi dari semua bidang.</p>
+                                    @endif
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+                @endif
+                {{-- ▲▲▲ AKHIR KODE BARU ▲▲▲ --}}
 
                 <div class="mt-8 flex justify-end">
                     <a href="{{ route('superadmin.admins.index') }}" class="bg-gray-200 text-gray-700 font-semibold py-2 px-4 rounded-lg shadow-sm hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400">

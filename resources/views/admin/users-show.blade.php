@@ -17,16 +17,13 @@
 
             <main id="main-content" class="flex-1 p-4 sm:p-6 md:p-8" style="background-color: #F7F7F7;"> {{-- Applied F7F7F7 to main content background --}}
 
-                {{-- Pindah link "Kembali ke Daftar User" ke dalam main --}}
                 <a href="{{ route('admin.monitoring.users.index') }}"
                     class="text-sm font-medium hover:text-blue-800 transition-colors text-lg ">
                     <i class="fa-solid fa-arrow-left text-[#14BDEB]"></i>
                     <span class="text-[#2A2B2A]">Kembali</span>
                 </a>
 
-                {{-- BLOK HEADER LAMA DI DALAM MAIN TELAH DIHAPUS --}}
-
-                {{-- 2. INFO PENGGUNA DIPERBAIKI: Ukuran foto profil diperbaiki dan perataan disempurnakan. --}}
+                {{-- INFO PENGGUNA & TOMBOL AKSI --}}
                 <div class="mb-6 p-4 border rounded-xl bg-white shadow-sm flex flex-col sm:flex-row items-center gap-5">
                     @php
                         $defaultPhoto = 'profile_photos/avatar_1 (1).jpg';
@@ -35,28 +32,40 @@
                             ? asset('storage/' . $photoPath)
                             : asset($photoPath);
                     @endphp
-                    {{-- Ukuran gambar dibalik agar lebih besar di layar sm ke atas --}}
                     <img src="{{ $finalPhotoUrl }}" alt="Foto"
                         class="w-16 h-16 sm:w-20 sm:h-20 rounded-full object-cover flex-shrink-0">
                     <div class="text-center sm:text-left">
                         <h2 class="text-xl sm:text-2xl font-bold" style="color: #2A2B2A;">{{ $user->name }}</h2>
-                        {{-- Applied 2A2B2A to user name --}}
                         <p class="text-sm text-gray-500">{{ $user->email }} | HP: {{ $user->phone ?? 'N/A' }}</p>
+                        
+                        {{-- ▼▼▼ KODE BARU DITAMBAHKAN DI SINI ▼▼▼ --}}
+                        {{-- Tombol ini hanya muncul jika yang login adalah Superadmin DAN user yang dilihat adalah user biasa --}}
+                        @if(Auth::user()->hasRole('superadmin') && $user->hasRole('user'))
+                            <div class="mt-3">
+                                <form action="{{ route('superadmin.users.promote', $user->id) }}" method="POST" onsubmit="return confirm('Anda yakin ingin menjadikan user ini sebagai Admin? Aksi ini tidak dapat dibatalkan.');">
+                                    @csrf
+                                    <button type="submit" class="inline-flex items-center px-4 py-2 bg-green-600 text-white font-semibold text-xs rounded-lg shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                                        <i class="fa-solid fa-user-shield mr-2"></i>
+                                        Jadikan Admin
+                                    </button>
+                                </form>
+                            </div>
+                        @endif
+                        {{-- ▲▲▲ AKHIR KODE BARU ▲▲▲ --}}
+
                     </div>
                 </div>
 
                 {{-- Container untuk Riwayat --}}
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
-                    {{-- 3. KARTU SEIMBANG: Diberi tinggi tetap dan flex-col agar sama tinggi dan bisa di-scroll --}}
+                    {{-- KARTU RIWAYAT ABSENSI --}}
                     <div class="bg-white rounded-xl shadow-md border border-gray-200 flex flex-col h-[600px]">
-                        {{-- 4. HEADER KARTU RESPONSIF: Header kartu akan stack di mobile --}}
                         <div
                             class="p-4 border-b border-gray-200 flex flex-col sm:flex-row justify-between sm:items-center gap-3">
                             <div class="flex items-center gap-3">
-                                <i class="fa-solid fa-calendar-check" style="color: #14BDEB;"></i> {{-- Applied 14BDEB to icon --}}
+                                <i class="fa-solid fa-calendar-check" style="color: #14BDEB;"></i>
                                 <h3 class="text-lg font-semibold" style="color: #2A2B2A;">Riwayat Absensi</h3>
-                                {{-- Applied 2A2B2A to heading --}}
                             </div>
                             <form id="form-absensi" method="GET" class="flex items-center gap-2 w-full sm:w-auto">
                                 <input type="date" name="filter_tanggal_absensi" id="tanggal-absensi"
@@ -76,14 +85,13 @@
                                 </select>
                             </form>
                         </div>
-                        {{-- Konten yang bisa di-scroll --}}
                         <div class="overflow-y-auto flex-grow">
                             @forelse($attendances as $attendance)
                                 <div
                                     class="p-4 border-b border-gray-100 last:border-b-0 hover:bg-gray-50 flex justify-between items-center">
                                     <div>
                                         <p class="font-semibold" style="color: #2A2B2A;">
-                                            {{ $attendance->date->translatedFormat('l, d M Y') }}</p> {{-- Applied 2A2B2A to attendance date --}}
+                                            {{ $attendance->date->translatedFormat('l, d M Y') }}</p>
                                         <p class="text-xs text-gray-500">Check-in:
                                             {{ $attendance->check_in ? $attendance->check_in->format('H:i') : '-' }} |
                                             Check-out:
@@ -92,7 +100,6 @@
                                     <span
                                         class="px-2 py-1 text-xs font-medium rounded-full {{ $attendance->attendance_status == 'Lengkap' ? 'text-green-800' : 'text-red-800' }}"
                                         style="background-color: {{ $attendance->attendance_status == 'Lengkap' ? '#CCEECC' : '#FFCCCC' }};">
-                                        {{-- Added custom background colors --}}
                                         {{ $attendance->attendance_status }}</span>
                                 </div>
                             @empty
@@ -110,14 +117,13 @@
                         @endif
                     </div>
 
-                    {{-- Kartu Riwayat Koreksi (diterapkan perbaikan yang sama) --}}
+                    {{-- KARTU RIWAYAT KOREKSI --}}
                     <div class="bg-white rounded-xl shadow-md border border-gray-200 flex flex-col h-[600px]">
                         <div
                             class="p-4 border-b border-gray-200 flex flex-col sm:flex-row justify-between sm:items-center gap-3">
                             <div class="flex items-center gap-3">
-                                <i class="fa-solid fa-user-pen" style="color: #F0386B;"></i> {{-- Applied F0386B to icon --}}
+                                <i class="fa-solid fa-user-pen" style="color: #F0386B;"></i>
                                 <h3 class="text-lg font-semibold" style="color: #2A2B2A;">Riwayat Pengajuan Koreksi</h3>
-                                {{-- Applied 2A2B2A to heading --}}
                             </div>
                             <form id="form-koreksi" method="GET" class="flex items-center gap-2 w-full sm:w-auto">
                                 <input type="date" name="filter_tanggal_koreksi" id="tanggal-koreksi"
@@ -144,14 +150,13 @@
                                     class="p-4 border-b border-gray-100 last:border-b-0 hover:bg-gray-50 flex justify-between items-center">
                                     <div>
                                         <p class="font-semibold" style="color: #2A2B2A;">Koreksi untuk
-                                            {{ $request->attendance_date->format('d M Y') }}</p> {{-- Applied 2A2B2A to correction date --}}
+                                            {{ $request->attendance_date->format('d M Y') }}</p>
                                         <p class="text-xs text-gray-500">Diajukan pada
                                             {{ $request->created_at->format('d M Y') }}</p>
                                     </div>
                                     <span
                                         class="px-2 py-1 text-xs font-medium rounded-full @if ($request->status == 'approved') text-green-800 @elseif($request->status == 'rejected') text-red-800 @else text-yellow-800 @endif"
                                         style="background-color: @if ($request->status == 'approved') #CCEECC @elseif($request->status == 'rejected') #FFCCCC @else #FFF3CC @endif;">
-                                        {{-- Added custom background colors --}}
                                         {{ Str::ucfirst($request->status) }}</span>
                                 </div>
                             @empty

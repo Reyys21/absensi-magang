@@ -25,7 +25,7 @@ class User extends Authenticatable
         'asal_kampus',
         'nim',
         'phone',
-        'bidang_id', // <-- Tambahkan 'bidang_id' di sini
+        'bidang_id',
     ];
 
     /**

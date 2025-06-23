@@ -53,7 +53,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/approval-requests', [AttendanceController::class, 'showApprovalRequests'])->name('approval.requests');
         Route::post('/approval-requests/{correctionRequest}/approve', [AttendanceController::class, 'approveCorrection'])->name('approval.approve');
         Route::post('/approval-requests/{correctionRequest}/reject', [AttendanceController::class, 'rejectCorrection'])->name('approval.reject');
-    
+
         // Rute untuk Fitur MONITORING User
         Route::get('/monitoring/users', [UserController::class, 'indexMonitoring'])->name('monitoring.users.index');
         Route::get('/monitoring/users/{user}', [UserController::class, 'showMonitoring'])->name('monitoring.users.show');
@@ -65,12 +65,15 @@ Route::middleware('auth')->group(function () {
     // --- GRUP RUTE KHUSUS SUPERADMIN ---
     Route::middleware('can:access-superadmin-pages')->prefix('superadmin')->name('superadmin.')->group(function () {
         Route::get('/dashboard', [AdminDashboardController::class, 'superadminDashboard'])->name('dashboard');
-      
+
         Route::resource('bidang', \App\Http\Controllers\Superadmin\BidangController::class);
         // Tambahkan route show untuk bidang
         Route::get('bidang/{bidang}/detail', [BidangController::class, 'show'])->name('bidang.show'); //
 
         Route::resource('admins', \App\Http\Controllers\Superadmin\AdminController::class)->parameters(['admins' => 'admin']);
+
+        // ▼▼▼ RUTE BARU DITAMBAHKAN DI SINI ▼▼▼
+        Route::post('users/{user}/promote', [\App\Http\Controllers\Superadmin\AdminController::class, 'promoteUser'])->name('users.promote');
     });
 
     // --- Rute profil yang sudah dilengkapi ---
@@ -85,13 +88,4 @@ Route::middleware('auth')->group(function () {
         Route::get('/change-password', 'showChangePasswordForm')->name('change-password'); // <-- Rute yang hilang
         Route::patch('/update-password', 'updatePassword')->name('update-password');
     });
-
-    // --- GRUP RUTE KHUSUS SUPERADMIN (ini duplikat dari atas, pastikan hanya ada satu) ---
-    // Route::middleware('can:access-superadmin-pages')->prefix('superadmin')->name('superadmin.')->group(function () {
-    //     Route::get('/dashboard', [AdminDashboardController::class, 'superadminDashboard'])->name('dashboard');
-      
-    //     Route::resource('bidang', \App\Http\Controllers\Superadmin\BidangController::class);
-
-    //     Route::resource('admins', \App\Http\Controllers\Superadmin\AdminController::class)->parameters(['admins' => 'admin']);
-    // });
 });

@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Spatie\Permission\Models\Role;
-
+use Spatie\Permission\Models\Permission; // <-- Ini baris yang paling penting
 
 class AdminController extends Controller
 {
@@ -70,22 +70,19 @@ class AdminController extends Controller
         $user = Auth::user();
         $bidangId = $request->input('bidang_id');
 
-        // Paksa bidang_id jika yang membuat adalah admin
         if ($user->hasRole('admin') && !$user->hasRole('superadmin')) {
             $bidangId = $user->bidang_id;
         }
 
-        // Buat user baru dengan menyertakan 'role'
         $admin = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'bidang_id' => $bidangId,
-            'role' => $request->role, // <-- INI PERBAIKANNYA
-            'asal_kampus' => 'Kantor Pusat', // Nilai default untuk admin
+            'role' => $request->role,
+            'asal_kampus' => 'Kantor Pusat',
         ]);
 
-        // Berikan role 'admin' menggunakan Spatie
         $admin->assignRole($request->role);
 
         return redirect()->route('superadmin.admins.index')
@@ -99,7 +96,6 @@ class AdminController extends Controller
     {
         $user = Auth::user();
 
-        // Cek hak akses: admin hanya boleh edit user di bidangnya
         if ($user->hasRole('admin') && !$user->hasRole('superadmin') && $user->bidang_id !== $admin->bidang_id) {
             abort(403, 'ANDA TIDAK MEMILIKI AKSES UNTUK MENGEDIT ADMIN INI.');
         }
@@ -111,10 +107,17 @@ class AdminController extends Controller
             $bidangs = Bidang::where('id', $user->bidang_id)->get();
         }
 
+        $permissions = Permission::whereIn('name', [
+            'view global dashboard',
+            'view all users',
+            'approve all requests'
+        ])->get();
+
         return view('superadmin.admins.form', [
             'admin' => $admin,
             'bidangs' => $bidangs,
-            'roles' => $roles
+            'roles' => $roles,
+            'permissions' => $permissions,
         ]);
     }
 
@@ -125,7 +128,6 @@ class AdminController extends Controller
     {
         $user = Auth::user();
 
-        // Cek hak akses: admin hanya boleh update user di bidangnya
         if ($user->hasRole('admin') && !$user->hasRole('superadmin') && $user->bidang_id !== $admin->bidang_id) {
             abort(403, 'ANDA TIDAK MEMILIKI AKSES UNTUK MEMPERBARUI ADMIN INI.');
         }
@@ -136,6 +138,8 @@ class AdminController extends Controller
             'password' => ['nullable', 'confirmed', Rules\Password::defaults()],
             'bidang_id' => ['required', 'exists:bidangs,id'],
             'role' => 'required|exists:roles,name',
+            'permissions' => 'nullable|array',
+            'permissions.*' => 'string|exists:permissions,name',
         ]);
 
         $bidangId = $request->input('bidang_id');
@@ -147,8 +151,8 @@ class AdminController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'bidang_id' => $bidangId,
-            'role' => $request->role, // <-- PASTIKAN ROLE JUGA DIUPDATE
-            'asal_kampus' => $admin->asal_kampus ?? 'Kantor Pusat', 
+            'role' => $request->role,
+            'asal_kampus' => $admin->asal_kampus ?? 'Kantor Pusat',
         ];
 
         if ($request->filled('password')) {
@@ -157,11 +161,18 @@ class AdminController extends Controller
         
         $admin->update($dataToUpdate);
 
-        // Sinkronkan role Spatie
         $admin->syncRoles($request->role);
 
+        if (Auth::user()->hasRole('superadmin')) {
+            if ($request->has('permissions')) {
+                $admin->syncPermissions($request->permissions);
+            } else {
+                $admin->syncPermissions([]);
+            }
+        }
+
         return redirect()->route('superadmin.admins.index')
-                         ->with('success', 'Data admin berhasil diperbarui.');
+                         ->with('success', 'Data admin dan izin berhasil diperbarui.');
     }
 
     /**
@@ -171,12 +182,10 @@ class AdminController extends Controller
     {
         $user = Auth::user();
 
-        // Mencegah menghapus diri sendiri
         if ($admin->id === $user->id) {
             return back()->with('error', 'Anda tidak bisa menghapus akun Anda sendiri.');
         }
 
-        // Cek hak akses: admin hanya boleh hapus user di bidangnya
         if ($user->hasRole('admin') && !$user->hasRole('superadmin') && $user->bidang_id !== $admin->bidang_id) {
             abort(403, 'ANDA TIDAK MEMILIKI AKSES UNTUK MENGHAPUS ADMIN INI.');
         }
@@ -185,5 +194,26 @@ class AdminController extends Controller
         
         return redirect()->route('superadmin.admins.index')
                          ->with('success', 'Akun admin berhasil dihapus.');
+    }
+
+    /**
+     * Promote a user to an admin.
+     *
+     * @param  \App\Models\User  $user
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function promoteUser(User $user)
+    {
+        if (!$user->hasRole('user')) {
+            return redirect()->back()->with('error', 'Hanya user dengan role "user" yang bisa dijadikan admin.');
+        }
+    
+        $user->role = 'admin';
+        $user->save();
+    
+        $user->syncRoles('admin');
+
+        return redirect()->route('admin.monitoring.users.show', $user->id)
+                         ->with('success', 'User ' . $user->name . ' berhasil dijadikan Admin.');
     }
 }

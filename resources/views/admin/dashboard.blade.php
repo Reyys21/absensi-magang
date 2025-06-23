@@ -8,7 +8,6 @@
 
     <header class="bg-white flex flex-row justify-between items-center py-2 px-4 sm:px-6 md:px-8 border-b border-gray-200">
         <div>
-            {{-- Ukuran font disesuaikan untuk mobile, tablet, dan desktop --}}
             <h1 class="text-lg sm:text-1xl lg:text-2xl font-bold text-[#2A2B2A]">Dashboard</h1>
         </div>
         @include('layouts.profile')
@@ -17,9 +16,18 @@
     {{-- Konten utama dimulai di sini --}}
     <main id="main-content" class="flex-1 p-4 sm:p-6 md:p-8 bg-gray-50/50">
 
-        {{-- Header Halaman --}}
+        {{-- ▼▼▼ KODE BARU DITAMBAHKAN DI SINI ▼▼▼ --}}
+        <div class="mb-6 bg-blue-100 border-l-4 border-blue-500 text-blue-800 p-4 rounded-r-lg shadow-sm" role="alert">
+            @if(Auth::user()->can('view all users'))
+                <p class="font-bold">Anda Memiliki Hak Akses Global</p>
+                <p class="text-sm mt-1">Anda dapat melihat data dari semua bidang. Gunakan filter pada setiap tabel atau grafik untuk melihat data bidang spesifik.</p>
+            @else
+                <p class="font-bold">Anda Mengelola Bidang: {{ Auth::user()->bidang->name ?? 'N/A' }}</p>
+                <p class="text-sm mt-1">Data yang ditampilkan di bawah ini adalah data yang relevan untuk bidang Anda.</p>
+            @endif
+        </div>
+        {{-- ▲▲▲ AKHIR KODE BARU ▲▲▲ --}}
 
-        {{-- REVISI: Tata Letak Utama Menggunakan Grid 2 Kolom Besar --}}
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
             <div class="flex flex-col gap-6">
@@ -125,7 +133,6 @@
 
                 <div class="bg-[#F7FFF7] p-6 rounded-2xl shadow-sm border border-gray-100">
                     <div class="flex justify-between items-center mb-4">
-                        {{-- REVISI: Judul diubah menjadi Performa Magang --}}
                         <h3 class="text-lg font-bold text-[#2A2B2A]">Performa Magang</h3>
                         <form id="filter-form" method="GET">
                             <select name="filter" id="date-filter"
@@ -172,7 +179,7 @@
                 chart: {
                     type: 'bar',
                     height: 250,
-                    stacked: false, // UBAH INI DARI TRUE MENJADI FALSE
+                    stacked: false,
                     toolbar: {
                         show: false
                     }
@@ -180,7 +187,7 @@
                 plotOptions: {
                     bar: {
                         horizontal: false,
-                        columnWidth: '40%', // Sesuaikan lebar kolom jika diperlukan
+                        columnWidth: '40%',
                         borderRadius: 4
                     }
                 },

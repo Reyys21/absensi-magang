@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Spatie\Permission\Models\Role;
-use Spatie\Permission\Models\Permission; // <-- Ini baris yang paling penting
+use Spatie\Permission\Models\Permission;
 
 class AdminController extends Controller
 {
@@ -22,7 +22,6 @@ class AdminController extends Controller
         $user = Auth::user();
         $query = User::role('admin');
 
-        // Jika pengguna adalah 'admin' (bukan 'superadmin'), filter berdasarkan bidangnya
         if ($user->hasRole('admin') && !$user->hasRole('superadmin')) {
             $query->where('bidang_id', $user->bidang_id);
         }
@@ -39,10 +38,8 @@ class AdminController extends Controller
         $user = Auth::user();
         $bidangs = Bidang::orderBy('name')->get();
         
-        // Admin tidak bisa membuat Superadmin
         $roles = Role::where('name', '!=', 'superadmin')->pluck('name', 'name');
 
-        // Jika user adalah admin, batasi pilihan bidang hanya ke bidangnya sendiri
         if ($user->hasRole('admin') && !$user->hasRole('superadmin')) {
             $bidangs = Bidang::where('id', $user->bidang_id)->get();
         }
@@ -215,5 +212,41 @@ class AdminController extends Controller
 
         return redirect()->route('admin.monitoring.users.show', $user->id)
                          ->with('success', 'User ' . $user->name . ' berhasil dijadikan Admin.');
+    }
+
+    /**
+     * Demote an admin back to a regular user.
+     *
+     * @param  \App\Models\User  $admin
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function demoteAdmin(User $admin)
+    {
+        // Mencegah demote superadmin atau diri sendiri
+        if ($admin->hasRole('superadmin') || Auth::id() === $admin->id) {
+            return redirect()->route('superadmin.admins.index')
+                             ->with('error', 'Superadmin tidak dapat diubah rolenya.');
+        }
+
+        // Pastikan target adalah seorang admin
+        if (!$admin->hasRole('admin')) {
+            return redirect()->route('superadmin.admins.index')
+                             ->with('error', 'User ini bukan admin.');
+        }
+
+        // Set kolom 'role' kembali ke 'mahasiswa' sebagai default
+        $admin->role = 'mahasiswa';
+        
+        // Cabut semua izin khusus yang mungkin dimiliki
+        $admin->syncPermissions([]);
+
+        // Sinkronkan role Spatie kembali ke 'user'
+        $admin->syncRoles('user');
+        
+        $admin->save();
+
+        // Redirect ke halaman daftar user (bukan lagi daftar admin)
+        return redirect()->route('admin.monitoring.users.index')
+                         ->with('success', 'Admin ' . $admin->name . ' berhasil diubah kembali menjadi User.');
     }
 }

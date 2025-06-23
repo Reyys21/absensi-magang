@@ -2,15 +2,23 @@
 
 namespace App\Models;
 
+// Contracts
+use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
+
+// Traits
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
-use Illuminate\Database\Eloquent\Relations\BelongsTo; // <-- Tambahkan import ini
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Auth\Passwords\CanResetPassword;
 
-class User extends Authenticatable
+// ▼▼▼ TAMBAHKAN USE STATEMENT INI ▼▼▼
+use App\Notifications\Auth\CustomResetPasswordNotification;
+
+class User extends Authenticatable implements CanResetPasswordContract
 {
-    use HasFactory, Notifiable, HasRoles;
+    use HasFactory, Notifiable, HasRoles, CanResetPassword;
 
     /**
      * The attributes that are mass assignable.
@@ -67,5 +75,17 @@ class User extends Authenticatable
     public function attendances()
     {
         return $this->hasMany(Attendance::class);
+    }
+
+    // ▼▼▼ TAMBAHKAN METHOD BARU INI DI SINI ▼▼▼
+    /**
+     * Mengirim notifikasi reset password kustom.
+     *
+     * @param  string  $token
+     * @return void
+     */
+    public function sendPasswordResetNotification($token)
+    {
+        $this->notify(new CustomResetPasswordNotification($token));
     }
 }

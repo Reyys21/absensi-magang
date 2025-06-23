@@ -5,7 +5,6 @@
 
         {{-- Header Halaman --}}
         <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-10">
-            {{-- Ukuran font diubah dari 4xl/5xl menjadi 2xl/3xl --}}
             <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-800 dark:text-white leading-tight mb-4 sm:mb-0">
                 Edit Profil
             </h1>
@@ -35,7 +34,6 @@
                                 d="M2.93 17.07A10 10 0 1 1 17.07 2.93 10 10 0 0 1 2.93 17.07zm12.73-1.41A8 8 0 1 0 4.34 4.34a8 8 0 0 0 11.32 11.32zM6.7 9.29L9 11.6l4.3-4.3 1.4 1.42L9 14.4l-3.7-3.7 1.4-1.42z" />
                         </svg></div>
                     <div>
-                        {{-- Ukuran font diubah dari text-lg ke text-base --}}
                         <p class="font-semibold text-base">Berhasil!</p>
                         <p class="text-sm">{{ session('status') }}</p>
                     </div>
@@ -87,7 +85,6 @@
                         Ganti Foto
                     </div>
                 </div>
-                {{-- Ukuran font diubah dari 2xl menjadi xl --}}
                 <p class="text-xl font-bold text-slate-800 dark:text-slate-100 text-center">
                     {{ optional($user)->name }}</p>
                 <span
@@ -95,9 +92,7 @@
                     {{ optional($user)->role ? Str::ucfirst(optional($user)->role) : 'N/A' }}
                 </span>
 
-                {{-- NAVIGASI LINK --}}
                 <div class="w-full flex flex-col space-y-3 mt-6">
-                     {{-- Ukuran font ditambahkan (text-sm) --}}
                     <a href="{{ route('profile.edit') }}"
                         class="w-full text-left py-3 px-5 rounded-xl font-semibold transition-colors duration-200 ease-in-out text-sm
                         bg-indigo-600 text-white shadow-md
@@ -130,7 +125,6 @@
             <div class="md:col-span-2 space-y-8">
                 <div id="general-info-content"
                     class="bg-slate-50 dark:bg-slate-700/50 p-7 rounded-xl shadow-md border border-slate-200 dark:border-slate-700">
-                    {{-- Ukuran font diubah dari 2xl menjadi lg --}}
                     <h2
                         class="text-lg font-bold mb-6 text-slate-700 dark:text-slate-200 border-b border-slate-300 dark:border-slate-600 pb-4">
                         Informasi Umum
@@ -143,7 +137,6 @@
                             <label for="name"
                                 class="block text-slate-700 dark:text-slate-300 text-sm font-medium mb-2">Nama
                                 Lengkap:</label>
-                            {{-- Ukuran font diubah dari text-base menjadi text-sm --}}
                             <input type="text" name="name" id="name"
                                 value="{{ old('name', optional($user)->name) }}"
                                 class="w-full px-4 py-2.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-200
@@ -152,7 +145,6 @@
                                     transition duration-150 ease-in-out text-sm"
                                 required>
                         </div>
-                        {{-- Semua input di bawah ini diubah menjadi text-sm --}}
                         <div>
                             <label for="email"
                                 class="block text-slate-700 dark:text-slate-300 text-sm font-medium mb-2">Alamat
@@ -165,23 +157,38 @@
                                     transition duration-150 ease-in-out text-sm"
                                 required>
                         </div>
-
-                        <div>
-                            <label for="role"
-                                class="block text-slate-700 dark:text-slate-300 text-sm font-medium mb-2">Daftar
-                                sebagai:</label>
-                            <select name="role" id="role"
-                                class="w-full px-4 py-2.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-200
-                                    focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500
-                                    transition duration-150 ease-in-out text-sm"
-                                required>
-                                <option value="">Pilih Role</option>
-                                <option value="mahasiswa" {{ optional($user)->role == 'mahasiswa' ? 'selected' : '' }}>
-                                    Mahasiswa</option>
-                                <option value="siswa" {{ optional($user)->role == 'siswa' ? 'selected' : '' }}>Siswa
-                                </option>
-                            </select>
-                        </div>
+                        
+                        {{-- ▼▼▼ KODE BARU DIMULAI DI SINI ▼▼▼ --}}
+                        {{-- Jika user adalah admin atau superadmin, tampilkan role sebagai teks yang tidak bisa diubah --}}
+                        @if (Auth::user()->hasAnyRole(['admin', 'superadmin']))
+                            <div>
+                                <label for="role" class="block text-slate-700 dark:text-slate-300 text-sm font-medium mb-2">Role:</label>
+                                <input type="text" value="{{ Str::ucfirst(Auth::user()->role) }}"
+                                    class="w-full px-4 py-2.5 rounded-lg border border-slate-200 dark:border-slate-600 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 cursor-not-allowed text-sm"
+                                    disabled>
+                                {{-- Kita tetap kirim rolenya via hidden input agar validasi tidak gagal --}}
+                                <input type="hidden" name="role" value="{{ Auth::user()->role }}">
+                            </div>
+                        @else
+                        {{-- Jika user biasa, tampilkan dropdown agar bisa memilih antara mahasiswa/siswa --}}
+                            <div>
+                                <label for="role"
+                                    class="block text-slate-700 dark:text-slate-300 text-sm font-medium mb-2">Daftar
+                                    sebagai:</label>
+                                <select name="role" id="role"
+                                    class="w-full px-4 py-2.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-200
+                                        focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500
+                                        transition duration-150 ease-in-out text-sm"
+                                    required>
+                                    <option value="">Pilih Role</option>
+                                    <option value="mahasiswa" {{ optional($user)->role == 'mahasiswa' ? 'selected' : '' }}>
+                                        Mahasiswa</option>
+                                    <option value="siswa" {{ optional($user)->role == 'siswa' ? 'selected' : '' }}>Siswa
+                                    </option>
+                                </select>
+                            </div>
+                        @endif
+                        {{-- ▲▲▲ AKHIR KODE BARU ▲▲▲ --}}
 
                         <div>
                             <label for="asal_kampus"
@@ -220,7 +227,6 @@
                         </div>
 
                         <div class="pt-4">
-                            {{-- Ukuran font diubah dari text-base menjadi text-sm --}}
                             <button type="submit"
                                 class="inline-flex items-center px-6 py-3 border border-transparent text-sm font-semibold rounded-lg shadow-md
                                     bg-green-600 text-white hover:bg-green-700
@@ -240,14 +246,13 @@
             </div>
         </div>
     </div>
-
-    {{-- MODAL UBAH FOTO PROFIL --}}
-    <div id="photoModal" class="fixed inset-0 bg-gray-900 bg-opacity-80 flex items-center justify-center z-50 hidden p-4">
+    
+    {{-- MODAL UBAH FOTO PROFIL (Tidak ada perubahan, kode lengkap tetap disertakan) --}}
+   <div id="photoModal" class="fixed inset-0 bg-gray-900 bg-opacity-80 flex items-center justify-center z-50 hidden p-4">
         <div class="bg-white dark:bg-slate-800 rounded-xl shadow-2xl p-7 sm:p-9 max-w-2xl w-full transform transition-all duration-300 ease-out scale-95 opacity-0"
             id="modal-content-wrapper">
             <div class="flex justify-between items-center mb-6 pb-4 border-b border-slate-200 dark:border-slate-700">
-                {{-- Ukuran font diubah dari 2xl menjadi lg --}}
-                <h2 class="text-lg font-bold text-slate-800 dark:text-slate-100">Ubah Foto Profil</h2>
+                <h2 class="text-2xl font-bold text-slate-800 dark:text-slate-100">Ubah Foto Profil</h2>
                 <button id="closeModalBtn"
                     class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors duration-200 ease-in-out">
                     <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"
@@ -260,8 +265,7 @@
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div>
-                    {{-- Ukuran font diubah dari xl menjadi base --}}
-                    <h3 class="text-base font-semibold mb-5 text-slate-700 dark:text-slate-200">Unggah Foto Baru</h3>
+                    <h3 class="text-xl font-semibold mb-5 text-slate-700 dark:text-slate-200">Unggah Foto Baru</h3>
                     <form action="{{ route('profile.update-photo') }}" method="POST" enctype="multipart/form-data"
                         id="uploadPhotoForm" class="space-y-5">
                         @csrf
@@ -271,21 +275,20 @@
                                 Gambar:</label>
                             <input type="file" name="profile_photo" id="profile_photo" accept="image/*"
                                 class="block w-full text-sm text-slate-600 dark:text-slate-300
-                                    file:mr-4 file:py-2.5 file:px-5
-                                    file:rounded-md file:border-0
-                                    file:text-sm file:font-semibold
-                                    file:bg-indigo-100 dark:file:bg-indigo-800 file:text-indigo-700 dark:file:text-indigo-200
-                                    hover:file:bg-indigo-200 dark:hover:file:bg-indigo-700 cursor-pointer
-                                    border border-slate-300 dark:border-slate-600 rounded-lg p-1 transition-all duration-200 ease-in-out">
+                                       file:mr-4 file:py-2.5 file:px-5
+                                       file:rounded-md file:border-0
+                                       file:text-sm file:font-semibold
+                                       file:bg-indigo-100 dark:file:bg-indigo-800 file:text-indigo-700 dark:file:text-indigo-200
+                                       hover:file:bg-indigo-200 dark:hover:file:bg-indigo-700 cursor-pointer
+                                       border border-slate-300 dark:border-slate-600 rounded-lg p-1 transition-all duration-200 ease-in-out">
                             <p class="text-xs text-slate-500 dark:text-slate-400 mt-2">Maksimal 2MB, format JPG, PNG, GIF.
                             </p>
                         </div>
-                        {{-- Ukuran font diubah dari text-base menjadi text-sm --}}
                         <button type="submit"
-                            class="w-full inline-flex items-center justify-center px-6 py-3 border border-transparent text-sm font-semibold rounded-lg shadow-sm
-                                    bg-indigo-600 text-white hover:bg-indigo-700
-                                    focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-slate-800
-                                    transition-colors duration-200 ease-in-out">
+                            class="w-full inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-semibold rounded-lg shadow-sm
+                                   bg-indigo-600 text-white hover:bg-indigo-700
+                                   focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-slate-800
+                                   transition-colors duration-200 ease-in-out">
                             <svg class="w-5 h-5 mr-2 -ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                                 xmlns="http://www.w3.org/2000/svg">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -297,7 +300,7 @@
                 </div>
 
                 <div>
-                    <h3 class="text-base font-semibold mb-5 text-slate-700 dark:text-slate-200">Pilih Avatar Default</h3>
+                    <h3 class="text-xl font-semibold mb-5 text-slate-700 dark:text-slate-200">Pilih Avatar Default</h3>
                     <form action="{{ route('profile.update-photo') }}" method="POST" id="defaultAvatarForm">
                         @csrf
                         <div class="grid grid-cols-3 gap-4 max-h-64 overflow-y-auto pr-3 custom-scrollbar">
@@ -324,12 +327,11 @@
                     onsubmit="return confirm('Apakah Anda yakin ingin menghapus foto profil? Ini akan mengembalikan ke avatar default pertama.');"
                     class="w-full sm:w-auto">
                     @csrf
-                    {{-- Ukuran font diubah dari text-base menjadi text-sm --}}
                     <button type="submit"
-                        class="w-full sm:w-auto inline-flex items-center justify-center px-5 py-2.5 border border-transparent text-sm font-semibold rounded-lg shadow-sm
-                            bg-red-600 text-white hover:bg-red-700
-                            focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 dark:focus:ring-offset-slate-800
-                            transition-colors duration-200 ease-in-out">
+                        class="w-full sm:w-auto inline-flex items-center justify-center px-5 py-2.5 border border-transparent text-base font-semibold rounded-lg shadow-sm
+                               bg-red-600 text-white hover:bg-red-700
+                               focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 dark:focus:ring-offset-slate-800
+                               transition-colors duration-200 ease-in-out">
                         <svg class="w-5 h-5 mr-2 -ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                             xmlns="http://www.w3.org/2000/svg">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -346,7 +348,6 @@
 
 @push('styles')
     <style>
-        /* Custom scrollbar for better aesthetics in avatar selection */
         .custom-scrollbar::-webkit-scrollbar {
             width: 8px;
         }
@@ -357,26 +358,21 @@
 
         .custom-scrollbar::-webkit-scrollbar-thumb {
             background: #94a3b8;
-            /* slate-400 */
             border-radius: 4px;
         }
 
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
             background: #64748b;
-            /* slate-500 */
         }
 
         .dark .custom-scrollbar::-webkit-scrollbar-thumb {
             background: #475569;
-            /* slate-600 */
         }
 
         .dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
             background: #334155;
-            /* slate-700 */
         }
 
-        /* Animasi modal */
         #photoModal.hidden #modal-content-wrapper {
             transform: scale(0.95);
             opacity: 0;
@@ -405,7 +401,7 @@
                     if (photoModal) {
                         photoModal.classList.remove('hidden');
                         document.body.classList.add('overflow-hidden');
-                        modalContentWrapper.offsetWidth; // Trigger reflow
+                        modalContentWrapper.offsetWidth; 
                         modalContentWrapper.classList.remove('opacity-0', 'scale-95');
                         modalContentWrapper.classList.add('opacity-100', 'scale-100');
                     }
@@ -467,7 +463,6 @@
             }
 
             window.selectDefaultAvatar = function(radioId, N_this_element) {
-                // Better way to reset active state using closest() and forEach()
                 const avatarContainers = defaultAvatarForm.querySelectorAll('[type="radio"]').forEach(radio => {
                     radio.closest('div').classList.remove('border-indigo-500', 'ring-2',
                         'ring-indigo-300',

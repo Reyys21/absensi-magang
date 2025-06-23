@@ -8,8 +8,11 @@ use App\Http\Controllers\RegisteredUserController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\HomepageController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
-use App\Http\Controllers\Admin\UserController; // <-- PASTIKAN USE STATEMENT INI ADA DI ATAS
-use App\Http\Controllers\Superadmin\BidangController; // Import BidangController
+use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Superadmin\BidangController;
+// ▼▼▼ TAMBAHKAN USE STATEMENT UNTUK CONTROLLER BARU ▼▼▼
+use App\Http\Controllers\Auth\ForgotPasswordController;
+use App\Http\Controllers\Auth\ResetPasswordController;
 
 
 // Rute Homepage publik
@@ -21,6 +24,13 @@ Route::middleware('guest')->group(function () {
     Route::post('/login', [AuthController::class, 'login']);
     Route::get('/register', [RegisteredUserController::class, 'create'])->name('register');
     Route::post('/register', [RegisteredUserController::class, 'store']);
+
+    // ▼▼▼ BLOK RUTE BARU UNTUK LUPA PASSWORD ▼▼▼
+    Route::get('forgot-password', [ForgotPasswordController::class, 'showLinkRequestForm'])->name('password.request');
+    Route::post('forgot-password', [ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
+    Route::get('reset-password/{token}', [ResetPasswordController::class, 'showResetForm'])->name('password.reset');
+    Route::post('reset-password', [ResetPasswordController::class, 'update'])->name('password.update');
+    // ▲▲▲ AKHIR BLOK RUTE BARU ▲▲▲
 });
 
 // Rute untuk user yang sudah login
@@ -53,7 +63,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/approval-requests', [AttendanceController::class, 'showApprovalRequests'])->name('approval.requests');
         Route::post('/approval-requests/{correctionRequest}/approve', [AttendanceController::class, 'approveCorrection'])->name('approval.approve');
         Route::post('/approval-requests/{correctionRequest}/reject', [AttendanceController::class, 'rejectCorrection'])->name('approval.reject');
-
+    
         // Rute untuk Fitur MONITORING User
         Route::get('/monitoring/users', [UserController::class, 'indexMonitoring'])->name('monitoring.users.index');
         Route::get('/monitoring/users/{user}', [UserController::class, 'showMonitoring'])->name('monitoring.users.show');
@@ -65,27 +75,24 @@ Route::middleware('auth')->group(function () {
     // --- GRUP RUTE KHUSUS SUPERADMIN ---
     Route::middleware('can:access-superadmin-pages')->prefix('superadmin')->name('superadmin.')->group(function () {
         Route::get('/dashboard', [AdminDashboardController::class, 'superadminDashboard'])->name('dashboard');
-
+      
         Route::resource('bidang', \App\Http\Controllers\Superadmin\BidangController::class);
-        // Tambahkan route show untuk bidang
-        Route::get('bidang/{bidang}/detail', [BidangController::class, 'show'])->name('bidang.show'); //
+        Route::get('bidang/{bidang}/detail', [BidangController::class, 'show'])->name('bidang.show');
 
         Route::resource('admins', \App\Http\Controllers\Superadmin\AdminController::class)->parameters(['admins' => 'admin']);
-
-        // ▼▼▼ RUTE BARU DITAMBAHKAN DI SINI ▼▼▼
+    
         Route::post('users/{user}/promote', [\App\Http\Controllers\Superadmin\AdminController::class, 'promoteUser'])->name('users.promote');
+        
+        Route::post('admins/{admin}/demote', [\App\Http\Controllers\Superadmin\AdminController::class, 'demoteAdmin'])->name('admins.demote');
     });
 
     // --- Rute profil yang sudah dilengkapi ---
     Route::prefix('profile')->name('profile.')->controller(ProfileController::class)->group(function () {
-        // Rute yang sudah ada
         Route::get('/edit', 'edit')->name('edit');
         Route::patch('/update-information', 'updateProfileInformation')->name('update-information');
-
-        // --- RUTE BARU UNTUK PROFIL ---
         Route::post('/update-photo', 'updateProfilePhoto')->name('update-photo');
         Route::post('/delete-photo', 'deleteProfilePhoto')->name('delete-photo');
-        Route::get('/change-password', 'showChangePasswordForm')->name('change-password'); // <-- Rute yang hilang
+        Route::get('/change-password', 'showChangePasswordForm')->name('change-password');
         Route::patch('/update-password', 'updatePassword')->name('update-password');
     });
 });

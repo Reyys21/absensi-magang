@@ -36,13 +36,24 @@
                     : asset('profile_photos/avatar_1 (1).jpg') }}"
                 alt="{{ optional(Auth::user())->name ?: 'Pengguna' }}">
             <div>
-                {{-- Ukuran font diubah dari text-xl ke text-lg --}}
                 <h2 class="text-lg font-semibold text-white leading-tight">
                     {{ optional(Auth::user())->name ?: 'Guest User' }}</h2>
-                <span class="inline-block mt-1 px-2 py-0.5 rounded-sm text-xs font-medium bg-red-600 text-white">
-                    {{ optional(Auth::user())->role ?: 'N/A' }}
-                </span>
-                {{-- Ukuran font diubah dari text-sm ke text-xs --}}
+                
+                {{-- ▼▼▼ KODE BARU DITAMBAHKAN DI SINI ▼▼▼ --}}
+                {{-- Menampilkan Role dan Bidang --}}
+                <div class="flex items-center gap-x-2 mt-1">
+                    <span class="inline-block px-2 py-0.5 rounded-sm text-xs font-medium bg-red-600 text-white">
+                        {{ optional(Auth::user())->role ? Str::ucfirst(Auth::user()->role) : 'N/A' }}
+                    </span>
+                    {{-- Tampilkan nama bidang jika user memiliki bidang --}}
+                    @if(Auth::user()->bidang)
+                        <span class="inline-block px-2 py-0.5 rounded-sm text-xs font-medium bg-blue-600 text-white">
+                            {{ Auth::user()->bidang->name }}
+                        </span>
+                    @endif
+                </div>
+                {{-- ▲▲▲ AKHIR KODE BARU ▲▲▲ --}}
+
                 <div class="mt-2 text-xs text-gray-400 break-words">
                     <div>{{ optional(Auth::user())->email ?: 'N/A' }}</div>
                     <div>{{ optional(Auth::user())->nim ?: 'N/A' }}</div>

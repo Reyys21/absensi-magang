@@ -4,8 +4,6 @@
     {{-- Ini adalah div pembungkus utama untuk sidebar dan konten --}}
     <div class="flex flex-col md:flex-row min-h-screen font-[Inter]">
 
-        {{-- Asumsi: Sidebar dari layouts.app akan muncul di sini --}}
-
         <div class="flex-1 flex flex-col">
 
             <header class="bg-white flex flex-row justify-between items-center py-2 px-4 sm:px-6 md:px-8 border-b border-gray-200 sticky top-0 z-10">
@@ -18,11 +16,11 @@
             {{-- Konten utama dimulai di sini --}}
             <main id="main-content" class="flex-1 p-4 sm:p-6 md:p-8 bg-gray-50/50">
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 mb-6">
+                {{-- ▼▼▼ KODE GRID DIPERBARUI DI SINI ▼▼▼ --}}
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 mb-6">
+                {{-- ▲▲▲ AKHIR PERUBAHAN GRID ▲▲▲ --}}
                     
-                    {{-- KARTU 1: Absensi Hari Ini --}}
-                    {{-- Menambahkan min-h-[340px] untuk tinggi minimal di mobile, dan md:min-h-0 untuk menonaktifkannya di desktop --}}
-                    <div class="bg-[#0B849F] text-white rounded-[20px] px-4 sm:px-6 py-5 shadow-lg border flex flex-col justify-between relative overflow-hidden min-h-[340px] md:min-h-0">
+                    <div class="bg-[#0B849F] text-white rounded-[20px] px-4 sm:px-6 py-5 shadow-lg border flex flex-col justify-between relative overflow-hidden min-h-[340px] md:min-h-0 md:col-span-2">
                         <h2 class="text-white text-base sm:text-lg font-semibold mb-4">Absensi Hari Ini</h2>
                         <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
                             <div class="flex flex-col gap-4 sm:gap-6">
@@ -52,14 +50,20 @@
                         </div>
                     </div>
 
-                    {{-- KARTU 2: Absensi Saya --}}
-                    <div class="bg-[#0B849F] text-white rounded-[20px] p-4 sm:p-6 shadow-lg flex flex-col items-center justify-center text-center">
-                        <a class="flex flex-col items-center justify-center w-full h-full" href="{{ route('attendance.my') }}">
-                            <h2 class="text-base font-semibold mb-2">Absensi Saya</h2>
-                            <p class="text-3xl font-bold">{{ $attendanceCount }} hari</p>
-                        </a>
+                    {{-- ▼▼▼ BLOK KARTU BARU DITAMBAHKAN DI SINI ▼▼▼ --}}
+                    <div class="grid grid-rows-2 gap-4 sm:gap-6">
+                        <div class="bg-[#14BDEB] text-white rounded-[20px] p-4 sm:p-6 shadow-lg flex flex-col items-center justify-center text-center">
+                            <h2 class="text-base font-semibold mb-2">Bidang Penempatan</h2>
+                            <p class="text-xl font-bold">{{ Auth::user()->bidang->name ?? 'Belum Ditugaskan' }}</p>
+                        </div>
+                        <div class="bg-[#FFD100] text-[#2A2B2A] rounded-[20px] p-4 sm:p-6 shadow-lg flex flex-col items-center justify-center text-center">
+                            <a class="flex flex-col items-center justify-center w-full h-full" href="{{ route('attendance.my') }}">
+                                <h2 class="text-base font-semibold mb-2">Total Kehadiran</h2>
+                                <p class="text-3xl font-bold">{{ $attendanceCount }} hari</p>
+                            </a>
+                        </div>
                     </div>
-
+                    {{-- ▲▲▲ AKHIR BLOK KARTU BARU ▲▲▲ --}}
                 </div>
             </main>
         </div>

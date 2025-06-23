@@ -40,11 +40,25 @@
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-right">
                         <a href="{{ route('superadmin.admins.edit', $admin) }}" class="text-indigo-600 hover:text-indigo-900 mr-4">Edit</a>
-                        <form action="{{ route('superadmin.admins.destroy', $admin) }}" method="POST" class="inline" onsubmit="return confirm('Yakin ingin menghapus admin ini?');">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="text-red-600 hover:text-red-900">Hapus</button>
-                        </form>
+                        
+                        {{-- ▼▼▼ INI BAGIAN YANG DITAMBAHKAN/DIMODIFIKASI ▼▼▼ --}}
+                        {{-- Form Demote: Muncul jika target BUKAN superadmin & BUKAN diri sendiri --}}
+                        @if (Auth::id() !== $admin->id && !$admin->hasRole('superadmin'))
+                            <form action="{{ route('superadmin.admins.demote', $admin) }}" method="POST" class="inline" onsubmit="return confirm('Anda yakin ingin mengubah role admin ini kembali menjadi User? Semua izin khusus akan dicabut.');">
+                                @csrf
+                                <button type="submit" class="text-yellow-600 hover:text-yellow-900">Jadikan User</button>
+                            </form>
+                        @endif
+
+                        {{-- Form Hapus: Muncul jika target BUKAN diri sendiri --}}
+                        @if (Auth::id() !== $admin->id)
+                            <form action="{{ route('superadmin.admins.destroy', $admin) }}" method="POST" class="inline ml-4" onsubmit="return confirm('Yakin ingin menghapus admin ini?');">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="text-red-600 hover:text-red-900">Hapus</button>
+                            </form>
+                        @endif
+                        {{-- ▲▲▲ AKHIR BAGIAN YANG DIMODIFIKASI ▲▲▲ --}}
                     </td>
                 </tr>
                 @empty

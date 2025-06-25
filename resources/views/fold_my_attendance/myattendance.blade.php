@@ -86,9 +86,7 @@
                             <th class="py-3 px-4 whitespace-nowrap">Tanggal</th>
                             <th class="py-3 px-4 whitespace-nowrap">Check-In</th>
                             <th class="py-3 px-4 whitespace-nowrap">Check-Out</th>
-                            {{-- Removed whitespace-nowrap to allow text wrapping for Activity Title --}}
                             <th class="py-3 px-4">Judul Aktivitas</th>
-                            {{-- Removed whitespace-nowrap to allow text wrapping for Activity Description and adjusted width --}}
                             <th class="py-3 px-4 w-full md:w-[35%]">Deskripsi Aktivitas</th>
                             <th class="py-3 px-4 whitespace-nowrap">Status</th>
                         </tr>
@@ -277,6 +275,7 @@
                     const rows = table.querySelectorAll('tbody tr');
                     rows.forEach(row => {
                         const rowData = [];
+                        if (row.cells.length < 7) return;
                         // Dapatkan data untuk kolom tetap
                         rowData.push(row.cells[0].innerText.trim()); // No
                         rowData.push(row.cells[1].innerText.trim()); // Tanggal
@@ -292,8 +291,10 @@
                         const activityTitle = activityTitleElement ? activityTitleElement.innerText.trim() : '';
                         let activityDescription = activityDescriptionElement ? activityDescriptionElement.dataset
                             .fullText || activityDescriptionElement.innerText.trim() : '';
-                        activityDescription = activityDescription.replace(/(\r\n|\n|\r)/gm, " ").replace(/\s\s+/g,
-                        " "); // Bersihkan baris baru untuk Excel
+                        
+                        const tempDiv = document.createElement('div');
+                        tempDiv.innerHTML = activityDescription;
+                        activityDescription = (tempDiv.textContent || tempDiv.innerText).trim();
 
                         const status = statusElement ? statusElement.innerText.trim() : '';
 
@@ -320,6 +321,8 @@
 
                     table.querySelectorAll('tbody tr').forEach(row => {
                         let rowData = [];
+                        if (row.cells.length < 7) return;
+
                         rowData.push(cleanTextForCSV(row.cells[0].innerText)); // No
                         rowData.push(cleanTextForCSV(row.cells[1].innerText)); // Tanggal
                         rowData.push(cleanTextForCSV(row.cells[2].innerText)); // Check-In
@@ -334,8 +337,10 @@
                         const activityTitle = activityTitleCell ? activityTitleCell.innerText.trim() : '';
                         let activityDescription = activityDescriptionSpan ? activityDescriptionSpan.dataset
                             .fullText || activityDescriptionSpan.innerText.trim() : '';
-                        activityDescription = activityDescription.replace(/(\r\n|\n|\r)/gm, " ").replace(
-                            /\s\s+/g, " ");
+                        
+                        const tempDiv = document.createElement('div');
+                        tempDiv.innerHTML = activityDescription;
+                        activityDescription = (tempDiv.textContent || tempDiv.innerText).trim();
 
                         const status = statusSpan ? statusSpan.innerText.trim() : '';
 

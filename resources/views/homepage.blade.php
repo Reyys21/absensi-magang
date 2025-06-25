@@ -560,7 +560,7 @@
 
     <footer>
         <div class="container footer-content">
-            <p>&copy; 2025 Absensi Magang. Hak Cipta Dilindungi Oleh Rizky mwhehe.</p>
+            <p>&copy; 2025 Absensi Magang</p>
         </div>
     </footer>
 

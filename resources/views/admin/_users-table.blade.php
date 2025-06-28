@@ -2,8 +2,12 @@
     <table class="w-full min-w-full text-sm">
         <thead class="bg-gray-50 text-gray-600">
             <tr>
-                {{-- REVISI: Penambahan kolom "No" --}}
+                {{-- Kolom No untuk urutan per halaman --}}
                 <th class="p-4 text-left font-semibold w-16">No</th>
+                
+                {{-- ▼▼▼ KOLOM BARU DITAMBAHKAN ▼▼▼ --}}
+                <th class="p-4 text-left font-semibold">ID</th>
+                
                 <th class="p-4 text-left font-semibold">
                     @php
                         $direction = (request('sort_by') == 'name' && request('sort_direction') == 'asc') ? 'desc' : 'asc';
@@ -30,22 +34,24 @@
                         @endif
                     </a>
                 </th>
-                {{-- REVISI: Kolom "Nomor HP" dihapus --}}
                 <th class="p-4 text-left font-semibold">Status</th>
-                <th class="p-4 text-left font-semibold">Bidang</th> {{-- Tambah kolom Bidang --}}
+                <th class="p-4 text-left font-semibold">Bidang</th>
                 <th class="p-4 text-left font-semibold">Aksi</th>
             </tr>
         </thead>
         <tbody class="divide-y divide-gray-200">
             @forelse ($users as $key => $user)
                 <tr class="hover:bg-gray-50 transition-colors">
-                    {{-- REVISI: Penambahan data nomor urut --}}
+                    {{-- Penomoran ini sudah benar untuk pagination, jangan diubah --}}
                     <td class="p-4 whitespace-nowrap text-center">{{ $users->firstItem() + $key }}</td>
+                    
+                    {{-- ▼▼▼ DATA BARU DITAMPILKAN ▼▼▼ --}}
+                    <td class="p-4 whitespace-nowrap font-medium text-gray-500">{{ $user->id }}</td>
+
                     <td class="p-4 whitespace-nowrap">{{ $user->name }}</td>
                     <td class="p-4 whitespace-nowrap">{{ $user->email }}</td>
-                    {{-- REVISI: Kolom data "Nomor HP" dihapus --}}
                     <td class="p-4 whitespace-nowrap"><span class="px-2 py-1 text-xs font-medium rounded-full {{ $user->role == 'mahasiswa' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800' }}">{{ Str::ucfirst($user->role) }}</span></td>
-                    <td class="p-4 whitespace-nowrap">{{ $user->bidang->name ?? 'N/A' }}</td> {{-- Tampilkan nama bidang --}}
+                    <td class="p-4 whitespace-nowrap">{{ $user->bidang->name ?? 'N/A' }}</td>
                     <td class="p-4 whitespace-nowrap">
                         <a href="{{ route('admin.monitoring.users.show', $user->id) }}" class="font-medium text-blue-600 hover:text-blue-800">
                             Lihat Detail
@@ -54,8 +60,8 @@
                 </tr>
             @empty
                 <tr>
-                    {{-- REVISI: Colspan tetap 5 --}}
-                    <td colspan="6" class="text-center p-10 text-gray-500"> {{-- Ubah colspan menjadi 6 --}}
+                    {{-- Sesuaikan colspan menjadi 7 karena ada penambahan 1 kolom --}}
+                    <td colspan="7" class="text-center p-10 text-gray-500">
                         <i class="fa-solid fa-folder-open fa-3x mb-3"></i>
                         <p class="font-medium">Data tidak ditemukan.</p>
                     </td>

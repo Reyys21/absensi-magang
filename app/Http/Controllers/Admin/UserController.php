@@ -19,24 +19,23 @@ class UserController extends Controller
             $q->where('name', 'user');
         });
 
-    $currentUser = Auth::user();
+        $currentUser = Auth::user();
 
-    // Admin dengan scope global (berdasarkan permission) atau Superadmin bisa filter berdasarkan bidang
-    if ($currentUser->hasRole('superadmin') || $currentUser->can('view all users')) { // <-- PERUBAHAN DI SINI
-        if ($request->filled('bidang_filter')) {
-            $query->where('bidang_id', $request->bidang_filter);
+        if ($currentUser->hasRole('superadmin') || $currentUser->can('view all users')) {
+            if ($request->filled('bidang_filter')) {
+                $query->where('bidang_id', $request->bidang_filter);
+            }
+        } else {
+            $query->where('bidang_id', $currentUser->bidang_id);
         }
-    } else {
-        // Admin biasa hanya melihat pengguna dari bidangnya sendiri
-        $query->where('bidang_id', $currentUser->bidang_id);
-    }
-        // ▲▲▲ AKHIR PERUBAHAN LOGIKA ▲▲▲
 
         $query->when($request->search, function ($q, $search) {
             $q->where(function ($subQuery) use ($search) {
-                $subQuery->where('name', 'like', "%{$search}%")->orWhere('email', 'like', "%{$search}%");
+                $subQuery->where('name', 'like', "%{$search}%")
+                         ->orWhere('email', 'like', "%{$search}%");
             });
         });
+
         $query->when($request->filter_role, function ($q, $role) {
             $q->where('role', $role);
         });
@@ -50,16 +49,14 @@ class UserController extends Controller
             $query->latest();
         }
 
+        // Paginasi dengan mempertahankan query string
         $users = $query->with('bidang')->select('id', 'name', 'email', 'phone', 'role', 'bidang_id')->paginate(15)->appends($request->query());
 
         if ($request->ajax()) {
             return view('admin._users-table', compact('users'))->render();
         }
 
-        // ▼▼▼ PERUBAHAN LOGIKA DIMULAI DI SINI ▼▼▼
-        // Ambil data bidang untuk dropdown filter, JIKA user adalah superadmin ATAU admin global
-        $bidangs = ($currentUser->hasRole('superadmin') || $currentUser->has_global_scope) ? Bidang::orderBy('name')->get() : collect();
-        // ▲▲▲ AKHIR PERUBAHAN LOGIKA ▲▲▲
+        $bidangs = ($currentUser->hasRole('superadmin') || $currentUser->can('view all users')) ? Bidang::orderBy('name')->get() : collect();
 
         return view('admin.users', compact('users', 'bidangs'));
     }
@@ -72,19 +69,20 @@ class UserController extends Controller
 
         $currentUser = Auth::user();
 
-    if ($currentUser->hasRole('superadmin') || $currentUser->can('view all users')) { // <-- PERUBAHAN DI SINI
-        if ($request->filled('bidang_filter')) {
-            $query->where('bidang_id', $request->bidang_filter);
+        if ($currentUser->hasRole('superadmin') || $currentUser->can('view all users')) {
+            if ($request->filled('bidang_filter')) {
+                $query->where('bidang_id', $request->bidang_filter);
+            }
+        } else {
+            $query->where('bidang_id', $currentUser->bidang_id);
         }
-    } else {
-        $query->where('bidang_id', $currentUser->bidang_id);
-    }
 
         $query->when($request->search, function ($q, $search) {
             $q->where(function ($subQuery) use ($search) {
                 $subQuery->where('name', 'like', "%{$search}%")->orWhere('email', 'like', "%{$search}%");
             });
         });
+        
         $query->when($request->filter_role, function ($q, $role) {
             $q->where('role', $role);
         });
@@ -95,9 +93,7 @@ class UserController extends Controller
             return view('admin._account-table', compact('users'));
         }
 
-        // ▼▼▼ PERUBAHAN LOGIKA DIMULAI DI SINI ▼▼▼
-        $bidangs = ($currentUser->hasRole('superadmin') || $currentUser->has_global_scope) ? Bidang::orderBy('name')->get() : collect();
-        // ▲▲▲ AKHIR PERUBAHAN LOGIKA ▲▲▲
+        $bidangs = ($currentUser->hasRole('superadmin') || $currentUser->can('view all users')) ? Bidang::orderBy('name')->get() : collect();
 
         return view('admin.account', compact('users', 'bidangs'));
     }
@@ -107,11 +103,9 @@ class UserController extends Controller
     {
         $currentUser = Auth::user();
 
-        // ▼▼▼ PERUBAHAN LOGIKA DIMULAI DI SINI ▼▼▼
-      if ($currentUser->hasRole('admin') && !$currentUser->can('view all users') && $currentUser->bidang_id != $user->bidang_id) { // <-- PERUBAHAN DI SINI
-        abort(403, 'AKSES DITOLAK. Anda tidak berwenang melihat data user dari bidang lain.');
-    }
-        // ▲▲▲ AKHIR PERUBAHAN LOGIKA ▲▲▲
+        if ($currentUser->hasRole('admin') && !$currentUser->can('view all users') && $currentUser->bidang_id != $user->bidang_id) {
+            abort(403, 'AKSES DITOLAK. Anda tidak berwenang melihat data user dari bidang lain.');
+        }
 
         $attendancesQuery = Attendance::where('user_id', $user->id);
 

@@ -65,15 +65,16 @@
 @section('content')
     <div class="flex-1 flex flex-col">
 
-            <header class="bg-white flex flex-row justify-between items-center py-2 px-4 sm:px-6 md:px-8 border-b border-gray-200 sticky top-0 z-10">
-                <div>
-                    <h1 class="text-lg sm:text-xl lg:text-2xl font-bold text-gray-800">Permintaan Koreksi</h1>
-                </div>
-                @include('layouts.profile')
-            </header>
+        <header
+            class="bg-white flex flex-row justify-between items-center py-2 px-4 sm:px-6 md:px-8 border-b border-gray-200 sticky top-0 z-10">
+            <div>
+                <h1 class="text-lg sm:text-xl lg:text-2xl font-bold text-gray-800">Permintaan Koreksi</h1>
+            </div>
+            @include('layouts.profile')
+        </header>
 
-            {{-- Konten utama dimulai di sini --}}
-            <main id="main-content" class="flex-1 p-4 sm:p-6 md:p-8 bg-gray-50/50">
+        {{-- Konten utama dimulai di sini --}}
+        <main id="main-content" class="flex-1 p-4 sm:p-6 md:p-8 bg-gray-50/50">
 
             <div class="bg-white rounded-lg shadow-md p-4 md:p-6 mb-6">
                 <h2 class="text-lg font-semibold text-gray-800 mb-4">Daftar Permintaan Koreksi Absensi Anda</h2>
@@ -97,7 +98,7 @@
                                     <th
                                         class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                         Check-Out (Req)</th>
-                                    
+
                                     {{-- ▼▼▼ KOLOM BARU DITAMBAHKAN DI SINI ▼▼▼ --}}
                                     <th
                                         class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -132,8 +133,8 @@
                                             class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                             {{ $requestItem->new_check_out ? $requestItem->new_check_out->format('H:i') : '--.--' }}
                                         </td>
-                                        
-                                        {{-- ▼▼▼ DATA BARU DITAMBAHKAN DI SINI ▼▼▼ --}}
+
+                                        {{-- ▼▼▼ DATA BARU DITAMPILKAN DI SINI ▼▼▼ --}}
                                         <td data-label="Judul Aktivitas" class="px-6 py-4 text-sm text-gray-900">
                                             <span class="expandable-text"
                                                 data-original-text="{{ $requestItem->new_activity_title ?: '--' }}"></span>
@@ -143,7 +144,7 @@
                                                 data-original-text="{{ $requestItem->new_activity_description ?: '--' }}"></span>
                                         </td>
                                         {{-- ▲▲▲ AKHIR DATA BARU ▲▲▲ --}}
-                                        
+
                                         <td data-label="Alasan Anda" class="px-6 py-4 text-sm text-gray-900">
                                             <span class="expandable-text"
                                                 data-original-text="{{ $requestItem->reason ?: '--' }}"></span>
@@ -199,7 +200,7 @@
                         e.preventDefault();
                         if (link.textContent === 'Lihat selengkapnya') {
                             span.innerHTML =
-                            `${originalText} <a class="read-more-link">Ringkas</a>`;
+                                `${originalText} <a class="read-more-link">Ringkas</a>`;
                             // Re-add event listener to the new link
                             span.querySelector('.read-more-link').addEventListener('click',
                                 arguments.callee);

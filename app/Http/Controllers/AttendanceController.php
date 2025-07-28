@@ -203,8 +203,12 @@ class AttendanceController extends Controller
             if ($dailyAttendances->isEmpty() && Carbon::parse($selectedDate, $appTimezone)->lte(Carbon::now($appTimezone)) && Carbon::parse($selectedDate, $appTimezone)->gte($registrationDate)) {
                 $dummyAttendance = (object) [
                     'date' => Carbon::parse($selectedDate, $appTimezone),
-                    'check_in' => null, 'check_out' => null, 'activity_title' => null, 'activity_description' => null,
-                    'user_id' => $userId, 'is_dummy' => true,
+                    'check_in' => null,
+                    'check_out' => null,
+                    'activity_title' => null,
+                    'activity_description' => null,
+                    'user_id' => $userId,
+                    'is_dummy' => true,
                     'attendance_status' => 'Tidak Hadir (Belum Lengkap)',
                     'day_name' => Carbon::parse($selectedDate, $appTimezone)->translatedFormat('l'),
                     'formatted_date' => Carbon::parse($selectedDate, $appTimezone)->translatedFormat('d F Y'),
@@ -224,13 +228,19 @@ class AttendanceController extends Controller
             for ($d = Carbon::now($appTimezone)->startOfDay(); $d->gte($sevenDaysAgo); $d->subDay()) {
                 $dateString = $d->toDateString();
                 $attendanceRecord = $currentDailyAttendancesMap[$dateString] ?? null;
-                if ($d->lt($registrationDate->copy()->startOfDay())) continue;
+                if ($d->lt($registrationDate->copy()->startOfDay()))
+                    continue;
                 if ($attendanceRecord) {
                     $processedDailyAttendances->push($attendanceRecord);
                 } else {
                     $dummyAttendance = (object) [
-                        'date' => $d, 'check_in' => null, 'check_out' => null, 'activity_title' => null, 'activity_description' => null,
-                        'user_id' => $userId, 'is_dummy' => true,
+                        'date' => $d,
+                        'check_in' => null,
+                        'check_out' => null,
+                        'activity_title' => null,
+                        'activity_description' => null,
+                        'user_id' => $userId,
+                        'is_dummy' => true,
                         'attendance_status' => 'Tidak Hadir (Belum Lengkap)',
                         'day_name' => $d->translatedFormat('l'),
                         'formatted_date' => $d->translatedFormat('d F Y'),
@@ -319,21 +329,28 @@ class AttendanceController extends Controller
         $currentOldCheckInFormatted = $currentOldCheckIn ? $currentOldCheckIn->format('H:i') : null;
         $currentOldCheckOutFormatted = $currentOldCheckOut ? $currentOldCheckOut->format('H:i') : null;
         $hasChanges = false;
-        if (($currentOldCheckInFormatted !== $validated['new_check_in'] && !($currentOldCheckInFormatted === null && empty($validated['new_check_in']))) ||
+        if (
+            ($currentOldCheckInFormatted !== $validated['new_check_in'] && !($currentOldCheckInFormatted === null && empty($validated['new_check_in']))) ||
             ($currentOldCheckOutFormatted !== $validated['new_check_out'] && !($currentOldCheckOutFormatted === null && empty($validated['new_check_out']))) ||
             ($currentOldActivityTitle !== $validated['new_activity_title'] && !($currentOldActivityTitle === null && empty($validated['new_activity_title']))) ||
-            ($currentOldActivityDescription !== $validated['new_activity_description'] && !($currentOldActivityDescription === null && empty($validated['new_activity_description'])))) {
+            ($currentOldActivityDescription !== $validated['new_activity_description'] && !($currentOldActivityDescription === null && empty($validated['new_activity_description'])))
+        ) {
             $hasChanges = true;
         }
         if (!$hasChanges) {
             return redirect()->back()->with('info', 'Tidak ada perubahan yang diajukan untuk koreksi.');
         }
         $correctionData = [
-            'user_id' => $userId, 'attendance_date' => $dateToCorrect->toDateString(),
-            'old_check_in' => $attendance ? $attendance->check_in : null, 'old_check_out' => $attendance ? $attendance->check_out : null,
-            'new_check_in' => $newCheckInTime, 'new_check_out' => $newCheckOutTime,
-            'new_activity_title' => $validated['new_activity_title'], 'new_activity_description' => $validated['new_activity_description'],
-            'reason' => $validated['reason'], 'status' => 'pending',
+            'user_id' => $userId,
+            'attendance_date' => $dateToCorrect->toDateString(),
+            'old_check_in' => $attendance ? $attendance->check_in : null,
+            'old_check_out' => $attendance ? $attendance->check_out : null,
+            'new_check_in' => $newCheckInTime,
+            'new_check_out' => $newCheckOutTime,
+            'new_activity_title' => $validated['new_activity_title'],
+            'new_activity_description' => $validated['new_activity_description'],
+            'reason' => $validated['reason'],
+            'status' => 'pending',
         ];
         if ($existingCorrectionRequest) {
             $existingCorrectionRequest->update($correctionData);
@@ -359,9 +376,12 @@ class AttendanceController extends Controller
     {
         $appTimezone = config('app.timezone');
         $validated = $request->validate([
-            'user_id' => 'required|exists:users,id', 'date' => 'required|date',
-            'check_in' => 'nullable|date_format:H:i:s', 'check_out' => 'nullable|date_format:H:i:s|after:check_in',
-            'activity_title' => 'nullable|string|max:255', 'activity_description' => 'nullable|string',
+            'user_id' => 'required|exists:users,id',
+            'date' => 'required|date',
+            'check_in' => 'nullable|date_format:H:i:s',
+            'check_out' => 'nullable|date_format:H:i:s|after:check_in',
+            'activity_title' => 'nullable|string|max:255',
+            'activity_description' => 'nullable|string',
         ]);
         if ($validated['check_in']) {
             $validated['check_in'] = Carbon::createFromFormat('Y-m-d H:i:s', $validated['date'] . ' ' . $validated['check_in'], $appTimezone);
@@ -379,8 +399,11 @@ class AttendanceController extends Controller
     public function showApprovalRequests(Request $request)
     {
         $user = Auth::user();
-        $query = CorrectionRequest::with(['user', 'user.bidang'])->where('status', 'pending');
-
+        
+        // Query awal TIDAK lagi memfilter berdasarkan status
+        $query = CorrectionRequest::with(['user', 'user.bidang']);
+    
+        // Filter search tetap berlaku untuk semua
         if ($request->filled('search')) {
             $search = $request->input('search');
             $query->where(function ($q) use ($search) {
@@ -390,10 +413,13 @@ class AttendanceController extends Controller
                 })->orWhere('attendance_date', 'like', "%{$search}%");
             });
         }
-
+    
+        // Cek apakah yang login adalah admin/superadmin
         if (Gate::allows('access-admin-pages')) {
-            // ▼▼▼ PERUBAHAN LOGIKA DIMULAI DI SINI ▼▼▼
-            // Superadmin atau Admin dengan izin global bisa filter berdasarkan bidang
+            // === BAGIAN UNTUK ADMIN ===
+            // Filter 'pending' HANYA diterapkan untuk admin di sini
+            $query->where('status', 'pending');
+    
             if ($user->hasRole('superadmin') || $user->can('approve all requests')) {
                 if ($request->filled('bidang_filter')) {
                     $bidangId = $request->input('bidang_filter');
@@ -402,24 +428,27 @@ class AttendanceController extends Controller
                     });
                 }
             } else {
-                // Admin biasa hanya melihat permintaan dari bidangnya
                 $adminBidangId = $user->bidang_id;
                 $query->whereHas('user', function ($userQuery) use ($adminBidangId) {
                     $userQuery->where('bidang_id', $adminBidangId);
                 });
             }
-            // ▲▲▲ AKHIR PERUBAHAN LOGIKA ▲▲▲
-
+    
             $requests = $query->orderBy('created_at', 'desc')->paginate(10)->appends($request->query());
             $bidangs = Bidang::orderBy('name')->get();
             return view('admin.approval', compact('requests', 'bidangs'));
+
         } else {
-            // Logika untuk User Biasa
+            // === BAGIAN UNTUK USER BIASA ===
+            // Query untuk user biasa tidak difilter berdasarkan status
             $query->where('user_id', $user->id);
             $requests = $query->orderBy('created_at', 'desc')->paginate(10)->appends($request->query());
+            
+            // Mengarahkan ke view yang benar untuk user
             return view('fold_AttendanceApproval.Attendance Approval', compact('requests'));
         }
     }
+
 
     /**
      * Menyetujui permintaan koreksi absensi.
@@ -427,7 +456,7 @@ class AttendanceController extends Controller
     public function approveCorrection(CorrectionRequest $correctionRequest)
     {
         Gate::authorize('access-admin-pages');
-        
+
         // ▼▼▼ PERUBAHAN LOGIKA OTORISASI ▼▼▼
         $admin = Auth::user();
         // Tolak jika dia admin biasa (tanpa izin global) DAN mencoba mengakses data dari bidang lain
@@ -437,10 +466,14 @@ class AttendanceController extends Controller
         // ▲▲▲ AKHIR PERUBAHAN LOGIKA ▲▲▲
 
         $attendance = Attendance::firstOrNew(['user_id' => $correctionRequest->user_id, 'date' => $correctionRequest->attendance_date]);
-        if ($correctionRequest->new_check_in) $attendance->check_in = $correctionRequest->new_check_in;
-        if ($correctionRequest->new_check_out) $attendance->check_out = $correctionRequest->new_check_out;
-        if ($correctionRequest->new_activity_title) $attendance->activity_title = $correctionRequest->new_activity_title;
-        if ($correctionRequest->new_activity_description) $attendance->activity_description = $correctionRequest->new_activity_description;
+        if ($correctionRequest->new_check_in)
+            $attendance->check_in = $correctionRequest->new_check_in;
+        if ($correctionRequest->new_check_out)
+            $attendance->check_out = $correctionRequest->new_check_out;
+        if ($correctionRequest->new_activity_title)
+            $attendance->activity_title = $correctionRequest->new_activity_title;
+        if ($correctionRequest->new_activity_description)
+            $attendance->activity_description = $correctionRequest->new_activity_description;
         $attendance->save();
         $correctionRequest->update(['status' => 'approved', 'approved_by' => Auth::id(), 'approved_at' => now(), 'admin_notes' => 'Disetujui.']);
         return redirect()->route('admin.approval.requests')->with('success', 'Permintaan koreksi berhasil disetujui.');

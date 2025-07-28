@@ -5,37 +5,47 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
-use Spatie\Permission\PermissionRegistrar;
+use App\Models\User;
+use Illuminate\Support\Facades\Hash; // Import Hash
 
 class RolesAndPermissionsSeeder extends Seeder
 {
     /**
      * Run the database seeds.
+     *
+     * @return void
      */
-    public function run(): void
+    public function run()
     {
-        // Reset cache role dan permission
-        app()[PermissionRegistrar::class]->forgetCachedPermissions();
+        // Reset cached roles and permissions
+        app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
 
-        // 1. Buat Izin (Permissions) yang kita butuhkan
-        $permissions = [
-            'view global dashboard',
-            'view all users',
-            'approve all requests',
-        ];
+        // Buat Roles (Hak Akses)
+        $roleSuperAdmin = Role::create(['name' => 'super-admin']);
+        $roleAdmin = Role::create(['name' => 'admin']);
+        $roleUser = Role::create(['name' => 'user']); // <-- INI YANG DIPERBAIKI
 
-        foreach ($permissions as $permission) {
-            Permission::firstOrCreate(['name' => $permission, 'guard_name' => 'web']);
-        }
+        // Buat user contoh untuk setiap role
+        // Menggunakan Hash::make untuk mengenkripsi password
+        $superAdmin = User::create([
+            'name' => 'Super Admin',
+            'email' => 'superadmin@example.com',
+            'password' => Hash::make('password'),
+        ]);
+        $superAdmin->assignRole($roleSuperAdmin);
 
-        // 2. Buat Role dasar jika belum ada
-        Role::firstOrCreate(['name' => 'user', 'guard_name' => 'web']);
-        Role::firstOrCreate(['name' => 'admin', 'guard_name' => 'web']);
-        $superadminRole = Role::firstOrCreate(['name' => 'superadmin', 'guard_name' => 'web']);
+        $admin = User::create([
+            'name' => 'Admin',
+            'email' => 'admin@example.com',
+            'password' => Hash::make('password'),
+        ]);
+        $admin->assignRole($roleAdmin);
 
-        // 3. Berikan semua izin yang ada di sistem ke role 'superadmin'
-        // Ini memastikan superadmin selalu memiliki semua hak akses
-        $allPermissions = Permission::all();
-        $superadminRole->syncPermissions($allPermissions);
+        $user = User::create([
+            'name' => 'User Biasa',
+            'email' => 'user@example.com',
+            'password' => Hash::make('password'),
+        ]);
+        $user->assignRole($roleUser);
     }
-}
+}   

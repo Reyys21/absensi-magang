@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -12,10 +13,11 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // Panggil seeder yang mengatur Role dan Permission
+        // Panggil seeder secara berurutan
         $this->call([
             RolesAndPermissionsSeeder::class,
-            // Anda bisa menambahkan seeder lain di sini di masa depan
+            BidangSeeder::class,
+            // Anda bisa tambahkan seeder lain di sini jika ada
         ]);
     }
 }

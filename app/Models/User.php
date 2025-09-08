@@ -88,4 +88,5 @@ class User extends Authenticatable implements CanResetPasswordContract
     {
         $this->notify(new CustomResetPasswordNotification($token));
     }
+
 }

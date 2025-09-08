@@ -1,0 +1,37 @@
+{
+  "version": 2,
+  "functions": {
+    "api/index.php": { "runtime": "vercel-php@0.6.0" }
+  },
+  "routes": [
+    { "src": "/(.*)", "dest": "/public/index.php" }
+  ],
+  "env": {
+    "APP_NAME": "Absensi Magang",
+    "APP_ENV": "production",
+    "APP_KEY": "base64:TGaVaXwhWgjn9akhE4SCSIjGG/cQqvICUQ+PgLA3Bs0=",
+    "APP_DEBUG": "false",
+    "APP_URL": "https://absensi-magang.vercel.app",
+    "APP_TIMEZONE": "Asia/Jakarta",
+
+    "DB_CONNECTION": "mysql",
+    "DB_HOST": "4gg.h.filess.io",
+    "DB_PORT": "3306",
+    "DB_DATABASE": "db2024_stormtorn",
+    "DB_USERNAME": "db2024_stormtorn",
+    "DB_PASSWORD": "ISI_PASSWORD_DB_KAMU",
+
+    "SESSION_DRIVER": "cookie",
+    "CACHE_DRIVER": "array",
+    "QUEUE_CONNECTION": "sync",
+
+    "MAIL_MAILER": "smtp",
+    "MAIL_HOST": "smtp.gmail.com",
+    "MAIL_PORT": "587",
+    "MAIL_USERNAME": "email.anda@gmail.com",
+    "MAIL_PASSWORD": "sandi_16_karakter_yang_disalin",
+    "MAIL_ENCRYPTION": "tls",
+    "MAIL_FROM_ADDRESS": "email.anda@gmail.com",
+    "MAIL_FROM_NAME": "Absensi Magang"
+  }
+}

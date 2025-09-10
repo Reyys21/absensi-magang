@@ -1,10 +1,9 @@
 {
   "version": 2,
-  "functions": {
-    "api/index.php": {
-      "runtime": "vercel-php@0.6.0"
-    }
-  },
+  "builds": [
+    { "src": "api/index.php", "use": "vercel-php@0.6.0" },
+    { "src": "vite.config.js", "use": "@vercel/static-build" }
+  ],
   "routes": [
     { "src": "/build/(.*)", "dest": "public/build/$1" },
     { "src": "/(.*)", "dest": "public/index.php" }
@@ -12,6 +11,7 @@
   "env": {
     "APP_NAME": "Absensi Magang",
     "APP_ENV": "production",
+    "APP_KEY": "base64:ISI_APP_KEY_KAMU", 
     "APP_DEBUG": "false",
     "APP_URL": "https://absensi-magang.vercel.app",
     "APP_TIMEZONE": "Asia/Jakarta",
@@ -35,5 +35,6 @@
     "APP_ROUTES_CACHE": "/tmp/routes.php",
     "APP_SERVICES_CACHE": "/tmp/services.php",
     "VIEW_COMPILED_PATH": "/tmp"
-  }
+  },
+  "outputDirectory": "public"
 }

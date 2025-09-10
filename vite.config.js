@@ -10,8 +10,4 @@ export default defineConfig({
         }),
         tailwindcss(),
     ],
-    build: {
-        outDir: "dist", // default Vercel
-        emptyOutDir: true, // hapus isi folder sebelum build baru
-    },
 });
